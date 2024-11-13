@@ -23,6 +23,15 @@ class EInvoiceCreatorTest {
         assertThat(result).isNotEmpty()
     }
 
+    @Test
+    fun createZugferdXml() {
+        val invoice = createInvoice()
+
+        val result = underTest.createZugferdXml(invoice)
+
+        assertThat(result).isNotEmpty()
+    }
+
 
     private fun createInvoice(
         invoiceNumber: String = "12345",
