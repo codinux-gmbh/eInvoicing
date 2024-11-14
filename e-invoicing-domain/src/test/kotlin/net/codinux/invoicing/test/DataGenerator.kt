@@ -5,11 +5,13 @@ import net.codinux.invoicing.model.LineItem
 import net.codinux.invoicing.model.Party
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object DataGenerator {
 
     const val InvoiceNumber = "12345"
     val InvoicingDate = LocalDate.of(2015, 10, 21)
+    val DueDate = LocalDate.of(2016, 6, 15)
 
     const val SenderName = "Hochwürdiger Leistungserbringer"
     const val SenderStreet = "Fun Street 1"
@@ -43,8 +45,10 @@ object DataGenerator {
         sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone),
         recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone),
         items: List<LineItem> = listOf(createItem()),
-        dueDate: LocalDate? = null
-    ) = Invoice(invoiceNumber, invoicingDate, sender, recipient, items, dueDate)
+        dueDate: LocalDate? = DueDate,
+        paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
+        buyerReference: String? = null
+    ) = Invoice(invoiceNumber, invoicingDate, sender, recipient, items, dueDate, paymentDescription, buyerReference)
 
     fun createParty(
         name: String,

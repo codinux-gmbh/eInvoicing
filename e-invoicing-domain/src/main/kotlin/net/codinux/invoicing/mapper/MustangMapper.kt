@@ -25,6 +25,9 @@ class MustangMapper {
         this.setZFItems(ArrayList(invoice.items.map { mapLineItem(it) }))
 
         this.dueDate = map(invoice.dueDate)
+        this.paymentTermDescription = invoice.paymentDescription
+
+        this.referenceNumber = invoice.buyerReference
     }
 
     fun mapParty(party: Party): TradeParty = TradeParty(
