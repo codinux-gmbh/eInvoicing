@@ -18,9 +18,12 @@ class Party(
 
     // actually there can be multiple contacts in eInvoice data model, all containing an email, phone, fax and contact name
     val email: String? = null,
-    var phone: String? = null,
-    var fax: String? = null,
-    var contactName: String? = null,
+    val phone: String? = null,
+    val fax: String? = null,
+    val contactName: String? = null,
+
+    // actually there can be multiple bankDetails in eInvoice data model
+    val bankDetails: BankDetails? = null,
 ) {
     override fun toString() = "$name, $city"
 }

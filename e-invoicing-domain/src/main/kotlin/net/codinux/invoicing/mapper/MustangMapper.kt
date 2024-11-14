@@ -2,11 +2,7 @@ package net.codinux.invoicing.mapper
 
 import net.codinux.invoicing.model.LineItem
 import net.codinux.invoicing.model.Party
-import org.mustangproject.Contact
-import org.mustangproject.Invoice
-import org.mustangproject.Item
-import org.mustangproject.Product
-import org.mustangproject.TradeParty
+import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
 import java.time.Instant
@@ -34,13 +30,19 @@ class MustangMapper {
         party.name, party.street, party.postalCode, party.city, party.countryIsoCode
     ).apply {
         this.taxID = party.vatId
-        // TODO: ID?
         // TODO: description?
 
         this.email = party.email
         this.setContact(Contact(party.contactName, party.phone, party.email).apply {
             this.fax = party.fax
         })
+
+        party.bankDetails?.let {
+            this.addBankDetails(BankDetails(it.accountNumber, it.bankCode).apply {
+                accountName = it.accountHolderName
+                // TODO: there's currently no field for financialInstitutionName in Zugferd model even though it exists on CII and UBL
+            })
+        }
     }
 
     fun mapLineItem(item: LineItem): IZUGFeRDExportableItem = Item(

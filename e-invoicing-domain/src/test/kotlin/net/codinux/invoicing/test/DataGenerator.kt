@@ -1,5 +1,6 @@
 package net.codinux.invoicing.test
 
+import net.codinux.invoicing.model.BankDetails
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.LineItem
 import net.codinux.invoicing.model.Party
@@ -21,6 +22,9 @@ object DataGenerator {
     const val SenderVatId = "DE12345678"
     const val SenderEmail = "working-class-hero@rock.me"
     const val SenderPhone = "+4917012345678"
+    const val SenderAccountId = "DE00123456780987654321"
+    const val SenderBankCode = "12345678"
+    const val SenderAccountHolderName = "Manuela Musterfrau"
 
     const val RecipientName = "Untertänigster Leistungsempfänger"
     const val RecipientStreet = "Party Street 1"
@@ -42,7 +46,8 @@ object DataGenerator {
     fun createInvoice(
         invoiceNumber: String = InvoiceNumber,
         invoicingDate: LocalDate = InvoicingDate,
-        sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone),
+        sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone,
+            bankDetails = BankDetails(SenderAccountId, SenderBankCode, SenderAccountHolderName)),
         recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone),
         items: List<LineItem> = listOf(createItem()),
         dueDate: LocalDate? = DueDate,
@@ -60,8 +65,9 @@ object DataGenerator {
         email: String? = SenderEmail,
         phone: String? = SenderPhone,
         fax: String? = null,
-        contactName: String? = null
-    ) = Party(name, streetName, postalCode, city, country, vatId, email, phone, fax, contactName)
+        contactName: String? = null,
+        bankDetails: BankDetails? = null
+    ) = Party(name, streetName, postalCode, city, country, vatId, email, phone, fax, contactName, bankDetails)
 
     fun createItem(
         name: String = ItemName,
