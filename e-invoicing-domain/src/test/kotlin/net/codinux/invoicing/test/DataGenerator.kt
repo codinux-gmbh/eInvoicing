@@ -15,17 +15,19 @@ object DataGenerator {
     const val SenderStreet = "Fun Street 1"
     const val SenderPostalCode = "12345"
     const val SenderCity = "Glückstadt"
-    val SenderCountry: String? = null
+    const val SenderCountry = "DE"
     const val SenderVatId = "DE12345678"
     const val SenderEmail = "working-class-hero@rock.me"
+    const val SenderPhone = "+4917012345678"
 
     const val RecipientName = "Untertänigster Leistungsempfänger"
     const val RecipientStreet = "Party Street 1"
     const val RecipientPostalCode = SenderPostalCode
     const val RecipientCity = SenderCity
-    val RecipientCountry: String? = SenderCountry
+    const val RecipientCountry = "DE"
     const val RecipientVatId = "DE87654321"
     const val RecipientEmail = "exploiter@your.boss"
+    const val RecipientPhone = "+4912345678"
 
     const val ItemName = "Erbrachte Dienstleistungen"
     const val ItemUnit = "HUR" // EN code for 'hour'
@@ -38,8 +40,8 @@ object DataGenerator {
     fun createInvoice(
         invoiceNumber: String = InvoiceNumber,
         invoicingDate: LocalDate = InvoicingDate,
-        sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail),
-        recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail),
+        sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone),
+        recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone),
         items: List<LineItem> = listOf(createItem()),
         dueDate: LocalDate? = null
     ) = Invoice(invoiceNumber, invoicingDate, sender, recipient, items, dueDate)
@@ -50,9 +52,12 @@ object DataGenerator {
         postalCode: String = SenderPostalCode,
         city: String = SenderCity,
         country: String? = SenderCountry,
-        taxNumber: String? = SenderVatId,
+        vatId: String? = SenderVatId,
         email: String? = SenderEmail,
-    ) = Party(name, streetName, postalCode, city, country, taxNumber, email)
+        phone: String? = SenderPhone,
+        fax: String? = null,
+        contactName: String? = null
+    ) = Party(name, streetName, postalCode, city, country, vatId, email, phone, fax, contactName)
 
     fun createItem(
         name: String = ItemName,

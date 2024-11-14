@@ -9,13 +9,18 @@ class Party(
     val street: String,
     var postalCode: String?,
     val city: String,
-    val country: String? = null,
+    /**
+     * Two letter country ISO code, e.g. "us" for USA, "fr" for France, ...
+     */
+    val countryIsoCode: String? = null, // TODO: use the full country name here and map to ISO code in MustangMapper?
 
-    val taxNumber: String? = null, // better name like vatTaxNumber?
+    val vatId: String? = null,
 
+    // actually there can be multiple contacts in eInvoice data model, all containing an email, phone, fax and contact name
     val email: String? = null,
-//    var telephoneNumber: String? = null, // simply telephone?
-//    var website: String? = null,
+    var phone: String? = null,
+    var fax: String? = null,
+    var contactName: String? = null,
 ) {
     override fun toString() = "$name, $city"
 }

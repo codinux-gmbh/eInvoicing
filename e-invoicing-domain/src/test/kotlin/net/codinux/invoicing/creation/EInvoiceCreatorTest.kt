@@ -42,16 +42,16 @@ class EInvoiceCreatorTest {
         asserter.xpathHasValue("//rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString", DataGenerator.InvoicingDate.toString().replace("-", ""))
 
         val senderXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty"
-        assertParty(asserter, senderXPath, DataGenerator.SenderName, DataGenerator.SenderStreet, DataGenerator.SenderPostalCode, DataGenerator.SenderCity, DataGenerator.SenderVatId, DataGenerator.SenderEmail)
+        assertParty(asserter, senderXPath, DataGenerator.SenderName, DataGenerator.SenderStreet, DataGenerator.SenderPostalCode, DataGenerator.SenderCity, DataGenerator.SenderVatId, DataGenerator.SenderEmail, DataGenerator.SenderPhone)
 
         val receiverXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty"
-        assertParty(asserter, receiverXPath, DataGenerator.RecipientName, DataGenerator.RecipientStreet, DataGenerator.RecipientPostalCode, DataGenerator.RecipientCity, DataGenerator.RecipientVatId, DataGenerator.RecipientEmail)
+        assertParty(asserter, receiverXPath, DataGenerator.RecipientName, DataGenerator.RecipientStreet, DataGenerator.RecipientPostalCode, DataGenerator.RecipientCity, DataGenerator.RecipientVatId, DataGenerator.RecipientEmail, DataGenerator.RecipientPhone)
 
         val lineItemXPath = "//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem"
         assertLineItem(asserter, lineItemXPath, DataGenerator.ItemName, DataGenerator.ItemUnit, DataGenerator.ItemQuantity, DataGenerator.ItemPrice, DataGenerator.ItemVat, DataGenerator.ItemDescription)
     }
 
-    private fun assertParty(asserter: XPathAsserter, partyXPath: String, name: String, street: String, postalCode: String, city: String, vatId: String, email: String) {
+    private fun assertParty(asserter: XPathAsserter, partyXPath: String, name: String, street: String, postalCode: String, city: String, vatId: String, email: String, phone: String) {
         asserter.xpathHasValue("$partyXPath/ram:Name", name)
 
         asserter.xpathHasValue("$partyXPath/ram:PostalTradeAddress/ram:LineOne", street)
@@ -61,6 +61,8 @@ class EInvoiceCreatorTest {
         asserter.xpathHasValue("$partyXPath/ram:SpecifiedTaxRegistration/ram:ID", vatId)
 
         asserter.xpathHasValue("$partyXPath/ram:URIUniversalCommunication/ram:URIID", email)
+        asserter.xpathHasValue("$partyXPath/ram:DefinedTradeContact/ram:EmailURIUniversalCommunication/ram:URIID", email)
+        asserter.xpathHasValue("$partyXPath/ram:DefinedTradeContact/ram:TelephoneUniversalCommunication/ram:CompleteNumber", phone)
     }
 
     private fun assertLineItem(asserter: XPathAsserter, partyXPath: String, name: String, unit: String, quantity: BigDecimal, price: BigDecimal, vatPercentage: BigDecimal, description: String?) {

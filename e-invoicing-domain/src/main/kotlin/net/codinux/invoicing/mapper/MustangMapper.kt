@@ -2,6 +2,7 @@ package net.codinux.invoicing.mapper
 
 import net.codinux.invoicing.model.LineItem
 import net.codinux.invoicing.model.Party
+import org.mustangproject.Contact
 import org.mustangproject.Invoice
 import org.mustangproject.Item
 import org.mustangproject.Product
@@ -27,14 +28,16 @@ class MustangMapper {
     }
 
     fun mapParty(party: Party): TradeParty = TradeParty(
-        party.name, party.street, party.postalCode, party.city, party.country
+        party.name, party.street, party.postalCode, party.city, party.countryIsoCode
     ).apply {
-        this.taxID = party.taxNumber
-        // TODO: vatID?
+        this.taxID = party.vatId
         // TODO: ID?
         // TODO: description?
 
         this.email = party.email
+        this.setContact(Contact(party.contactName, party.phone, party.email).apply {
+            this.fax = party.fax
+        })
     }
 
     fun mapLineItem(item: LineItem): IZUGFeRDExportableItem = Item(
