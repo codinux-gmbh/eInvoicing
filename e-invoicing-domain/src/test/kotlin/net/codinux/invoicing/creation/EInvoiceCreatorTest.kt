@@ -63,7 +63,7 @@ class EInvoiceCreatorTest {
         assertParty(asserter, receiverXPath, DataGenerator.RecipientName, DataGenerator.RecipientStreet, DataGenerator.RecipientPostalCode, DataGenerator.RecipientCity, DataGenerator.RecipientVatId, DataGenerator.RecipientEmail, DataGenerator.RecipientPhone)
 
         val lineItemXPath = "//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem"
-        assertLineItem(asserter, lineItemXPath, DataGenerator.ItemName, DataGenerator.ItemUnit, DataGenerator.ItemQuantity, DataGenerator.ItemPrice, DataGenerator.ItemVat, DataGenerator.ItemDescription)
+        assertLineItem(asserter, lineItemXPath, DataGenerator.ItemName, DataGenerator.ItemUnit, DataGenerator.ItemQuantity, DataGenerator.ItemPrice, DataGenerator.ItemVatPercentage, DataGenerator.ItemDescription)
     }
 
     private fun assertParty(asserter: XPathAsserter, partyXPath: String, name: String, street: String, postalCode: String, city: String, vatId: String, email: String, phone: String) {
@@ -80,14 +80,14 @@ class EInvoiceCreatorTest {
         asserter.xpathHasValue("$partyXPath/ram:DefinedTradeContact/ram:TelephoneUniversalCommunication/ram:CompleteNumber", phone)
     }
 
-    private fun assertLineItem(asserter: XPathAsserter, partyXPath: String, name: String, unit: String, quantity: BigDecimal, price: BigDecimal, vatPercentage: BigDecimal, description: String?) {
-        asserter.xpathHasValue("$partyXPath/ram:SpecifiedTradeProduct/ram:Name", name)
+    private fun assertLineItem(asserter: XPathAsserter, itemXPath: String, name: String, unit: String, quantity: BigDecimal, price: BigDecimal, vatPercentage: BigDecimal, description: String?) {
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedTradeProduct/ram:Name", name)
 
-        asserter.xpathHasValue("$partyXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode", unit)
-        asserter.xpathHasValue("$partyXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity", quantity, 4)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode", unit)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity", quantity, 4)
 
-        asserter.xpathHasValue("$partyXPath/ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount", price, 2)
-        asserter.xpathHasValue("$partyXPath/ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent", vatPercentage, 2)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount", price, 2)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent", vatPercentage, 2)
 
 //        asserter.xpathHasValue("$partyXPath/ram:URIUniversalCommunication/ram:URIID", description)
     }

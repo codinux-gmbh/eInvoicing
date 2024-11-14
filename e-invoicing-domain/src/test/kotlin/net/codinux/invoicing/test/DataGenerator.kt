@@ -19,27 +19,26 @@ object DataGenerator {
     const val SenderPostalCode = "12345"
     const val SenderCity = "Glückstadt"
     const val SenderCountry = "DE"
-    const val SenderVatId = "DE12345678"
+    const val SenderVatId = "DE123456789"
     const val SenderEmail = "working-class-hero@rock.me"
     const val SenderPhone = "+4917012345678"
-    const val SenderAccountId = "DE00123456780987654321"
-    const val SenderBankCode = "12345678"
-    const val SenderAccountHolderName = "Manuela Musterfrau"
+    val SenderBankDetails = BankDetails("DE00123456780987654321", "ABZODEFFXXX", "Manuela Musterfrau")
 
     const val RecipientName = "Untertänigster Leistungsempfänger"
     const val RecipientStreet = "Party Street 1"
     const val RecipientPostalCode = SenderPostalCode
     const val RecipientCity = SenderCity
     const val RecipientCountry = "DE"
-    const val RecipientVatId = "DE87654321"
+    const val RecipientVatId = "DE987654321"
     const val RecipientEmail = "exploiter@your.boss"
-    const val RecipientPhone = "+4912345678"
+    const val RecipientPhone = "+491234567890"
+    val RecipientBankDetails: BankDetails? = null
 
     const val ItemName = "Erbrachte Dienstleistungen"
     const val ItemUnit = "HUR" // EN code for 'hour'
     val ItemQuantity = BigDecimal(1)
     val ItemPrice = BigDecimal(99)
-    val ItemVat = BigDecimal(0.19)
+    val ItemVatPercentage = BigDecimal(19)
     val ItemDescription: String? = null
 
 
@@ -47,8 +46,9 @@ object DataGenerator {
         invoiceNumber: String = InvoiceNumber,
         invoicingDate: LocalDate = InvoicingDate,
         sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone,
-            bankDetails = BankDetails(SenderAccountId, SenderBankCode, SenderAccountHolderName)),
-        recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone),
+            bankDetails = SenderBankDetails),
+        recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone,
+            bankDetails = RecipientBankDetails),
         items: List<LineItem> = listOf(createItem()),
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
@@ -74,7 +74,7 @@ object DataGenerator {
         unit: String = ItemUnit,
         quantity: BigDecimal = ItemQuantity,
         price: BigDecimal = ItemPrice,
-        vatPercentage: BigDecimal = ItemVat,
+        vatPercentage: BigDecimal = ItemVatPercentage,
         description: String? = ItemDescription,
     ) = LineItem(name, unit, quantity, price, vatPercentage, description)
 
