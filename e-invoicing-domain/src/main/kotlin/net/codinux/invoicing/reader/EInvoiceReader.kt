@@ -10,24 +10,35 @@ class EInvoiceReader(
     private val mapper: MustangMapper = MustangMapper()
 ) {
 
-    fun readFromXml(file: File) = readFromXml(file.inputStream())
+    fun readFromXml(xmlFile: File) = readFromXml(xmlFile.inputStream())
 
-    fun readFromXml(stream: InputStream): Invoice? {
+    fun readFromXml(stream: InputStream) = readFromXml(stream.reader().readText())
+
+    fun readFromXml(xml: String): Invoice {
         val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to a Invoice object
-        importer.fromXML(stream.reader().readText())
+        importer.fromXML(xml)
 
         return extractInvoice(importer)
     }
 
-    fun extractFromPdf(file: File) = extractFromPdf(file.inputStream())
+    fun extractFromPdf(pdfFile: File) = extractFromPdf(pdfFile.inputStream())
 
-    fun extractFromPdf(stream: InputStream): Invoice? {
+    fun extractFromPdf(stream: InputStream): Invoice {
         val importer = ZUGFeRDInvoiceImporter(stream)
 
         return extractInvoice(importer)
     }
 
-    private fun extractInvoice(importer: ZUGFeRDInvoiceImporter): Invoice? {
+    fun extractXmlFromPdf(pdfFile: File) = extractXmlFromPdf(pdfFile.inputStream())
+
+    fun extractXmlFromPdf(stream: InputStream): String {
+        val importer = ZUGFeRDInvoiceImporter(stream)
+
+        return String(importer.rawXML, Charsets.UTF_8)
+    }
+
+
+    private fun extractInvoice(importer: ZUGFeRDInvoiceImporter): Invoice {
         val invoice = importer.extractInvoice()
 
         // TODO: the values LineTotalAmount, ChargeTotalAmount, AllowanceTotalAmount, TaxBasisTotalAmount, TaxTotalAmount,
