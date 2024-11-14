@@ -44,14 +44,13 @@ class EInvoiceCreatorTest {
 
     private fun createParty(
         name: String,
-        streetName: String = "Fun Street",
-        houseNumber: String = "1",
+        streetName: String = "Fun Street 1",
         postalCode: String = "12345",
         city: String = "Glückstadt",
         country: String? = null,
         taxNumber: String? = "DE12345678",
         email: String? = null,
-    ) = Party(name, streetName, houseNumber, postalCode, city, country, taxNumber, email)
+    ) = Party(name, streetName, postalCode, city, country, taxNumber, email)
 
     private fun createItem(
         name: String = "Erbrachte Dienstleistungen",

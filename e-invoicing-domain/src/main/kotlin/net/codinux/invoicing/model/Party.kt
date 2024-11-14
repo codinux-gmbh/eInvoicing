@@ -3,8 +3,10 @@ package net.codinux.invoicing.model
 class Party(
     val name: String,
 
-    val streetName: String,
-    val houseNumber: String,
+    /**
+     * Party's street and house number.
+     */
+    val street: String,
     var postalCode: String?,
     val city: String,
     val country: String? = null,

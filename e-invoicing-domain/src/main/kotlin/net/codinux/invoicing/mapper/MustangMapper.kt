@@ -1,6 +1,7 @@
-package net.codinux.invoicing.creation
+package net.codinux.invoicing.mapper
 
 import net.codinux.invoicing.model.LineItem
+import net.codinux.invoicing.model.Party
 import org.mustangproject.Invoice
 import org.mustangproject.Item
 import org.mustangproject.Product
@@ -25,8 +26,8 @@ class MustangMapper {
         this.dueDate = map(invoice.dueDate)
     }
 
-    fun mapParty(party: net.codinux.invoicing.model.Party): TradeParty = TradeParty(
-        party.name, "${party.streetName} ${party.houseNumber}", party.postalCode, party.city, party.country
+    fun mapParty(party: Party): TradeParty = TradeParty(
+        party.name, party.street, party.postalCode, party.city, party.country
     ).apply {
         this.taxID = party.taxNumber
         // TODO: vatID?
