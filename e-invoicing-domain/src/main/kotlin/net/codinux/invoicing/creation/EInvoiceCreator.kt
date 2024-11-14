@@ -1,10 +1,9 @@
 package net.codinux.invoicing.creation
 
+import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.Invoice
-import org.mustangproject.ZUGFeRD.IXMLProvider
-import org.mustangproject.ZUGFeRD.Profiles
-import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider
-import org.mustangproject.ZUGFeRD.ZUGFeRDExporterFromA3
+import org.mustangproject.ZUGFeRD.*
+import java.io.File
 
 class EInvoiceCreator(
     private val mapper: MustangMapper = MustangMapper()
@@ -17,14 +16,40 @@ class EInvoiceCreator(
         return createXml(provider, invoice)
     }
 
-    fun createZugferdXml(invoice: Invoice, zugferdVersion: Int = 2): String {
+    fun createZugferdXml(invoice: Invoice): String {
         val exporter = ZUGFeRDExporterFromA3()
-            .setZUGFeRDVersion(zugferdVersion)
-            .setProfile("EN16931")
+            .setProfile("EN16931") // required for XML?
+
+        return createXml(exporter.provider, invoice)
+    }
+
+    fun createZugferdPdf(invoice: Invoice, outputFile: File) {
+        val xml = createZugferdXml(invoice)
+        val xmlFile = File.createTempFile(outputFile.nameWithoutExtension, ".xml")
+            .also { it.writeText(xml) }
+        val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
+
+        val visualizer = ZUGFeRDVisualizer()
+        visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
+
+        combinePdfAndXml(pdfFile, xml, outputFile)
+
+        xmlFile.delete()
+        pdfFile.delete()
+    }
+
+    fun combinePdfAndXml(pdfFile: File, xml: String, outputFile: File) {
+        val exporter = ZUGFeRDExporterFromA3()
+            .setZUGFeRDVersion(2)
+            .setProfile("EN16931") // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
+//            .disableFacturX()
             .setProducer("danki die geile Sau")
             .setCreator(System.getProperty("user.name"))
 
-        return createXml(exporter.provider, invoice)
+        exporter.load(pdfFile.inputStream())
+        exporter.setXML(xml.toByteArray())
+
+        exporter.export(outputFile.outputStream())
     }
 
 

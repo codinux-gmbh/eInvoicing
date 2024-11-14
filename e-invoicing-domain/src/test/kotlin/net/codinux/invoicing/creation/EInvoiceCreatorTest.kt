@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isNotEmpty
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.XPathAsserter
+import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
+import java.io.File
 import java.math.BigDecimal
 import kotlin.test.Test
 
@@ -28,6 +30,19 @@ class EInvoiceCreatorTest {
         val result = underTest.createZugferdXml(invoice)
 
         assertInvoiceXml(result)
+    }
+
+    @Test
+    fun createZugferdPdf() {
+        val testFile = File.createTempFile("Zugferd", ".pdf")
+        val invoice = createInvoice()
+
+        underTest.createZugferdPdf(invoice, testFile)
+
+        val importer = ZUGFeRDInvoiceImporter(testFile.inputStream())
+        val xml = String(importer.rawXML, Charsets.UTF_8)
+
+        assertInvoiceXml(xml)
     }
 
 
