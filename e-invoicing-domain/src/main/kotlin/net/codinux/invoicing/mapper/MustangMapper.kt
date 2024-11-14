@@ -29,7 +29,7 @@ class MustangMapper {
     fun mapParty(party: Party): TradeParty = TradeParty(
         party.name, party.street, party.postalCode, party.city, party.countryIsoCode
     ).apply {
-        this.taxID = party.vatId
+        this.setVATID(party.vatId)
         // TODO: description?
 
         this.email = party.email
