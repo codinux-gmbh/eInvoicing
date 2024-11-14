@@ -1,12 +1,9 @@
 package net.codinux.invoicing.creation
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isNotEmpty
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.LineItem
-import net.codinux.invoicing.model.Party
-import java.math.BigDecimal
-import java.time.LocalDate
+import net.codinux.invoicing.test.DataGenerator
 import kotlin.test.Test
 
 class EInvoiceCreatorTest {
@@ -20,7 +17,7 @@ class EInvoiceCreatorTest {
 
         val result = underTest.createXRechnungXml(invoice)
 
-        assertThat(result).isNotEmpty()
+        assertInvoiceXml(result)
     }
 
     @Test
@@ -29,36 +26,17 @@ class EInvoiceCreatorTest {
 
         val result = underTest.createZugferdXml(invoice)
 
-        assertThat(result).isNotEmpty()
+        assertInvoiceXml(result)
     }
 
 
-    private fun createInvoice(
-        invoiceNumber: String = "12345",
-        invoicingDate: LocalDate = LocalDate.of(2015, 10, 21),
-        sender: Party = createParty("Hochwürdiger Leistungserbringer"),
-        recipient: Party = createParty("Untertänigster Leistungsempfänger"),
-        items: List<LineItem> = listOf(createItem()),
-        dueDate: LocalDate? = null
-    ) = Invoice(invoiceNumber, invoicingDate, sender, recipient, items, dueDate)
+    private fun createInvoice() = DataGenerator.createInvoice()
 
-    private fun createParty(
-        name: String,
-        streetName: String = "Fun Street 1",
-        postalCode: String = "12345",
-        city: String = "Glückstadt",
-        country: String? = null,
-        taxNumber: String? = "DE12345678",
-        email: String? = null,
-    ) = Party(name, streetName, postalCode, city, country, taxNumber, email)
+    private fun assertInvoiceXml(xml: String) {
+        assertThat(xml).isNotEmpty()
 
-    private fun createItem(
-        name: String = "Erbrachte Dienstleistungen",
-        unit: String = "",
-        quantity: BigDecimal = BigDecimal(1),
-        price: BigDecimal = BigDecimal(99),
-        vatPercentage: BigDecimal = BigDecimal(0.19),
-        description: String? = null,
-    ) = LineItem(name, unit, quantity, price, vatPercentage, description)
+        assertThat(xml).contains("<ram:ID>${DataGenerator.InvoiceNumber}</ram:ID>")
+        assertThat(xml).contains("""<udt:DateTimeString format="102">${DataGenerator.InvoicingDate.toString().replace("-", "")}</udt:DateTimeString>""")
+    }
 
 }
