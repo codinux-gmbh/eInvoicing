@@ -19,12 +19,40 @@ val invoiceFromXml = reader.readFromXml(File("XRechnung.xml"))
 ### Find all invoices of an IMAP email account
 
 ```kotlin
-        val mailReader = MailReader()
-        
-        val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
-            username = "", // your mail account username
-            password = "", // your mail account username
-            serverAddress = "", // IMAP server address
-            port = null // IMAP server port, leave null if default port 993
-        ))
+val mailReader = MailReader()
+
+val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
+    username = "", // your mail account username
+    password = "", // your mail account username
+    serverAddress = "", // IMAP server address
+    port = null // IMAP server port, leave null if default port 993
+))
+```
+
+## Create eInvoice
+
+```kotlin
+fun create() {
+    val invoice = createInvoice()
+    val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
+
+    val creator = EInvoiceCreator()
+
+    // create a PDF that also contains the eInvoice as XML attachment
+    creator.createZugferdPdf(invoice, pdfResultFile)
+
+    // create only the XML file
+    val xml = creator.createZugferdXml(invoice)
+
+    // create a XRechnung
+    val xRechnung = creator.createXRechnungXml(invoice)
+}
+
+private fun createInvoice() = Invoice(
+    invoiceNumber = "RE-00001",
+    invoicingDate = LocalDate.now(),
+    sender = Party("codinux GmbH & Co. KG", "Fun Street 1", "12345", "Glückstadt"),
+    recipient = Party("Abzock GmbH", "Ausbeutstr.", "12345", "Abzockhausen"),
+    items = listOf(LineItem("Erbrachte Dienstleistungen", "HUR", BigDecimal(170), BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
+)
 ```

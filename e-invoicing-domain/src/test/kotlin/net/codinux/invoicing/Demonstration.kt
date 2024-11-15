@@ -1,9 +1,15 @@
 package net.codinux.invoicing
 
+import net.codinux.invoicing.creation.EInvoiceCreator
 import net.codinux.invoicing.mail.MailAccount
 import net.codinux.invoicing.mail.MailReader
+import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.LineItem
+import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.reader.EInvoiceReader
 import java.io.File
+import java.math.BigDecimal
+import java.time.LocalDate
 
 class Demonstration {
 
@@ -27,4 +33,28 @@ class Demonstration {
             port = null // IMAP server port, leave null if default port 993
         ))
     }
+
+    fun create() {
+        val invoice = createInvoice()
+        val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
+
+        val creator = EInvoiceCreator()
+
+        // create a PDF that also contains the eInvoice as XML attachment
+        creator.createZugferdPdf(invoice, pdfResultFile)
+
+        // create only the XML file
+        val xml = creator.createZugferdXml(invoice)
+
+        // create a XRechnung
+        val xRechnung = creator.createXRechnungXml(invoice)
+    }
+
+    private fun createInvoice() = Invoice(
+        invoiceNumber = "RE-00001",
+        invoicingDate = LocalDate.now(),
+        sender = Party("codinux GmbH & Co. KG", "Fun Street 1", "12345", "Glückstadt"),
+        recipient = Party("Abzock GmbH", "Ausbeutstr.", "12345", "Abzockhausen"),
+        items = listOf(LineItem("Erbrachte Dienstleistungen", "HUR", BigDecimal(170), BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
+    )
 }
