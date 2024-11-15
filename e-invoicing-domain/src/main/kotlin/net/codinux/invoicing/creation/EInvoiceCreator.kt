@@ -52,6 +52,33 @@ class EInvoiceCreator(
         exporter.export(outputFile.outputStream())
     }
 
+    // extract to EInvoiceConverter?
+    fun convertInvoiceToHtml(invoice: Invoice, outputFile: File, language: ZUGFeRDVisualizer.Language = ZUGFeRDVisualizer.Language.DE) =
+        convertInvoiceToHtml(createXRechnungXml(invoice), outputFile, language)
+
+    fun convertInvoiceToHtml(invoiceXml: String, outputFile: File, language: ZUGFeRDVisualizer.Language = ZUGFeRDVisualizer.Language.DE): String {
+        val xmlFile = File.createTempFile("Zugferd", ".xml")
+            .also { it.writeText(invoiceXml) }
+
+        val visualizer = ZUGFeRDVisualizer()
+
+        val html = visualizer.visualize(xmlFile.absolutePath, language)
+
+        outputFile.writeText(html)
+        copyResource("xrechnung-viewer.css", outputFile, ".css")
+        copyResource("xrechnung-viewer.js", outputFile, ".js")
+
+        xmlFile.delete()
+
+        return html
+    }
+
+    private fun copyResource(resourceName: String, outputFile: File, outputFileExtension: String) {
+        javaClass.classLoader.getResourceAsStream(resourceName).use {
+            it?.copyTo(File(outputFile.parentFile, outputFile.nameWithoutExtension + outputFileExtension).outputStream())
+        }
+    }
+
 
     private fun createXml(provider: IXMLProvider, invoice: Invoice): String {
         val transaction = mapper.mapToTransaction(invoice)

@@ -1,5 +1,7 @@
 package net.codinux.invoicing.creation
 
+import assertk.assertThat
+import assertk.assertions.isNotEmpty
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.InvoiceAsserter
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
@@ -31,8 +33,8 @@ class EInvoiceCreatorTest {
 
     @Test
     fun createZugferdPdf() {
-        val testFile = File.createTempFile("Zugferd", ".pdf")
         val invoice = createInvoice()
+        val testFile = File.createTempFile("Zugferd", ".pdf")
 
         underTest.createZugferdPdf(invoice, testFile)
 
@@ -40,6 +42,16 @@ class EInvoiceCreatorTest {
         val xml = String(importer.rawXML, Charsets.UTF_8)
 
         assertInvoiceXml(xml)
+    }
+
+    @Test
+    fun convertInvoiceToHtml() {
+        val invoice = createInvoice()
+        val testFile = File.createTempFile("Zugferd", ".html")
+
+        val result = underTest.convertInvoiceToHtml(invoice, testFile)
+
+        assertThat(result).isNotEmpty()
     }
 
 
