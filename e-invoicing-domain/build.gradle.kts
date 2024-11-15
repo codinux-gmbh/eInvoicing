@@ -14,6 +14,7 @@ val klfVersion: String by project
 
 val assertKVersion: String by project
 val xunitVersion: String by project
+val logbackVersion: String by project
 
 dependencies {
     implementation("org.mustangproject:library:$mustangVersion")
@@ -23,8 +24,10 @@ dependencies {
 
     testImplementation(kotlin("test"))
 
-    implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
+    testImplementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
     testImplementation("org.xmlunit:xmlunit-core:$xunitVersion")
+
+    testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
 }
 
 
