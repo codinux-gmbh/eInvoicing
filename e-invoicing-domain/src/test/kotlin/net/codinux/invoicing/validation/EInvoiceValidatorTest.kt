@@ -2,7 +2,7 @@ package net.codinux.invoicing.validation
 
 import assertk.assertThat
 import assertk.assertions.*
-import java.io.File
+import net.codinux.invoicing.test.TestUtils
 import kotlin.test.Test
 
 class EInvoiceValidatorTest {
@@ -54,7 +54,6 @@ class EInvoiceValidatorTest {
     }
 
 
-    private fun getTestFile(filename: String): File =
-        File(this.javaClass.classLoader.getResource("files/$filename")!!.toURI())
+    private fun getTestFile(filename: String) = TestUtils.getTestFile(filename)
 
 }

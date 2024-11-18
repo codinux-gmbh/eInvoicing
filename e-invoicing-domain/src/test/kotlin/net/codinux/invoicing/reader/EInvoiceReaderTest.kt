@@ -2,7 +2,7 @@ package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.test.InvoiceAsserter
-import java.io.InputStream
+import net.codinux.invoicing.test.TestUtils
 import kotlin.test.Test
 
 class EInvoiceReaderTest {
@@ -32,8 +32,7 @@ class EInvoiceReaderTest {
     }
 
 
-    private fun getTestFile(filename: String): InputStream =
-        this.javaClass.classLoader.getResourceAsStream("files/$filename")!!
+    private fun getTestFile(filename: String) = TestUtils.getTestFileAsStream(filename)
 
     private fun assertInvoice(invoice: Invoice?) {
         InvoiceAsserter.assertInvoice(invoice)
