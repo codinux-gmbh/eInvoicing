@@ -7,6 +7,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.LineItem
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.reader.EInvoiceReader
+import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -33,6 +34,17 @@ class Demonstration {
             port = null // IMAP server port, leave null if default port 993
         ))
     }
+
+    fun validate() {
+        val validator = EInvoiceValidator()
+        val invoiceFile = File("ZUGFeRD.pdf") // or XRechnung,xml, ...
+
+        val result = validator.validate(invoiceFile)
+
+        println("Is valid? ${result.isValid}")
+        println(result.report)
+    }
+
 
     fun create() {
         val invoice = createInvoice()

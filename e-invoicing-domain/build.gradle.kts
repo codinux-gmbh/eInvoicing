@@ -20,6 +20,7 @@ val logbackVersion: String by project
 
 dependencies {
     implementation("org.mustangproject:library:$mustangVersion")
+    implementation("org.mustangproject:validator:$mustangVersion")
 
     implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
 

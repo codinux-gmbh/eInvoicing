@@ -29,6 +29,18 @@ val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
 ))
 ```
 
+### Validate eInvoice
+
+```kotlin
+val validator = EInvoiceValidator()
+val invoiceFile = File("ZUGFeRD.pdf") // or XRechnung,xml, ...
+
+val result = validator.validate(invoiceFile)
+
+println("Is valid? ${result.isValid}")
+println(result.report)
+```
+
 ## Create eInvoice
 
 ```kotlin
