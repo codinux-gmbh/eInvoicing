@@ -17,10 +17,6 @@ class MailReader(
     private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
-    private val extractionErrorMessages = mutableSetOf<String?>()
-
-    private val extractionErrors = mutableSetOf<Throwable>()
-
     private val log by logger()
 
 
@@ -113,8 +109,6 @@ class MailReader(
             try {
                 eInvoiceReader.extractFromPdf(part.inputStream)
             } catch (e: Throwable) {
-                extractionErrorMessages.add(e.message)
-                extractionErrors.add(e)
                 null
             }
         } else if (filename.endsWith(".xml") || contentType.startsWith("application/xml") || contentType.startsWith("text/xml")) {
