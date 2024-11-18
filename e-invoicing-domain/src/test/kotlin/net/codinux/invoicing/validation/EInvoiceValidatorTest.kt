@@ -1,9 +1,7 @@
 package net.codinux.invoicing.validation
 
 import assertk.assertThat
-import assertk.assertions.isFalse
-import assertk.assertions.isNotEmpty
-import assertk.assertions.isTrue
+import assertk.assertions.*
 import java.io.File
 import kotlin.test.Test
 
@@ -19,7 +17,11 @@ class EInvoiceValidatorTest {
         val result = underTest.validate(testFile)
 
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
-        assertThat(result.report).isNotEmpty()
+        assertThat(result.reportAsXml).isNotEmpty()
+        assertThat(result.xmlValidationResults).hasSize(3)
+        assertThat(result.countXmlNotices).isEqualTo(0)
+        assertThat(result.countXmlErrors).isEqualTo(3)
+        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
     }
 
     @Test
@@ -28,8 +30,13 @@ class EInvoiceValidatorTest {
 
         val result = underTest.validate(testFile)
 
+
         assertThat(result.isValid).isTrue()
-        assertThat(result.report).isNotEmpty()
+        assertThat(result.reportAsXml).isNotEmpty()
+        assertThat(result.xmlValidationResults).hasSize(5)
+        assertThat(result.countXmlNotices).isEqualTo(5)
+        assertThat(result.countXmlErrors).isEqualTo(0)
+        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
     }
 
     @Test
@@ -39,7 +46,11 @@ class EInvoiceValidatorTest {
         val result = underTest.validate(testFile)
 
         assertThat(result.isValid).isTrue()
-        assertThat(result.report).isNotEmpty()
+        assertThat(result.reportAsXml).isNotEmpty()
+        assertThat(result.xmlValidationResults).hasSize(5)
+        assertThat(result.countXmlNotices).isEqualTo(5)
+        assertThat(result.countXmlErrors).isEqualTo(0)
+        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
     }
 
 
