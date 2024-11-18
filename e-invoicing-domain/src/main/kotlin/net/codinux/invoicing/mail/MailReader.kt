@@ -101,21 +101,20 @@ class MailReader(
         return null
     }
 
-    private fun tryToReadEInvoice(part: BodyPart): Invoice? {
+    private fun tryToReadEInvoice(part: BodyPart): Invoice? = try {
         val filename = part.fileName.lowercase()
         val contentType = part.contentType.lowercase()
 
-        return if (filename.endsWith(".pdf") || contentType.startsWith("application/pdf") || contentType.startsWith("application/octet-stream")) {
-            try {
-                eInvoiceReader.extractFromPdf(part.inputStream)
-            } catch (e: Throwable) {
-                null
-            }
+        if (filename.endsWith(".pdf") || contentType.startsWith("application/pdf") || contentType.startsWith("application/octet-stream")) {
+            eInvoiceReader.extractFromPdf(part.inputStream)
         } else if (filename.endsWith(".xml") || contentType.startsWith("application/xml") || contentType.startsWith("text/xml")) {
             eInvoiceReader.readFromXml(part.inputStream)
         } else {
             null
         }
+    } catch (e: Throwable) {
+        log.debug(e) { "Could not extract invoices from ${part.fileName}" }
+        null
     }
 
     // TODO: same code as in MustangMapper
