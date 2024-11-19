@@ -79,4 +79,9 @@ val output = File("Zugferd.pdf")
 val creator = EInvoiceCreator()
 
 creator.combinePdfAndInvoiceXml(invoice, existingPdf, output)
+
+// or if you already have the invoice XML:
+val invoiceXml: String = "..." // e.g. creator.createZugferdXml(invoice)
+
+creator.combinePdfAndInvoiceXml(invoiceXml, existingPdf, output)
 ```
