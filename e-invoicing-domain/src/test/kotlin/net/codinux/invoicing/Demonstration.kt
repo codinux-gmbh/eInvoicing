@@ -62,6 +62,17 @@ class Demonstration {
         val xRechnung = creator.createXRechnungXml(invoice)
     }
 
+    fun combinePdfAndInvoiceXml() {
+        val invoice: Invoice = createInvoice()
+        val existingPdf = File("Invoice.pdf")
+        val output = File("Zugferd.pdf")
+
+        val creator = EInvoiceCreator()
+
+        creator.combinePdfAndInvoiceXml(invoice, existingPdf, output)
+    }
+
+
     private fun createInvoice() = Invoice(
         invoiceNumber = "RE-00001",
         invoicingDate = LocalDate.now(),

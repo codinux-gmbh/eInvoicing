@@ -68,3 +68,15 @@ private fun createInvoice() = Invoice(
     items = listOf(LineItem("Erbrachte Dienstleistungen", "HUR", BigDecimal(170), BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
 )
 ```
+
+### Attach invoice XML to existing PDF
+
+```kotlin
+val invoice: Invoice = createInvoice()
+val existingPdf = File("Invoice.pdf")
+val output = File("Zugferd.pdf")
+
+val creator = EInvoiceCreator()
+
+creator.combinePdfAndInvoiceXml(invoice, existingPdf, output)
+```

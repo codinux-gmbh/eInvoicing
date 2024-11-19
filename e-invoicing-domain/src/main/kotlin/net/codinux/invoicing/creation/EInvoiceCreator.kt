@@ -32,13 +32,16 @@ class EInvoiceCreator(
         val visualizer = ZUGFeRDVisualizer()
         visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
 
-        combinePdfAndXml(pdfFile, xml, outputFile)
+        combinePdfAndInvoiceXml(xml, pdfFile, outputFile)
 
         xmlFile.delete()
         pdfFile.delete()
     }
 
-    fun combinePdfAndXml(pdfFile: File, xml: String, outputFile: File) {
+    fun combinePdfAndInvoiceXml(invoice: Invoice, pdfFile: File, outputFile: File) =
+        combinePdfAndInvoiceXml(createZugferdXml(invoice), pdfFile, outputFile)
+
+    fun combinePdfAndInvoiceXml(invoiceXml: String, pdfFile: File, outputFile: File) {
         val exporter = ZUGFeRDExporterFromA3()
             .setZUGFeRDVersion(2)
             .setProfile("EN16931") // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
@@ -47,7 +50,7 @@ class EInvoiceCreator(
             .setCreator(System.getProperty("user.name"))
 
         exporter.load(pdfFile.inputStream())
-        exporter.setXML(xml.toByteArray())
+        exporter.setXML(invoiceXml.toByteArray())
 
         exporter.export(outputFile.outputStream())
     }
