@@ -1,5 +1,6 @@
 pluginManagement {
     val kotlinVersion: String by settings
+    val quarkusVersion: String by settings
 
 
     repositories {
@@ -12,6 +13,8 @@ pluginManagement {
 
         kotlin("plugin.allopen") version kotlinVersion
         kotlin("plugin.noarg") version kotlinVersion
+
+        id("io.quarkus") version quarkusVersion
     }
 }
 
@@ -24,3 +27,5 @@ plugins {
 rootProject.name = "eInvoicing"
 
 include("e-invoicing-domain")
+
+include("e-invoice-api")
