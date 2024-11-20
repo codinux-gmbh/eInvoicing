@@ -13,6 +13,9 @@ kotlin {
 
 val quarkusVersion: String by project
 
+val klfVersion: String by project
+val lokiLogAppenderVersion: String by project
+
 dependencies {
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusVersion"))
     implementation("io.quarkus:quarkus-kotlin")
@@ -24,6 +27,12 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation("io.quarkus:quarkus-micrometer")
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
+
+    implementation(project(":e-invoicing-domain"))
+
+    implementation("net.codinux.log:klf:$klfVersion")
+    implementation("net.codinux.log:quarkus-loki-log-appender:$lokiLogAppenderVersion")
+    implementation("net.codinux.log.kubernetes:codinux-kubernetes-info-retriever:$lokiLogAppenderVersion")
 
 
     testImplementation("io.quarkus:quarkus-junit5")
