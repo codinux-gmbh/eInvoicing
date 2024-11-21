@@ -49,4 +49,12 @@ class InvoicingResource(
     fun extractInvoiceData(invoice: java.nio.file.Path) =
         service.extractInvoiceData(invoice)
 
+    @Path("validate")
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.APPLICATION_XML)
+    @Operation(summary = "Validate a Factur-x / ZUGFeRD or XRechnung file")
+    fun validateInvoiceXml(invoice: java.nio.file.Path) =
+        service.validateInvoice(invoice).reportAsXml
+
 }

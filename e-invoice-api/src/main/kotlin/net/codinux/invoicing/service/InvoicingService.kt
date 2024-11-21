@@ -4,6 +4,7 @@ import jakarta.inject.Singleton
 import net.codinux.invoicing.creation.EInvoiceCreator
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
+import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.extension
@@ -14,6 +15,8 @@ class InvoicingService {
     private val creator = EInvoiceCreator()
 
     private val reader = EInvoiceReader()
+
+    private val validator = EInvoiceValidator()
 
 
     fun createXRechnung(invoice: Invoice): String =
@@ -38,5 +41,9 @@ class InvoicingService {
         "pdf" -> reader.extractFromPdf(invoiceFile.toFile())
         else -> throw IllegalArgumentException("We can only extract eInvoice data from .xml and .pdf files")
     }
+
+
+    fun validateInvoice(invoice: Path) =
+        validator.validate(invoice.toFile())
 
 }
