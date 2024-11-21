@@ -9,7 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation
 
 @Path("")
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_OCTET_STREAM)
 class InvoicingResource(
     private val service: InvoicingService
 ) {
@@ -30,7 +30,6 @@ class InvoicingResource(
 
     @Path("facturx/pdf")
     @POST
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     fun createFacturXPdf(invoice: Invoice): Response {
         val pdfFile = service.createFacturXPdf(invoice)
@@ -39,5 +38,15 @@ class InvoicingResource(
             .header("Content-Disposition", "attachment;filename=\"Invoice.pdf\"")
             .build()
     }
+
+
+
+    @Path("extract")
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Extract invoice data from a Factur-x / ZUGFeRD or XRechnung file")
+    fun extractInvoiceData(invoice: java.nio.file.Path) =
+        service.extractInvoiceData(invoice)
 
 }
