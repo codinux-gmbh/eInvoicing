@@ -89,6 +89,7 @@ class MailReader(
         return emptyList()
     }
 
+    // tried to parallelize reading messages by reading them on multiple thread but that had no effect on process duration (don't know why)
     private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = folder.messages.mapNotNull { message ->
         try {
             if (message.isMimeType("multipart/*")) {
