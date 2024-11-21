@@ -144,7 +144,7 @@ class MailReader(
     }
 
     private fun tryToReadEInvoice(part: Part, mediaType: String?): Invoice? = try {
-        val filename = part.fileName.lowercase()
+        val filename = part.fileName?.lowercase() ?: ""
 
         if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             eInvoiceReader.extractFromPdf(part.inputStream)
