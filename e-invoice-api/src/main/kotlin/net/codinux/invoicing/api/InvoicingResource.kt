@@ -45,7 +45,7 @@ class InvoicingResource(
     fun createFacturXPdf(invoice: Invoice): Response {
         val pdfFile = service.createFacturXPdf(invoice)
 
-        return createPdfFileResponse(pdfFile)
+        return createPdfFileResponse(pdfFile, invoice)
     }
 
     @Path("attach")
@@ -60,7 +60,7 @@ class InvoicingResource(
     ): Response {
         val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile())
 
-        return createPdfFileResponse(pdfFile)
+        return createPdfFileResponse(pdfFile, invoice)
     }
 
 
@@ -83,9 +83,9 @@ class InvoicingResource(
         service.validateInvoice(invoice.uploadedFile()).reportAsXml
 
 
-    private fun createPdfFileResponse(pdfFile: java.nio.file.Path): Response =
+    private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
         Response.ok(pdfFile)
-            .header("Content-Disposition", "attachment;filename=\"Invoice.pdf\"")
+            .header("Content-Disposition", "attachment;filename=\"${invoice.invoicingDate.toString().replace('-', '.')} ${invoice.recipient.name} ${invoice.invoiceNumber}.pdf\"")
             .build()
 
 }
