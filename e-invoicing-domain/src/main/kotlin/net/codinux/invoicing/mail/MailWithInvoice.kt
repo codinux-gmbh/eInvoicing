@@ -16,6 +16,7 @@ class MailWithInvoice(
      * -> use with care. Message numbers are not valid / the same anymore after expunge.
      */
     val messageNumber: Int,
+    val isEncrypted: Boolean = false,
     val plainTextBody: String?,
     val htmlBody: String?,
     val attachmentsWithEInvoice: List<MailAttachmentWithEInvoice>

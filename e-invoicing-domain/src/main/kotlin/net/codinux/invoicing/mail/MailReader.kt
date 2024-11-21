@@ -111,6 +111,7 @@ class MailReader(
                 return MailWithInvoice(
                     message.from?.joinToString(), message.subject ?: "",
                     message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
+                    parts.any { it.mediaType == "application/pgp-encrypted" },
                     getPlainTextBody(parts), getHtmlBody(parts),
                     attachmentsWithEInvoice
                 )
