@@ -4,6 +4,7 @@ import jakarta.mail.BodyPart
 import jakarta.mail.Folder
 import jakarta.mail.Part
 import jakarta.mail.Session
+import jakarta.mail.Store
 import jakarta.mail.internet.MimeMultipart
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -21,17 +22,12 @@ class MailReader(
 
 
     fun listAllMessagesWithEInvoice(account: MailAccount): List<MailWithInvoice> {
-        val properties = mapAccountToJavaMailProperties(account)
-
         try {
-            val session = Session.getInstance(properties)
-            session.getStore("imap").use { store ->
-                store.connect(account.serverAddress, account.username, account.password)
-
+            connect(account) { store ->
                 val inbox = store.getFolder("INBOX")
                 inbox.open(Folder.READ_ONLY)
 
-                return listAllMessagesWithEInvoiceInFolder(inbox).also {
+                listAllMessagesWithEInvoiceInFolder(inbox).also {
                     inbox.close(false)
                 }
             }
@@ -41,18 +37,6 @@ class MailReader(
 
         return emptyList()
     }
-
-    private fun mapAccountToJavaMailProperties(account: MailAccount) = Properties().apply {
-        put("mail.store.protocol", "imap")
-
-        put("mail.imap.host", account.serverAddress)
-        put("mail.imap.port", account.port?.toString() ?: "993")  // Default IMAP over SSL
-        put("mail.imap.ssl.enable", "true")
-
-        put("mail.imap.connectiontimeout", "5000")
-        put("mail.imap.timeout", "5000")
-    }
-
 
     private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = folder.messages.mapNotNull { message ->
         try {
@@ -120,5 +104,28 @@ class MailReader(
     // TODO: same code as in MustangMapper
     private fun map(date: Date): LocalDate =
         date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+
+
+    private fun <T> connect(account: MailAccount, connected: (Store) -> T?): T? {
+        val properties = mapAccountToJavaMailProperties(account)
+
+        val session = Session.getInstance(properties)
+        session.getStore("imap").use { store ->
+            store.connect(account.serverAddress, account.username, account.password)
+
+            return connected(store)
+        }
+    }
+
+    private fun mapAccountToJavaMailProperties(account: MailAccount) = Properties().apply {
+        put("mail.store.protocol", "imap")
+
+        put("mail.imap.host", account.serverAddress)
+        put("mail.imap.port", account.port?.toString() ?: "993")  // Default IMAP over SSL
+        put("mail.imap.ssl.enable", "true")
+
+        put("mail.imap.connectiontimeout", "5000")
+        put("mail.imap.timeout", "5000")
+    }
 
 }
