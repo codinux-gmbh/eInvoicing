@@ -59,14 +59,14 @@ class InvoicingResource(
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Extract invoice data from a Factur-x / ZUGFeRD or XRechnung file")
+    @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     fun extractInvoiceData(invoice: FileUpload) =
         service.extractInvoiceData(invoice.uploadedFile())
 
     @Path("validate")
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    @Operation(summary = "Validate a Factur-x / ZUGFeRD or XRechnung file")
+    @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
     fun validateInvoiceXml(invoice: FileUpload) =
         service.validateInvoice(invoice.uploadedFile()).reportAsXml
 

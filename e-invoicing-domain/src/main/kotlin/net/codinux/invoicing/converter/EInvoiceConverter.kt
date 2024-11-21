@@ -30,12 +30,12 @@ class EInvoiceConverter {
 
 
     /**
-     * Converts a CII (Cross Industry Invoice) invoice, e.g. a Zugferd or Factur-X invoice, to UBL (Universal Business Language).
+     * Converts a CII (Cross Industry Invoice) invoice, e.g. a ZUGFeRD or Factur-X invoice, to UBL (Universal Business Language).
      */
     fun convertCiiToUbl(invoice: Invoice) = convertCiiToUbl(createXRechnungXml(invoice))
 
     /**
-     * Converts a CII (Cross Industry Invoice) invoice, e.g. a Zugferd or Factur-X invoice, to UBL (Universal Business Language).
+     * Converts a CII (Cross Industry Invoice) invoice, e.g. a ZUGFeRD or Factur-X invoice, to UBL (Universal Business Language).
      */
     fun convertCiiToUbl(invoiceXml: String): String {
         // TODO: extract a common method for this
@@ -54,7 +54,7 @@ class EInvoiceConverter {
     }
 
     /**
-     * Converts a CII (Cross Industry Invoice) invoice, e.g. a Zugferd or Factur-X invoice, to UBL (Universal Business Language).
+     * Converts a CII (Cross Industry Invoice) invoice, e.g. a ZUGFeRD or Factur-X invoice, to UBL (Universal Business Language).
      */
     fun convertCiiToUbl(xmlFile: File, outputFile: File) {
         val cii2Ubl = CIIToUBL()
