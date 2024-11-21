@@ -18,6 +18,11 @@ class InvoicingResource(
     private val service: InvoicingService
 ) {
 
+    companion object {
+        private const val MediaTypePdf = "application/pdf"
+    }
+
+
     @Path("xrechnung")
     @POST
     @Operation(summary = "Create a XRechnung XML")
@@ -34,7 +39,7 @@ class InvoicingResource(
 
     @Path("facturx/pdf")
     @POST
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
     fun createFacturXPdf(invoice: Invoice): Response {
@@ -46,12 +51,12 @@ class InvoicingResource(
     @Path("attach")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaTypePdf)
     @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
     @Tag(name = "Create - Attach")
     fun attachInvoiceXmlToPdf(
         @RestForm @PartType(MediaType.APPLICATION_JSON) invoice: Invoice,
-        @RestForm("pdf") pdf: FileUpload
+        @RestForm("pdf") @PartType(MediaTypePdf) pdf: FileUpload
     ): Response {
         val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile())
 
