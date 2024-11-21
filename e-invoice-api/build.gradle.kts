@@ -28,7 +28,7 @@ dependencies {
     implementation("io.quarkus:quarkus-micrometer")
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
-    implementation(project(":e-invoicing-domain"))
+    implementation(project(":e-invoice-domain"))
 
     implementation("net.codinux.log:klf:$klfVersion")
     implementation("net.codinux.log:quarkus-loki-log-appender:$lokiLogAppenderVersion")
