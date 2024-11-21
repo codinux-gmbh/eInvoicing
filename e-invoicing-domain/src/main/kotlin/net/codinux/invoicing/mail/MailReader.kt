@@ -23,6 +23,12 @@ class MailReader(
     private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
+    private data class MessagePart(
+        val mediaType: String,
+        val part: Part
+    )
+
+
     private val mailDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
 
     private val log by logger()
@@ -116,9 +122,7 @@ class MailReader(
         return null
     }
 
-    private fun getAllMessageParts(part: Part): List<Part> {
-        contentClasses.add(part.content?.let { it::class })
-
+    private fun getAllMessageParts(part: Part): List<MessagePart> {
         return if (part.isMimeType("multipart/*")) {
             val multipart = part.content as Multipart
             val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
@@ -127,28 +131,32 @@ class MailReader(
                 getAllMessageParts(subPart)
             }
         } else {
-            listOf(part)
+            val mediaType = getMediaType(part)
+            if (mediaType == null) {
+                log.warn { "Could not determine media type of message part $part" }
+                emptyList()
+            } else {
+                listOf(MessagePart(mediaType, part))
+            }
         }
     }
 
-    private fun findEInvoice(part: Part): MailAttachmentWithEInvoice? {
+    private fun findEInvoice(messagePart: MessagePart): MailAttachmentWithEInvoice? {
         try {
-            if (Part.ATTACHMENT.equals(part.disposition, true)) { // TODO: what about Part.INLINE?
-                val mediaType = getMediaType(part)?.lowercase()
-                val invoice = tryToReadEInvoice(part, mediaType)
+            val part = messagePart.part
+            val invoice = tryToReadEInvoice(part, messagePart.mediaType)
 
-                if (invoice != null) {
-                    val filename = File(part.fileName)
-                    val file = File.createTempFile(filename.nameWithoutExtension, "." + filename.extension).also { file ->
-                        part.inputStream.use { it.copyTo(file.outputStream()) }
-                        file.deleteOnExit()
-                    }
-
-                    return MailAttachmentWithEInvoice(part.fileName, mediaType, invoice, file)
+            if (invoice != null) {
+                val filename = File(part.fileName)
+                val file = File.createTempFile(filename.nameWithoutExtension, "." + filename.extension).also { file ->
+                    part.inputStream.use { it.copyTo(file.outputStream()) }
+                    file.deleteOnExit()
                 }
+
+                return MailAttachmentWithEInvoice(part.fileName, messagePart.mediaType, invoice, file)
             }
         } catch (e: Throwable) {
-            log.error(e) { "Could not check attachment '${part.fileName}' for eInvoice" }
+            log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
         }
 
         return null
