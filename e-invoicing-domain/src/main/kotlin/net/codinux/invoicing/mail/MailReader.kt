@@ -103,7 +103,7 @@ class MailReader(
                 if (attachmentsWithEInvoice.isNotEmpty()) {
                     return@mapNotNull MailWithInvoice(
                         message.from.joinToString(), message.subject,
-                        map(message.sentDate), map(message.receivedDate), message.messageNumber,
+                        message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                         attachmentsWithEInvoice
                     )
                 }
