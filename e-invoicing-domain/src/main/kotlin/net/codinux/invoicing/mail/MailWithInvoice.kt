@@ -4,7 +4,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 class MailWithInvoice(
-    val sender: String,
+    val sender: String?,
     val subject: String,
     val sent: Instant?,
     val received: Instant,

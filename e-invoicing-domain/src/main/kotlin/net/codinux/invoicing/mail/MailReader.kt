@@ -110,7 +110,7 @@ class MailReader(
 
             if (attachmentsWithEInvoice.isNotEmpty()) {
                 return MailWithInvoice(
-                    message.from.joinToString(), message.subject,
+                    message.from?.joinToString(), message.subject,
                     message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                     getPlainTextBody(parts), getHtmlBody(parts),
                     attachmentsWithEInvoice
