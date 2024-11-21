@@ -185,7 +185,7 @@ class MailReader(
      *
      * -> This method removes parameters and return media type (first part) only
      */
-    private fun getMediaType(part: Part): String? = part.contentType?.let { contentType ->
+    private fun getMediaType(part: Part): String? = part.contentType?.lowercase()?.let { contentType ->
         val indexOfSeparator = contentType.indexOf(';')
 
         if (indexOfSeparator > -1) {
