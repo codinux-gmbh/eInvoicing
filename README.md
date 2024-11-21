@@ -2,6 +2,9 @@
 
 Tools for working with eInvoicing according to EU standard EU 16931.
 
+As ZUGFeRD 2 and Factur-X unified their specification, these two names are used synonymously and interchangeably 
+throughout the documentation and code.
+
 ## Reading
 
 ### Extract eInvoice from a PDF or XML file:
