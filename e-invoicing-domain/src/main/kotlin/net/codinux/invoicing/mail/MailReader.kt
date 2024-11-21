@@ -1,8 +1,8 @@
 package net.codinux.invoicing.mail
 
-import jakarta.mail.BodyPart
 import jakarta.mail.Folder
 import jakarta.mail.Message
+import jakarta.mail.Multipart
 import jakarta.mail.Part
 import jakarta.mail.Session
 import jakarta.mail.Store
@@ -92,21 +92,18 @@ class MailReader(
     // tried to parallelize reading messages by reading them on multiple thread but that had no effect on process duration (don't know why)
     private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = folder.messages.mapNotNull { message ->
         try {
-            if (message.isMimeType("multipart/*")) {
-                val multipart = message.content as MimeMultipart
-                val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
+            val parts = getAllMessageParts(message)
 
-                val attachmentsWithEInvoice = parts.mapNotNull { part ->
-                    findEInvoice(part)
-                }
+            val attachmentsWithEInvoice = parts.mapNotNull { part ->
+                findEInvoice(part)
+            }
 
-                if (attachmentsWithEInvoice.isNotEmpty()) {
-                    return@mapNotNull MailWithInvoice(
-                        message.from.joinToString(), message.subject,
-                        message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
-                        attachmentsWithEInvoice
-                    )
-                }
+            if (attachmentsWithEInvoice.isNotEmpty()) {
+                return@mapNotNull MailWithInvoice(
+                    message.from.joinToString(), message.subject,
+                    message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
+                    attachmentsWithEInvoice
+                )
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not read mail $message" }
@@ -115,7 +112,22 @@ class MailReader(
         null
     }
 
-    private fun findEInvoice(part: BodyPart): MailAttachmentWithEInvoice? {
+    private fun getAllMessageParts(part: Part): List<Part> {
+        contentClasses.add(part.content?.let { it::class })
+
+        return if (part.content is Multipart) {
+            val multipart = part.content as Multipart
+            val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
+
+            parts.flatMap { subPart ->
+                getAllMessageParts(subPart)
+            }
+        } else {
+            listOf(part)
+        }
+    }
+
+    private fun findEInvoice(part: Part): MailAttachmentWithEInvoice? {
         try {
             if (Part.ATTACHMENT.equals(part.disposition, true)) { // TODO: what about Part.INLINE?
                 val mediaType = getMediaType(part)?.lowercase()
@@ -138,7 +150,7 @@ class MailReader(
         return null
     }
 
-    private fun tryToReadEInvoice(part: BodyPart, mediaType: String?): Invoice? = try {
+    private fun tryToReadEInvoice(part: Part, mediaType: String?): Invoice? = try {
         val filename = part.fileName.lowercase()
 
         if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
@@ -160,7 +172,7 @@ class MailReader(
      *
      * -> This method removes parameters and return media type (first part) only
      */
-    private fun getMediaType(part: BodyPart): String? = part.contentType?.let { contentType ->
+    private fun getMediaType(part: Part): String? = part.contentType?.let { contentType ->
         val indexOfSeparator = contentType.indexOf(';')
 
         if (indexOfSeparator > -1) {
