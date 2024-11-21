@@ -8,6 +8,8 @@ kotlin {
 }
 
 
+val kotlinCoroutinesVersion: String by project
+
 val mustangVersion: String by project
 
 val angusMailVersion: String by project
@@ -19,6 +21,8 @@ val xunitVersion: String by project
 val logbackVersion: String by project
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
+
     implementation("org.mustangproject:library:$mustangVersion")
     implementation("org.mustangproject:validator:$mustangVersion")
 

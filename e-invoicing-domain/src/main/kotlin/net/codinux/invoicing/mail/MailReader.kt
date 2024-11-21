@@ -2,29 +2,81 @@ package net.codinux.invoicing.mail
 
 import jakarta.mail.BodyPart
 import jakarta.mail.Folder
+import jakarta.mail.Message
 import jakarta.mail.Part
 import jakarta.mail.Session
 import jakarta.mail.Store
+import jakarta.mail.event.MessageCountAdapter
+import jakarta.mail.event.MessageCountEvent
 import jakarta.mail.internet.MimeMultipart
+import kotlinx.coroutines.*
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
+import org.eclipse.angus.mail.imap.IMAPFolder
 import java.io.File
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.Executors
 
 class MailReader(
     private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
+    private val mailDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+
     private val log by logger()
 
 
-    fun listAllMessagesWithEInvoice(account: MailAccount): List<MailWithInvoice> {
+    fun listenForNewReceivedEInvoices(account: MailAccount, emailFolderName: String = "INBOX", eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
-                val inbox = store.getFolder("INBOX")
+                val folder = store.getFolder(emailFolderName)
+                folder.open(Folder.READ_ONLY)
+
+                folder.addMessageCountListener(object : MessageCountAdapter() {
+                    override fun messagesAdded(event: MessageCountEvent) {
+                        event.messages.forEach { message ->
+                            findEInvoice(message)?.let {
+                                eInvoiceReceived(it)
+                            }
+                        }
+                    }
+                })
+
+                launch(mailDispatcher) {
+                    keepConnectionOpen(account, folder)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error(e) { "Listening to new received eInvoices of '${account.username}' failed" }
+        }
+
+        log.info { "Stopped listening to new received eInvoices of '${account.username}'" }
+    }
+
+    private suspend fun keepConnectionOpen(account: MailAccount, folder: Folder) {
+        log.info { "Listening to new mails of ${account.username}" }
+
+        // Use IMAP IDLE to keep the connection alive
+        while (true) {
+            if (!folder.isOpen) {
+                log.info { "Reopening inbox of ${account.username} ..." }
+                folder.open(Folder.READ_ONLY)
+            }
+
+            (folder as IMAPFolder).idle()
+
+            delay(250)
+        }
+    }
+
+
+    fun listAllMessagesWithEInvoice(account: MailAccount, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
+        try {
+            connect(account) { store ->
+                val inbox = store.getFolder(emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
                 listAllMessagesWithEInvoiceInFolder(inbox).also {
