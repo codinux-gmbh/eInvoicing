@@ -8,6 +8,13 @@ class MailWithInvoice(
     val subject: String,
     val sent: Instant?,
     val received: Instant,
+    /**
+     * From documentation of underlying mail library:
+     * "Since message numbers can change within a session if the folder is expunged, clients are advised not to use
+     * message numbers as references to messages."
+     *
+     * -> use with care. Message numbers are not valid / the same anymore after expunge.
+     */
     val messageNumber: Int,
     val plainTextBody: String?,
     val htmlBody: String?,
