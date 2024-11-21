@@ -213,9 +213,8 @@ class MailReader(
             } else if (partsForMediaTypeWithoutFilename.isEmpty()) {
                 log.warn { "Multiple message parts with media type '$mediaType' found, but all have a filename" }
                 null
-            } else {
-                log.warn { "Multiple message parts with media type '$mediaType' found, but more than one does not have a filename" }
-                partsForMediaTypeWithoutFilename.first().part.content as? String
+            } else { // if there are multiple parts without filename, then the second one is in most cases quoted previous message(s)
+                partsForMediaTypeWithoutFilename.mapNotNull { it.part.content as? String }.joinToString("\r\n")
             }
         }
     } catch (e: Throwable) {
