@@ -119,7 +119,7 @@ class MailReader(
     private fun getAllMessageParts(part: Part): List<Part> {
         contentClasses.add(part.content?.let { it::class })
 
-        return if (part.content is Multipart) {
+        return if (part.isMimeType("multipart/*")) {
             val multipart = part.content as Multipart
             val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
 
