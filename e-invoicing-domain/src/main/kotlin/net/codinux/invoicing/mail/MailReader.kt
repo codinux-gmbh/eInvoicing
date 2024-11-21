@@ -15,8 +15,7 @@ import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
 import org.eclipse.angus.mail.imap.IMAPFolder
 import java.io.File
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -101,7 +100,11 @@ class MailReader(
                 }
 
                 if (attachmentsWithEInvoice.isNotEmpty()) {
-                    return@mapNotNull MailWithInvoice(message.from.joinToString(), message.subject, map(message.sentDate), attachmentsWithEInvoice)
+                    return@mapNotNull MailWithInvoice(
+                        message.from.joinToString(), message.subject,
+                        map(message.sentDate), map(message.receivedDate), message.messageNumber,
+                        attachmentsWithEInvoice
+                    )
                 }
             }
         } catch (e: Throwable) {
@@ -153,9 +156,8 @@ class MailReader(
         null
     }
 
-    // TODO: same code as in MustangMapper
-    private fun map(date: Date): LocalDate =
-        date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    private fun map(date: Date): Instant =
+        date.toInstant()
 
 
     private fun <T> connect(account: MailAccount, connected: (Store) -> T?): T? {
