@@ -1,6 +1,7 @@
 package net.codinux.invoicing.mail
 
 import assertk.assertThat
+import assertk.assertions.isEmpty
 import assertk.assertions.isNotEmpty
 import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
