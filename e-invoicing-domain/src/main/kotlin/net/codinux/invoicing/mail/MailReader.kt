@@ -122,8 +122,9 @@ class MailReader(
 
                 if (invoice != null) {
                     val filename = File(part.fileName)
-                    val file = File.createTempFile(filename.nameWithoutExtension, filename.extension).also { file ->
+                    val file = File.createTempFile(filename.nameWithoutExtension, "." + filename.extension).also { file ->
                         part.inputStream.use { it.copyTo(file.outputStream()) }
+                        file.deleteOnExit()
                     }
 
                     return MailAttachmentWithEInvoice(part.fileName, mediaType, invoice, file)
