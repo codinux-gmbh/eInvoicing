@@ -37,7 +37,7 @@ class FilesystemInvoiceReader(
         if (extension == "pdf") {
             eInvoiceReader.extractFromPdf(file.inputStream())
         } else if (extension == "xml") {
-            eInvoiceReader.readFromXml(file.inputStream())
+            eInvoiceReader.extractFromXml(file.inputStream())
         } else {
             null
         }

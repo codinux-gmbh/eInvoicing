@@ -17,11 +17,11 @@ class Demonstration {
     fun read() {
         val reader = EInvoiceReader()
 
-        // read a ZUGFeRD or Factor-X PDF that contains eInvoice XML as attachment
+        // extract invoice data from a ZUGFeRD or Factor-X PDF that contains eInvoice XML as attachment
         val invoiceFromPDF = reader.extractFromPdf(File("ZUGFeRD.pdf"))
 
-        // read a eInvoice XML file like XRechnung:
-        val invoiceFromXml = reader.readFromXml(File("XRechnung.xml"))
+        // extract eInvoice data from a XML file like XRechnung:
+        val invoiceFromXml = reader.extractFromXml(File("XRechnung.xml"))
     }
 
     fun fromMail() {
@@ -53,28 +53,28 @@ class Demonstration {
         val creator = EInvoiceCreator()
 
         // create a PDF that also contains the eInvoice as XML attachment
-        creator.createZugferdPdf(invoice, pdfResultFile)
+        creator.createFacturXPdf(invoice, pdfResultFile)
 
         // create only the XML file
-        val xml = creator.createZugferdXml(invoice)
+        val xml = creator.createFacturXXml(invoice)
 
         // create a XRechnung
         val xRechnung = creator.createXRechnungXml(invoice)
     }
 
-    fun combinePdfAndInvoiceXml() {
+    fun attachInvoiceXmlToPdf() {
         val invoice: Invoice = createInvoice()
         val existingPdf = File("Invoice.pdf")
         val output = File("Zugferd.pdf")
 
         val creator = EInvoiceCreator()
 
-        creator.combinePdfAndInvoiceXml(invoice, existingPdf, output)
+        creator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
         // or if you already have the invoice XML:
         val invoiceXml: String = "..." // e.g. creator.createZugferdXml(invoice)
 
-        creator.combinePdfAndInvoiceXml(invoiceXml, existingPdf, output)
+        creator.attachInvoiceXmlToPdf(invoiceXml, existingPdf, output)
     }
 
 

@@ -108,7 +108,7 @@ class MailReader(
         if (filename.endsWith(".pdf") || contentType.startsWith("application/pdf") || contentType.startsWith("application/octet-stream")) {
             eInvoiceReader.extractFromPdf(part.inputStream)
         } else if (filename.endsWith(".xml") || contentType.startsWith("application/xml") || contentType.startsWith("text/xml")) {
-            eInvoiceReader.readFromXml(part.inputStream)
+            eInvoiceReader.extractFromXml(part.inputStream)
         } else {
             null
         }

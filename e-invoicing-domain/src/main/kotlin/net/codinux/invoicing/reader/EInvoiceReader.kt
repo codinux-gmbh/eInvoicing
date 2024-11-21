@@ -10,11 +10,11 @@ class EInvoiceReader(
     private val mapper: MustangMapper = MustangMapper()
 ) {
 
-    fun readFromXml(xmlFile: File) = readFromXml(xmlFile.inputStream())
+    fun extractFromXml(xmlFile: File) = extractFromXml(xmlFile.inputStream())
 
-    fun readFromXml(stream: InputStream) = readFromXml(stream.reader().readText())
+    fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
 
-    fun readFromXml(xml: String): Invoice {
+    fun extractFromXml(xml: String): Invoice {
         val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to a Invoice object
         importer.fromXML(xml)
 

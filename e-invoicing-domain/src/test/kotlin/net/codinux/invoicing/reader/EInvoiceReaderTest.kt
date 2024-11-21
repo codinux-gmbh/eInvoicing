@@ -11,8 +11,8 @@ class EInvoiceReaderTest {
 
 
     @Test
-    fun readFromXml() {
-        val result = underTest.readFromXml(getTestFile("XRechnung.xml"))
+    fun extractFromXml() {
+        val result = underTest.extractFromXml(getTestFile("XRechnung.xml"))
 
         assertInvoice(result)
     }

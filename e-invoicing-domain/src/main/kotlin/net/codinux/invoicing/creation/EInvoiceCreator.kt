@@ -16,15 +16,26 @@ class EInvoiceCreator(
         return createXml(provider, invoice)
     }
 
-    fun createZugferdXml(invoice: Invoice): String {
+
+    /**
+     * Synonym for [createFacturXXml] (ZUGFeRD 2 is a synonym for Factur-X).
+     */
+    fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
+
+    fun createFacturXXml(invoice: Invoice): String {
         val exporter = ZUGFeRDExporterFromA3()
             .setProfile("EN16931") // required for XML?
 
         return createXml(exporter.provider, invoice)
     }
 
-    fun createZugferdPdf(invoice: Invoice, outputFile: File) {
-        val xml = createZugferdXml(invoice)
+    /**
+     * Synonym for [createFacturXPdf] (ZUGFeRD 2 is a synonym for Factur-X).
+     */
+    fun createZugferdPdf(invoice: Invoice, outputFile: File) = createFacturXPdf(invoice, outputFile)
+
+    fun createFacturXPdf(invoice: Invoice, outputFile: File) {
+        val xml = createFacturXXml(invoice)
         val xmlFile = File.createTempFile(outputFile.nameWithoutExtension, ".xml")
             .also { it.writeText(xml) }
         val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
@@ -32,16 +43,17 @@ class EInvoiceCreator(
         val visualizer = ZUGFeRDVisualizer()
         visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
 
-        combinePdfAndInvoiceXml(xml, pdfFile, outputFile)
+        attachInvoiceXmlToPdf(xml, pdfFile, outputFile)
 
         xmlFile.delete()
         pdfFile.delete()
     }
 
-    fun combinePdfAndInvoiceXml(invoice: Invoice, pdfFile: File, outputFile: File) =
-        combinePdfAndInvoiceXml(createZugferdXml(invoice), pdfFile, outputFile)
 
-    fun combinePdfAndInvoiceXml(invoiceXml: String, pdfFile: File, outputFile: File) {
+    fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: File, outputFile: File) =
+        attachInvoiceXmlToPdf(createFacturXXml(invoice), pdfFile, outputFile)
+
+    fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: File, outputFile: File) {
         val exporter = ZUGFeRDExporterFromA3()
             .setZUGFeRDVersion(2)
             .setProfile("EN16931") // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG

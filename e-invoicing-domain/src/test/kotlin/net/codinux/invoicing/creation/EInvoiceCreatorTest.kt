@@ -21,20 +21,20 @@ class EInvoiceCreatorTest {
     }
 
     @Test
-    fun createZugferdXml() {
+    fun createFacturXXml() {
         val invoice = createInvoice()
 
-        val result = underTest.createZugferdXml(invoice)
+        val result = underTest.createFacturXXml(invoice)
 
         assertInvoiceXml(result)
     }
 
     @Test
-    fun createZugferdPdf() {
+    fun createFacturXPdf() {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createZugferdPdf(invoice, testFile)
+        underTest.createFacturXPdf(invoice, testFile)
 
         val importer = ZUGFeRDInvoiceImporter(testFile.inputStream())
         val xml = String(importer.rawXML, Charsets.UTF_8)
