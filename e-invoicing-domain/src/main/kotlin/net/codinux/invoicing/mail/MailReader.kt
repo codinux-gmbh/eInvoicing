@@ -116,21 +116,17 @@ class MailReader(
 
     private fun findEInvoice(part: BodyPart): MailAttachmentWithEInvoice? {
         try {
-            if (part.disposition == Part.ATTACHMENT) {
-                val invoice = tryToReadEInvoice(part)
-                if (invoice != null) {
-                    var contentType = part.contentType
-                    val indexOfSeparator = contentType.indexOf(';')
-                    if (indexOfSeparator > -1) {
-                        contentType = contentType.substring(0, indexOfSeparator)
-                    }
+            if (Part.ATTACHMENT.equals(part.disposition, true)) { // TODO: what about Part.INLINE?
+                val mediaType = getMediaType(part)?.lowercase()
+                val invoice = tryToReadEInvoice(part, mediaType)
 
+                if (invoice != null) {
                     val filename = File(part.fileName)
                     val file = File.createTempFile(filename.nameWithoutExtension, filename.extension).also { file ->
                         part.inputStream.use { it.copyTo(file.outputStream()) }
                     }
 
-                    return MailAttachmentWithEInvoice(part.fileName, contentType, invoice, file)
+                    return MailAttachmentWithEInvoice(part.fileName, mediaType, invoice, file)
                 }
             }
         } catch (e: Throwable) {
@@ -140,13 +136,12 @@ class MailReader(
         return null
     }
 
-    private fun tryToReadEInvoice(part: BodyPart): Invoice? = try {
+    private fun tryToReadEInvoice(part: BodyPart, mediaType: String?): Invoice? = try {
         val filename = part.fileName.lowercase()
-        val contentType = part.contentType.lowercase()
 
-        if (filename.endsWith(".pdf") || contentType.startsWith("application/pdf") || contentType.startsWith("application/octet-stream")) {
+        if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             eInvoiceReader.extractFromPdf(part.inputStream)
-        } else if (filename.endsWith(".xml") || contentType.startsWith("application/xml") || contentType.startsWith("text/xml")) {
+        } else if (filename.endsWith(".xml") || mediaType == "application/xml" || mediaType == "text/xml") {
             eInvoiceReader.extractFromXml(part.inputStream)
         } else {
             null
@@ -154,6 +149,23 @@ class MailReader(
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${part.fileName}" }
         null
+    }
+
+    /**
+     * In most cases parameters are added to content-type's media type, e.g.
+     * - text/html; charset=utf-8
+     * - multipart/related; boundary="boundary-related"; type="text/html"
+     *
+     * -> This method removes parameters and return media type (first part) only
+     */
+    private fun getMediaType(part: BodyPart): String? = part.contentType?.let { contentType ->
+        val indexOfSeparator = contentType.indexOf(';')
+
+        if (indexOfSeparator > -1) {
+            contentType.substring(0, indexOfSeparator)
+        } else {
+            contentType
+        }
     }
 
     private fun map(date: Date): Instant =
