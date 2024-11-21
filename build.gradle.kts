@@ -15,7 +15,25 @@ allprojects {
     group = "net.codinux.invoicing"
     version = "0.5.0-SNAPSHOT"
 
+    ext["sourceCodeRepositoryBaseUrl"] = "git.dankito.net/codinux/eInvoicing"
+
+    ext["projectDescription"] = "Tools to work with eInvoices according to EU standard EN 16931"
+
+
     repositories {
         mavenCentral()
     }
+}
+
+
+tasks.register("publishAllToMavenLocal") {
+    dependsOn(
+        ":e-invoice-domain:publishToMavenLocal"
+    )
+}
+
+tasks.register("publishAll") {
+    dependsOn(
+        ":e-invoice-domain:publish"
+    )
 }

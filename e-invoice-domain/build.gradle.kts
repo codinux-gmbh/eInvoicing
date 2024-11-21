@@ -43,3 +43,9 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+
+
+ext["customArtifactId"] = "e-invoice"
+
+apply(from = "../gradle/scripts/publish-codinux-repo.gradle.kts")
