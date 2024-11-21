@@ -33,7 +33,7 @@ class MailReader(
     private val log by logger()
 
 
-    fun listenForNewReceivedEInvoices(account: MailAccount, emailFolderName: String = "INBOX", eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
+    fun listenForNewReceivedEInvoices(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX", eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(emailFolderName)
@@ -42,7 +42,7 @@ class MailReader(
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
                         event.messages.forEach { message ->
-                            findEInvoice(message)?.let {
+                            findEInvoice(message, downloadMessageBody)?.let {
                                 eInvoiceReceived(it)
                             }
                         }
@@ -77,13 +77,13 @@ class MailReader(
     }
 
 
-    fun listAllMessagesWithEInvoice(account: MailAccount, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
+    fun listAllMessagesWithEInvoice(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
         try {
             connect(account) { store ->
                 val inbox = store.getFolder(emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
-                listAllMessagesWithEInvoiceInFolder(inbox).also {
+                listAllMessagesWithEInvoiceInFolder(inbox, downloadMessageBody).also {
                     inbox.close(false)
                 }
             }
@@ -94,7 +94,7 @@ class MailReader(
         return emptyList()
     }
 
-    private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = runBlocking {
+    private fun listAllMessagesWithEInvoiceInFolder(folder: Folder, downloadMessageBody: Boolean): List<MailWithInvoice> = runBlocking {
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
@@ -103,7 +103,7 @@ class MailReader(
         IntRange(1, messageCount).mapNotNull { messageNumber -> // message numbers start at 1
             async(mailDispatcher) {
                 try {
-                    findEInvoice(folder.getMessage(messageNumber))
+                    findEInvoice(folder.getMessage(messageNumber), downloadMessageBody)
                 } catch (e: Throwable) {
                     log.error(e) { "Could not get message with messageNumber $messageNumber" }
                     null
@@ -114,7 +114,7 @@ class MailReader(
             .filterNotNull()
     }
 
-    private fun findEInvoice(message: Message): MailWithInvoice? {
+    private fun findEInvoice(message: Message, downloadMessageBody: Boolean): MailWithInvoice? {
         try {
             val parts = getAllMessageParts(message)
 
@@ -127,7 +127,7 @@ class MailReader(
                     message.from?.joinToString(), message.subject ?: "",
                     message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                     parts.any { it.mediaType == "application/pgp-encrypted" },
-                    getPlainTextBody(parts), getHtmlBody(parts),
+                    if (downloadMessageBody) getPlainTextBody(parts) else null, if (downloadMessageBody) getHtmlBody(parts) else null,
                     attachmentsWithEInvoice
                 )
             }
