@@ -17,6 +17,7 @@ import java.io.File
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.Executors
+import kotlin.math.max
 
 class MailReader(
     private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
@@ -28,7 +29,7 @@ class MailReader(
     )
 
 
-    private val mailDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+    private val mailDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 
     private val log by logger()
 
