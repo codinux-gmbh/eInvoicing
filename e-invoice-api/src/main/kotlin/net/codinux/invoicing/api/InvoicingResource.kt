@@ -67,20 +67,29 @@ class InvoicingResource(
 
     @Path("extract")
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
-    fun extractInvoiceData(invoice: FileUpload) =
-        service.extractInvoiceData(invoice.uploadedFile())
+    fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path) =
+        service.extractInvoiceDataFromPdf(invoice)
+
+    @Path("extract")
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
+    @Tag(name = "Extract")
+    fun extractInvoiceDataFromXml(invoice: java.nio.file.Path) =
+        service.extractInvoiceDataFromXml(invoice)
 
     @Path("validate")
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Validate")
-    fun validateInvoiceXml(invoice: FileUpload) =
-        service.validateInvoice(invoice.uploadedFile()).reportAsXml
+    fun validateInvoiceXml(invoice: java.nio.file.Path) =
+        service.validateInvoice(invoice).reportAsXml
 
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =

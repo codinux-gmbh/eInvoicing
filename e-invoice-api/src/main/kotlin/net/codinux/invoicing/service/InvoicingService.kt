@@ -7,7 +7,6 @@ import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.extension
 
 @Singleton
 class InvoicingService {
@@ -42,17 +41,15 @@ class InvoicingService {
     }
 
 
-    fun extractInvoiceData(invoiceFile: Path) = when (invoiceFile.extension.lowercase()) {
-        "xml" -> reader.extractFromXml(invoiceFile.toFile())
-        "pdf" -> reader.extractFromPdf(invoiceFile.toFile())
-        else -> throw IllegalArgumentException("We can only extract eInvoice data from .xml and .pdf files")
-    }
+    fun extractInvoiceDataFromPdf(invoiceFile: Path) =
+        reader.extractFromPdf(invoiceFile.toFile())
+
+    fun extractInvoiceDataFromXml(invoiceFile: Path) =
+        reader.extractFromXml(invoiceFile.toFile())
 
 
-    fun validateInvoice(invoiceFile: Path) =when (invoiceFile.extension.lowercase()) {
-        "xml", "pdf" -> validator.validate(invoiceFile.toFile())
-        else -> throw IllegalArgumentException("We can only validate .xml and .pdf eInvoice files")
-    }
+    fun validateInvoice(invoiceFile: Path) =
+        validator.validate(invoiceFile.toFile())
 
 
     private fun createTempPdfFile(): Path =
