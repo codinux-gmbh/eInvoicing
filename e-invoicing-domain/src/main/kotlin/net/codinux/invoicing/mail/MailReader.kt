@@ -91,6 +91,10 @@ class MailReader(
 
     // tried to parallelize reading messages by reading them on multiple thread but that had no effect on process duration (don't know why)
     private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = folder.messages.mapNotNull { message ->
+        findEInvoice(message)
+    }
+
+    private fun findEInvoice(message: Message): MailWithInvoice? {
         try {
             val parts = getAllMessageParts(message)
 
@@ -99,17 +103,17 @@ class MailReader(
             }
 
             if (attachmentsWithEInvoice.isNotEmpty()) {
-                return@mapNotNull MailWithInvoice(
+                return MailWithInvoice(
                     message.from.joinToString(), message.subject,
                     message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                     attachmentsWithEInvoice
                 )
             }
         } catch (e: Throwable) {
-            log.error(e) { "Could not read mail $message" }
+            log.error(e) { "Could not read message $message" }
         }
 
-        null
+        return null
     }
 
     private fun getAllMessageParts(part: Part): List<Part> {
