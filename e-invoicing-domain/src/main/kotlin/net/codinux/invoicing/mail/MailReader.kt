@@ -8,7 +8,6 @@ import jakarta.mail.Session
 import jakarta.mail.Store
 import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
-import jakarta.mail.internet.MimeMultipart
 import kotlinx.coroutines.*
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -123,25 +122,6 @@ class MailReader(
         return null
     }
 
-    private fun getAllMessageParts(part: Part): List<MessagePart> {
-        return if (part.isMimeType("multipart/*")) {
-            val multipart = part.content as Multipart
-            val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
-
-            parts.flatMap { subPart ->
-                getAllMessageParts(subPart)
-            }
-        } else {
-            val mediaType = getMediaType(part)
-            if (mediaType == null) {
-                log.warn { "Could not determine media type of message part $part" }
-                emptyList()
-            } else {
-                listOf(MessagePart(mediaType, part))
-            }
-        }
-    }
-
     private fun findEInvoice(messagePart: MessagePart): MailAttachmentWithEInvoice? {
         try {
             val part = messagePart.part
@@ -176,6 +156,26 @@ class MailReader(
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${part.fileName}" }
         null
+    }
+
+
+    private fun getAllMessageParts(part: Part): List<MessagePart> {
+        return if (part.isMimeType("multipart/*")) {
+            val multipart = part.content as Multipart
+            val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
+
+            parts.flatMap { subPart ->
+                getAllMessageParts(subPart)
+            }
+        } else {
+            val mediaType = getMediaType(part)
+            if (mediaType == null) {
+                log.warn { "Could not determine media type of message part $part" }
+                emptyList()
+            } else {
+                listOf(MessagePart(mediaType, part))
+            }
+        }
     }
 
     /**
