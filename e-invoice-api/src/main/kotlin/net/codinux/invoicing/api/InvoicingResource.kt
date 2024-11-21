@@ -23,21 +23,21 @@ class InvoicingResource(
     }
 
 
-    @Path("xrechnung")
+    @Path("create/xrechnung")
     @POST
     @Operation(summary = "Create a XRechnung XML")
     @Tag(name = "Create")
     fun createXRechnung(invoice: Invoice) =
         service.createXRechnung(invoice)
 
-    @Path("facturx/xml")
+    @Path("create/facturx/xml")
     @POST
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML (ZUGFeRD is a synonym for Factur-X)")
     @Tag(name = "Create")
     fun createFacturXXml(invoice: Invoice) =
         service.createFacturXXml(invoice)
 
-    @Path("facturx/pdf")
+    @Path("create/facturx/pdf")
     @POST
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
