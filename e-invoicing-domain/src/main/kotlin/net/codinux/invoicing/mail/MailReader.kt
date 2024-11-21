@@ -94,9 +94,24 @@ class MailReader(
         return emptyList()
     }
 
-    // tried to parallelize reading messages by reading them on multiple thread but that had no effect on process duration (don't know why)
-    private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = folder.messages.mapNotNull { message ->
-        findEInvoice(message)
+    private fun listAllMessagesWithEInvoiceInFolder(folder: Folder): List<MailWithInvoice> = runBlocking {
+        val messageCount = folder.messageCount
+        if (messageCount <= 0) {
+            return@runBlocking emptyList()
+        }
+
+        IntRange(1, messageCount).mapNotNull { messageNumber -> // message numbers start at 1
+            async(mailDispatcher) {
+                try {
+                    findEInvoice(folder.getMessage(messageNumber))
+                } catch (e: Throwable) {
+                    log.error(e) { "Could not get message with messageNumber $messageNumber" }
+                    null
+                }
+            }
+        }
+            .awaitAll()
+            .filterNotNull()
     }
 
     private fun findEInvoice(message: Message): MailWithInvoice? {
