@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
+import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
@@ -20,12 +21,14 @@ class InvoicingResource(
     @Path("xrechnung")
     @POST
     @Operation(summary = "Create a XRechnung XML")
+    @Tag(name = "Create")
     fun createXRechnung(invoice: Invoice) =
         service.createXRechnung(invoice)
 
     @Path("facturx/xml")
     @POST
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML (ZUGFeRD is a synonym for Factur-X)")
+    @Tag(name = "Create")
     fun createFacturXXml(invoice: Invoice) =
         service.createFacturXXml(invoice)
 
@@ -33,6 +36,7 @@ class InvoicingResource(
     @POST
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
+    @Tag(name = "Create")
     fun createFacturXPdf(invoice: Invoice): Response {
         val pdfFile = service.createFacturXPdf(invoice)
 
@@ -44,6 +48,7 @@ class InvoicingResource(
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
+    @Tag(name = "Create - Attach")
     fun attachInvoiceXmlToPdf(
         @RestForm @PartType(MediaType.APPLICATION_JSON) invoice: Invoice,
         @RestForm("pdf") pdf: FileUpload
@@ -60,6 +65,7 @@ class InvoicingResource(
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
+    @Tag(name = "Extract")
     fun extractInvoiceData(invoice: FileUpload) =
         service.extractInvoiceData(invoice.uploadedFile())
 
@@ -67,6 +73,7 @@ class InvoicingResource(
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
+    @Tag(name = "Validate")
     fun validateInvoiceXml(invoice: FileUpload) =
         service.validateInvoice(invoice.uploadedFile()).reportAsXml
 
