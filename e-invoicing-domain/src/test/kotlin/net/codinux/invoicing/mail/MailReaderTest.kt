@@ -27,6 +27,9 @@ class MailReaderTest {
         val result = underTest.listAllMessagesWithEInvoice(mailAccount)
 
         assertThat(result).isNotEmpty()
+
+        val messagesWithoutBody = result.filter { it.plainTextOrHtmlBody == null }
+        assertThat(messagesWithoutBody).isEmpty()
     }
 
 }

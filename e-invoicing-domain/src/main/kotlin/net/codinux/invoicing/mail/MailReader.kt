@@ -112,6 +112,7 @@ class MailReader(
                 return MailWithInvoice(
                     message.from.joinToString(), message.subject,
                     message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
+                    getPlainTextBody(parts), getHtmlBody(parts),
                     attachmentsWithEInvoice
                 )
             }
@@ -192,6 +193,34 @@ class MailReader(
         } else {
             contentType
         }
+    }
+
+    private fun getPlainTextBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/plain")
+
+    private fun getHtmlBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/html")
+
+    private fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String): String? = try {
+        val partsForMediaType = parts.filter { it.mediaType == mediaType }
+
+        if (partsForMediaType.size == 1) {
+            partsForMediaType.first().part.content as? String
+        } else if (partsForMediaType.isEmpty()) {
+            null
+        } else {
+            val partsForMediaTypeWithoutFilename = partsForMediaType.filter { it.part.fileName == null }
+            if (partsForMediaTypeWithoutFilename.size == 1) {
+                partsForMediaTypeWithoutFilename.first().part.content as? String
+            } else if (partsForMediaTypeWithoutFilename.isEmpty()) {
+                log.warn { "Multiple message parts with media type '$mediaType' found, but all have a filename" }
+                null
+            } else {
+                log.warn { "Multiple message parts with media type '$mediaType' found, but more than one does not have a filename" }
+                partsForMediaTypeWithoutFilename.first().part.content as? String
+            }
+        }
+    } catch (e: Throwable) {
+        log.error(e) { "Could not get message body for media type '$mediaType'" }
+        null
     }
 
     private fun map(date: Date): Instant =
