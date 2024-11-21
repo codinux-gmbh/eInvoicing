@@ -25,12 +25,18 @@ class InvoicingService {
     fun createFacturXXml(invoice: Invoice): String =
         creator.createZugferdXml(invoice)
 
-    fun createFacturXPdf(invoice: Invoice): File {
-        val resultFile = File.createTempFile("factur-x", ".pdf").also {
-            it.deleteOnExit()
-        }
+    fun createFacturXPdf(invoice: Invoice): Path {
+        val resultFile = createTempPdfFile()
 
-        creator.createZugferdPdf(invoice, resultFile)
+        creator.createZugferdPdf(invoice, resultFile.toFile())
+
+        return resultFile
+    }
+
+    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path): Path {
+        val resultFile = createTempPdfFile()
+
+        creator.combinePdfAndInvoiceXml(invoice, pdf.toFile(), resultFile.toFile())
 
         return resultFile
     }
@@ -45,5 +51,11 @@ class InvoicingService {
 
     fun validateInvoice(invoice: Path) =
         validator.validate(invoice.toFile())
+
+
+    private fun createTempPdfFile(): Path =
+        File.createTempFile("factur-x", ".pdf")
+            .also { it.deleteOnExit() }
+            .toPath()
 
 }
