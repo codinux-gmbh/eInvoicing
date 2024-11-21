@@ -49,8 +49,10 @@ class InvoicingService {
     }
 
 
-    fun validateInvoice(invoice: Path) =
-        validator.validate(invoice.toFile())
+    fun validateInvoice(invoiceFile: Path) =when (invoiceFile.extension.lowercase()) {
+        "xml", "pdf" -> validator.validate(invoiceFile.toFile())
+        else -> throw IllegalArgumentException("We can only validate .xml and .pdf eInvoice files")
+    }
 
 
     private fun createTempPdfFile(): Path =
