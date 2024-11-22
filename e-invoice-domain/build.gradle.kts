@@ -7,6 +7,10 @@ kotlin {
     jvmToolchain(11)
 }
 
+java {
+    withSourcesJar()
+}
+
 
 val kotlinCoroutinesVersion: String by project
 
