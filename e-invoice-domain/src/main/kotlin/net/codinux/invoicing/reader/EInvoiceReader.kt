@@ -6,39 +6,39 @@ import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import java.io.InputStream
 
-class EInvoiceReader(
-    private val mapper: MustangMapper = MustangMapper()
+open class EInvoiceReader(
+    protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
-    fun extractFromXml(xmlFile: File) = extractFromXml(xmlFile.inputStream())
+    open fun extractFromXml(xmlFile: File) = extractFromXml(xmlFile.inputStream())
 
-    fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
+    open fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
 
-    fun extractFromXml(xml: String): Invoice {
+    open fun extractFromXml(xml: String): Invoice {
         val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to a Invoice object
         importer.fromXML(xml)
 
         return extractInvoice(importer)
     }
 
-    fun extractFromPdf(pdfFile: File) = extractFromPdf(pdfFile.inputStream())
+    open fun extractFromPdf(pdfFile: File) = extractFromPdf(pdfFile.inputStream())
 
-    fun extractFromPdf(stream: InputStream): Invoice {
+    open fun extractFromPdf(stream: InputStream): Invoice {
         val importer = ZUGFeRDInvoiceImporter(stream)
 
         return extractInvoice(importer)
     }
 
-    fun extractXmlFromPdf(pdfFile: File) = extractXmlFromPdf(pdfFile.inputStream())
+    open fun extractXmlFromPdf(pdfFile: File) = extractXmlFromPdf(pdfFile.inputStream())
 
-    fun extractXmlFromPdf(stream: InputStream): String {
+    open fun extractXmlFromPdf(stream: InputStream): String {
         val importer = ZUGFeRDInvoiceImporter(stream)
 
         return String(importer.rawXML, Charsets.UTF_8)
     }
 
 
-    private fun extractInvoice(importer: ZUGFeRDInvoiceImporter): Invoice {
+    protected open fun extractInvoice(importer: ZUGFeRDInvoiceImporter): Invoice {
         val invoice = importer.extractInvoice()
 
         // TODO: the values LineTotalAmount, ChargeTotalAmount, AllowanceTotalAmount, TaxBasisTotalAmount, TaxTotalAmount,

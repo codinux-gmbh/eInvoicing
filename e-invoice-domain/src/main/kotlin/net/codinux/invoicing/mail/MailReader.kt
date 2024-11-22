@@ -19,22 +19,22 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.math.max
 
-class MailReader(
-    private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
+open class MailReader(
+    protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
-    private data class MessagePart(
+    protected data class MessagePart(
         val mediaType: String,
         val part: Part
     )
 
 
-    private val mailDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
+    protected open val mailDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 
-    private val log by logger()
+    protected val log by logger()
 
 
-    fun listenForNewReceivedEInvoices(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX", eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
+    open fun listenForNewReceivedEInvoices(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX", eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(emailFolderName)
@@ -61,7 +61,7 @@ class MailReader(
         log.info { "Stopped listening to new received eInvoices of '${account.username}'" }
     }
 
-    private suspend fun keepConnectionOpen(account: MailAccount, folder: Folder) {
+    protected open suspend fun keepConnectionOpen(account: MailAccount, folder: Folder) {
         log.info { "Listening to new mails of ${account.username}" }
 
         // Use IMAP IDLE to keep the connection alive
@@ -78,7 +78,7 @@ class MailReader(
     }
 
 
-    fun listAllMessagesWithEInvoice(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
+    open fun listAllMessagesWithEInvoice(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
         try {
             return connect(account) { store ->
                 val inbox = store.getFolder(emailFolderName)
@@ -95,7 +95,7 @@ class MailReader(
         return emptyList()
     }
 
-    private fun listAllMessagesWithEInvoiceInFolder(folder: Folder, downloadMessageBody: Boolean): List<MailWithInvoice> = runBlocking {
+    protected open fun listAllMessagesWithEInvoiceInFolder(folder: Folder, downloadMessageBody: Boolean): List<MailWithInvoice> = runBlocking {
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
@@ -115,7 +115,7 @@ class MailReader(
             .filterNotNull()
     }
 
-    private fun findEInvoice(message: Message, downloadMessageBody: Boolean): MailWithInvoice? {
+    protected open fun findEInvoice(message: Message, downloadMessageBody: Boolean): MailWithInvoice? {
         try {
             val parts = getAllMessageParts(message)
 
@@ -139,7 +139,7 @@ class MailReader(
         return null
     }
 
-    private fun findEInvoice(messagePart: MessagePart): MailAttachmentWithEInvoice? {
+    protected open fun findEInvoice(messagePart: MessagePart): MailAttachmentWithEInvoice? {
         try {
             val part = messagePart.part
             val invoice = tryToReadEInvoice(part, messagePart.mediaType)
@@ -160,7 +160,7 @@ class MailReader(
         return null
     }
 
-    private fun tryToReadEInvoice(part: Part, mediaType: String?): Invoice? = try {
+    protected open fun tryToReadEInvoice(part: Part, mediaType: String?): Invoice? = try {
         val filename = part.fileName?.lowercase() ?: ""
 
         if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
@@ -176,7 +176,7 @@ class MailReader(
     }
 
 
-    private fun getAllMessageParts(part: Part): List<MessagePart> {
+    protected open fun getAllMessageParts(part: Part): List<MessagePart> {
         return if (part.isMimeType("multipart/*")) {
             val multipart = part.content as Multipart
             val parts = IntRange(0, multipart.count - 1).map { multipart.getBodyPart(it) }
@@ -202,7 +202,7 @@ class MailReader(
      *
      * -> This method removes parameters and return media type (first part) only
      */
-    private fun getMediaType(part: Part): String? = part.contentType?.lowercase()?.let { contentType ->
+    protected open fun getMediaType(part: Part): String? = part.contentType?.lowercase()?.let { contentType ->
         val indexOfSeparator = contentType.indexOf(';')
 
         if (indexOfSeparator > -1) {
@@ -212,11 +212,11 @@ class MailReader(
         }
     }
 
-    private fun getPlainTextBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/plain")
+    protected open fun getPlainTextBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/plain")
 
-    private fun getHtmlBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/html")
+    protected open fun getHtmlBody(parts: Collection<MessagePart>) = getBodyWithMediaType(parts, "text/html")
 
-    private fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String): String? = try {
+    protected open fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String): String? = try {
         val partsForMediaType = parts.filter { it.mediaType == mediaType }
 
         if (partsForMediaType.size == 1) {
@@ -239,11 +239,11 @@ class MailReader(
         null
     }
 
-    private fun map(date: Date): Instant =
+    protected open fun map(date: Date): Instant =
         date.toInstant()
 
 
-    private fun <T> connect(account: MailAccount, connected: (Store) -> T): T {
+    protected open fun <T> connect(account: MailAccount, connected: (Store) -> T): T {
         val properties = mapAccountToJavaMailProperties(account)
 
         val session = Session.getInstance(properties)
@@ -254,7 +254,7 @@ class MailReader(
         }
     }
 
-    private fun mapAccountToJavaMailProperties(account: MailAccount) = Properties().apply {
+    protected open fun mapAccountToJavaMailProperties(account: MailAccount) = Properties().apply {
         put("mail.store.protocol", "imap")
 
         put("mail.imap.host", account.serverAddress)

@@ -1,27 +1,31 @@
 package net.codinux.invoicing.validation
 
+import net.codinux.log.logger
 import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
 import java.lang.reflect.Field
 
-class EInvoiceValidator {
+open class EInvoiceValidator {
 
     companion object {
         private val SectionField = getPrivateField("section")
         private val CriterionField = getPrivateField("criterion")
         private val StacktraceField = getPrivateField("stacktrace")
 
+        private val log by logger()
+
         private fun getPrivateField(fieldName: String): Field? = try {
            org.mustangproject.validator.ValidationResultItem::class.java.getDeclaredField(fieldName).apply {
                trySetAccessible()
            }
         } catch (e: Throwable) {
+            log.error(e) { "Could not access private field '$fieldName' of Mustang ValidationResultItem" }
             null
         }
     }
 
 
-    fun validate(fileToValidate: File, disableNotices: Boolean = false): InvoiceValidationResult {
+    open fun validate(fileToValidate: File, disableNotices: Boolean = false): InvoiceValidationResult {
         val validator = object : ZUGFeRDValidator() {
             fun getContext() = this.context
         }
@@ -42,10 +46,10 @@ class EInvoiceValidator {
         return InvoiceValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report)
     }
 
-    private fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
+    protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
         ValidationResultItem(mapSeverity(item), item.message, item.location, SectionField?.get(item) as? Int, CriterionField?.get(item) as? String, StacktraceField?.get(item) as? String)
 
-    private fun mapSeverity(item: org.mustangproject.validator.ValidationResultItem): ValidationResultSeverity {
+    protected open fun mapSeverity(item: org.mustangproject.validator.ValidationResultItem): ValidationResultSeverity {
         var name = item.severity.name
         name = name.first().uppercase() + name.substring(1)
 

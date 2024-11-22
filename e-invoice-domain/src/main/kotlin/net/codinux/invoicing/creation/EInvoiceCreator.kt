@@ -5,11 +5,11 @@ import net.codinux.invoicing.model.Invoice
 import org.mustangproject.ZUGFeRD.*
 import java.io.File
 
-class EInvoiceCreator(
-    private val mapper: MustangMapper = MustangMapper()
+open class EInvoiceCreator(
+    protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
-    fun createXRechnungXml(invoice: Invoice): String {
+    open fun createXRechnungXml(invoice: Invoice): String {
         val provider = ZUGFeRD2PullProvider()
         provider.profile = Profiles.getByName("XRechnung")
 
@@ -20,9 +20,9 @@ class EInvoiceCreator(
     /**
      * Synonym for [createFacturXXml] (ZUGFeRD 2 is a synonym for Factur-X).
      */
-    fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
+    open fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
 
-    fun createFacturXXml(invoice: Invoice): String {
+    open fun createFacturXXml(invoice: Invoice): String {
         val exporter = ZUGFeRDExporterFromA3()
             .setProfile("EN16931") // required for XML?
 
@@ -32,9 +32,9 @@ class EInvoiceCreator(
     /**
      * Synonym for [createFacturXPdf] (ZUGFeRD 2 is a synonym for Factur-X).
      */
-    fun createZugferdPdf(invoice: Invoice, outputFile: File) = createFacturXPdf(invoice, outputFile)
+    open fun createZugferdPdf(invoice: Invoice, outputFile: File) = createFacturXPdf(invoice, outputFile)
 
-    fun createFacturXPdf(invoice: Invoice, outputFile: File) {
+    open fun createFacturXPdf(invoice: Invoice, outputFile: File) {
         val xml = createFacturXXml(invoice)
         val xmlFile = File.createTempFile(outputFile.nameWithoutExtension, ".xml")
             .also { it.writeText(xml) }
@@ -50,10 +50,10 @@ class EInvoiceCreator(
     }
 
 
-    fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: File, outputFile: File) =
+    open fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: File, outputFile: File) =
         attachInvoiceXmlToPdf(createFacturXXml(invoice), pdfFile, outputFile)
 
-    fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: File, outputFile: File) {
+    open fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: File, outputFile: File) {
         val exporter = ZUGFeRDExporterFromA3()
             .setZUGFeRDVersion(2)
             .setProfile("EN16931") // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
@@ -68,7 +68,7 @@ class EInvoiceCreator(
     }
 
 
-    private fun createXml(provider: IXMLProvider, invoice: Invoice): String {
+    protected open fun createXml(provider: IXMLProvider, invoice: Invoice): String {
         val transaction = mapper.mapToTransaction(invoice)
 
         provider.generateXML(transaction)

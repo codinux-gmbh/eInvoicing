@@ -10,9 +10,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 
-class MustangMapper {
+open class MustangMapper {
 
-    fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
+    open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
         this.number = invoice.invoiceNumber
         this.issueDate = map(invoice.invoicingDate)
         this.sender = mapParty(invoice.sender)
@@ -26,7 +26,7 @@ class MustangMapper {
         this.referenceNumber = invoice.buyerReference
     }
 
-    fun mapParty(party: Party): TradeParty = TradeParty(
+    open fun mapParty(party: Party): TradeParty = TradeParty(
         party.name, party.street, party.postalCode, party.city, party.countryIsoCode
     ).apply {
         this.setVATID(party.vatId)
@@ -45,7 +45,7 @@ class MustangMapper {
         }
     }
 
-    fun mapLineItem(item: LineItem): IZUGFeRDExportableItem = Item(
+    open fun mapLineItem(item: LineItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
         Product(item.name, item.description ?: "", item.unit, item.vatPercentage), item.price, item.quantity
     ).apply {
@@ -53,7 +53,7 @@ class MustangMapper {
     }
 
 
-    fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
+    open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
         invoiceNumber = invoice.number,
         invoicingDate = map(invoice.issueDate),
         sender = mapParty(invoice.sender),
@@ -66,32 +66,32 @@ class MustangMapper {
         buyerReference = invoice.referenceNumber
     )
 
-    fun mapParty(party: TradeParty) = Party(
+    open fun mapParty(party: TradeParty) = Party(
         party.name, party.street, party.zip, party.location, party.country, party.vatID,
         party.email ?: party.contact?.eMail, party.contact?.phone, party.contact?.fax, party.contact?.name,
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )
 
-    fun mapLineItem(item: IZUGFeRDExportableItem) = LineItem(
+    open fun mapLineItem(item: IZUGFeRDExportableItem) = LineItem(
         item.product.name, item.product.unit, item.quantity, item.price, item.product.vatPercent, item.product.description.takeUnless { it.isBlank() }
     )
 
 
     @JvmName("mapNullable")
-    private fun map(date: LocalDate?) =
+    protected fun map(date: LocalDate?) =
         date?.let { map(it) }
 
-    private fun map(date: LocalDate): Date =
+    protected open fun map(date: LocalDate): Date =
         Date.from(mapToInstant(date))
 
-    private fun mapToInstant(date: LocalDate): Instant =
+    protected open fun mapToInstant(date: LocalDate): Instant =
         date.atStartOfDay(ZoneId.systemDefault()).toInstant()
 
     @JvmName("mapNullable")
-    private fun map(date: Date?) =
+    protected fun map(date: Date?) =
         date?.let { map(it) }
 
-    private fun map(date: Date): LocalDate =
+    protected open fun map(date: Date): LocalDate =
         date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 
 }

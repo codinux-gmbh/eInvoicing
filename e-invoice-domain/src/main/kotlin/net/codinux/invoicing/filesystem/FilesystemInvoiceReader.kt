@@ -6,16 +6,16 @@ import net.codinux.log.logger
 import java.nio.file.Path
 import kotlin.io.path.*
 
-class FilesystemInvoiceReader(
-    private val eInvoiceReader: EInvoiceReader = EInvoiceReader()
+open class FilesystemInvoiceReader(
+    protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
     private val log by logger()
 
-    fun readAllInvoicesOfDirectory(directory: Path, recursive: Boolean = false) =
+    open fun readAllInvoicesOfDirectory(directory: Path, recursive: Boolean = false) =
         readInvoicesFromFiles(collectFiles(directory, recursive))
 
-    private fun collectFiles(directory: Path, recursive: Boolean): List<Path> = buildList {
+    protected open fun collectFiles(directory: Path, recursive: Boolean): List<Path> = buildList {
         directory.listDirectoryEntries().forEach { child ->
             if (child.isRegularFile()) {
                 add(child)
@@ -25,13 +25,13 @@ class FilesystemInvoiceReader(
         }
     }
 
-    fun readInvoicesFromFiles(vararg files: Path) =
+    open fun readInvoicesFromFiles(vararg files: Path) =
         readInvoicesFromFiles(files.toList())
 
-    fun readInvoicesFromFiles(files: List<Path>): List<InvoiceOnFilesystem> =
+    open fun readInvoicesFromFiles(files: List<Path>): List<InvoiceOnFilesystem> =
         files.mapNotNull { file -> readInvoiceFromFile(file)?.let { InvoiceOnFilesystem(file, it) } }
 
-    fun readInvoiceFromFile(file: Path): Invoice? = try {
+    open fun readInvoiceFromFile(file: Path): Invoice? = try {
         val extension = file.extension.lowercase()
 
         if (extension == "pdf") {
