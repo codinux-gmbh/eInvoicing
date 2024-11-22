@@ -25,7 +25,7 @@ class MailReaderTest {
 
     @Test
     fun listAllMessagesWithEInvoice() {
-        val result = underTest.listAllMessagesWithEInvoice(mailAccount)
+        val result = underTest.listAllMessagesWithEInvoice(mailAccount, true)
 
         assertThat(result).isNotEmpty()
 
