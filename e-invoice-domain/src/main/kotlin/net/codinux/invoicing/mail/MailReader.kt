@@ -80,7 +80,7 @@ class MailReader(
 
     fun listAllMessagesWithEInvoice(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): List<MailWithInvoice> {
         try {
-            connect(account) { store ->
+            return connect(account) { store ->
                 val inbox = store.getFolder(emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
@@ -243,7 +243,7 @@ class MailReader(
         date.toInstant()
 
 
-    private fun <T> connect(account: MailAccount, connected: (Store) -> T?): T? {
+    private fun <T> connect(account: MailAccount, connected: (Store) -> T): T {
         val properties = mapAccountToJavaMailProperties(account)
 
         val session = Session.getInstance(properties)
