@@ -10,6 +10,13 @@ open class EInvoiceReader(
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
+    companion object {
+        val KnownEInvoiceXmlAttachmentNames = listOf(
+            "factur-x.xml", "zugferd-invoice.xml", "xrechnung.xml" // also "ZUGFeRD-invoice.xml" is found but we make compare case insensitive anyway
+        )
+    }
+
+
     open fun extractFromXml(xmlFile: File) = extractFromXml(xmlFile.inputStream())
 
     open fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
