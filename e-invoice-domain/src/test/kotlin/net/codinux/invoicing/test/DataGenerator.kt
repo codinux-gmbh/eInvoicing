@@ -2,7 +2,7 @@ package net.codinux.invoicing.test
 
 import net.codinux.invoicing.model.BankDetails
 import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.LineItem
+import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -35,10 +35,10 @@ object DataGenerator {
     val RecipientBankDetails: BankDetails? = null
 
     const val ItemName = "Erbrachte Dienstleistungen"
-    const val ItemUnit = "HUR" // EN code for 'hour'
     val ItemQuantity = BigDecimal(1)
-    val ItemPrice = BigDecimal(99)
-    val ItemVatPercentage = BigDecimal(19)
+    const val ItemUnit = "HUR" // EN code for 'hour'
+    val ItemUnitPrice = BigDecimal(99)
+    val ItemVatRate = BigDecimal(19)
     val ItemDescription: String? = null
 
 
@@ -49,7 +49,7 @@ object DataGenerator {
             bankDetails = SenderBankDetails),
         recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone,
             bankDetails = RecipientBankDetails),
-        items: List<LineItem> = listOf(createItem()),
+        items: List<InvoiceItem> = listOf(createItem()),
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
         buyerReference: String? = null
@@ -71,11 +71,11 @@ object DataGenerator {
 
     fun createItem(
         name: String = ItemName,
-        unit: String = ItemUnit,
         quantity: BigDecimal = ItemQuantity,
-        price: BigDecimal = ItemPrice,
-        vatPercentage: BigDecimal = ItemVatPercentage,
+        unit: String = ItemUnit,
+        unitPrice: BigDecimal = ItemUnitPrice,
+        vatRate: BigDecimal = ItemVatRate,
         description: String? = ItemDescription,
-    ) = LineItem(name, unit, quantity, price, vatPercentage, description)
+    ) = InvoiceItem(name, quantity, unit, unitPrice, vatRate, description)
 
 }

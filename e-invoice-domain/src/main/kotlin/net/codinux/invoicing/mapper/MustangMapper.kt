@@ -1,6 +1,6 @@
 package net.codinux.invoicing.mapper
 
-import net.codinux.invoicing.model.LineItem
+import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
 import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.IExportableTransaction
@@ -45,9 +45,9 @@ open class MustangMapper {
         }
     }
 
-    open fun mapLineItem(item: LineItem): IZUGFeRDExportableItem = Item(
+    open fun mapLineItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
-        Product(item.name, item.description ?: "", item.unit, item.vatPercentage), item.price, item.quantity
+        Product(item.name, item.description ?: "", item.unit, item.vatRate), item.unitPrice, item.quantity
     ).apply {
 
     }
@@ -72,8 +72,8 @@ open class MustangMapper {
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )
 
-    open fun mapLineItem(item: IZUGFeRDExportableItem) = LineItem(
-        item.product.name, item.product.unit, item.quantity, item.price, item.product.vatPercent, item.product.description.takeUnless { it.isBlank() }
+    open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
+        item.product.name, item.quantity, item.product.unit, item.price, item.product.vatPercent, item.product.description.takeUnless { it.isBlank() }
     )
 
 

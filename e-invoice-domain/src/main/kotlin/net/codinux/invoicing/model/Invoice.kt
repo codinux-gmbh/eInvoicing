@@ -7,7 +7,7 @@ class Invoice(
     val invoicingDate: LocalDate,
     val sender: Party,
     val recipient: Party,
-    val items: List<LineItem>,
+    val items: List<InvoiceItem>,
 
     val dueDate: LocalDate? = null,
     val paymentDescription: String? = null,

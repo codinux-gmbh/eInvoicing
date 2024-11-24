@@ -4,7 +4,7 @@ import net.codinux.invoicing.creation.EInvoiceCreator
 import net.codinux.invoicing.mail.MailAccount
 import net.codinux.invoicing.mail.MailReader
 import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.LineItem
+import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
@@ -83,6 +83,6 @@ class Demonstration {
         invoicingDate = LocalDate.now(),
         sender = Party("codinux GmbH & Co. KG", "Fun Street 1", "12345", "Glückstadt"),
         recipient = Party("Abzock GmbH", "Ausbeutstr.", "12345", "Abzockhausen"),
-        items = listOf(LineItem("Erbrachte Dienstleistungen", "HUR", BigDecimal(170), BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
+        items = listOf(InvoiceItem("Erbrachte Dienstleistungen", BigDecimal(170), "HUR", BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
     )
 }
