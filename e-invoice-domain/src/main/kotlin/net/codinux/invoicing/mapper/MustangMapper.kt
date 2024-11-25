@@ -1,5 +1,6 @@
 package net.codinux.invoicing.mapper
 
+import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.AmountAdjustments
 import net.codinux.invoicing.model.ChargeOrAllowance
 import net.codinux.invoicing.model.InvoiceItem
@@ -13,7 +14,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 
-open class MustangMapper {
+open class MustangMapper(
+    protected open val calculator: AmountsCalculator = AmountsCalculator()
+) {
 
     open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
         this.number = invoice.invoiceNumber
@@ -32,6 +35,10 @@ open class MustangMapper {
             this.totalPrepaidAmount = adjustments.prepaidAmounts
             adjustments.charges.forEach { this.addCharge(mapCharge(it)) }
             adjustments.allowances.forEach { this.addAllowance(mapAllowance(it)) }
+        }
+
+        if (invoice.totalAmounts == null) {
+            invoice.totalAmounts = calculator.calculateTotalAmounts(this)
         }
     }
 
@@ -95,6 +102,8 @@ open class MustangMapper {
         buyerReference = invoice.referenceNumber,
 
         amountAdjustments = mapAmountAdjustments(invoice),
+
+        totalAmounts = calculator.calculateTotalAmounts(invoice)
     )
 
     open fun mapParty(party: TradeParty) = Party(
