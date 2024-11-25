@@ -18,6 +18,14 @@ class Invoice(
     val buyerReference: String? = null,
 
     val amountAdjustments: AmountAdjustments? = null,
+
+    /**
+     * The total amounts of the invoice.
+     *
+     * For outgoing invoices: You don't have to calculate them, we do this for you. This ensures that all total amounts
+     * are in accordance to other data of the invoice like the invoice item amounts and amount adjustments.
+     */
+    var totalAmounts: TotalAmounts? = null
 ) {
-    override fun toString() = "$invoicingDate $invoiceNumber to $recipient"
+    override fun toString() = "$invoicingDate $invoiceNumber to $recipient ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }
