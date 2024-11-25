@@ -117,7 +117,8 @@ open class MustangMapper(
     )
 
     protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
-        if ((invoice.totalPrepaidAmount == null || invoice.totalPrepaidAmount == BigDecimal.ZERO) && invoice.zfCharges.isEmpty() && invoice.zfAllowances.isEmpty()) {
+        if ((invoice.totalPrepaidAmount == null || invoice.totalPrepaidAmount == BigDecimal.ZERO)
+            && invoice.zfCharges.isNullOrEmpty() && invoice.zfAllowances.isNullOrEmpty()) {
             return null
         }
 
