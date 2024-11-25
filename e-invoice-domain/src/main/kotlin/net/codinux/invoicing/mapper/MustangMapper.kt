@@ -1,10 +1,13 @@
 package net.codinux.invoicing.mapper
 
+import net.codinux.invoicing.model.AmountAdjustments
+import net.codinux.invoicing.model.ChargeOrAllowance
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
 import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,6 +27,12 @@ open class MustangMapper {
         this.paymentTermDescription = invoice.paymentDescription
 
         this.referenceNumber = invoice.buyerReference
+
+        invoice.amountAdjustments?.let { adjustments ->
+            this.totalPrepaidAmount = adjustments.prepaidAmounts
+            adjustments.charges.forEach { this.addCharge(mapCharge(it)) }
+            adjustments.allowances.forEach { this.addAllowance(mapAllowance(it)) }
+        }
     }
 
     open fun mapParty(party: Party): TradeParty = TradeParty(
@@ -52,6 +61,26 @@ open class MustangMapper {
 
     }
 
+    protected open fun mapCharge(charge: ChargeOrAllowance) = Charge(charge.actualAmount).apply {
+        this.percent = charge.calculationPercent
+
+        this.reason = charge.reason
+        this.reasonCode = charge.reasonCode
+
+        this.taxPercent = charge.taxRateApplicablePercent
+        this.categoryCode = charge.taxCategoryCode
+    }
+
+    protected open fun mapAllowance(allowance: ChargeOrAllowance) = Allowance(allowance.actualAmount).apply {
+        this.percent = allowance.calculationPercent
+
+        this.reason = allowance.reason
+        this.reasonCode = allowance.reasonCode
+
+        this.taxPercent = allowance.taxRateApplicablePercent
+        this.categoryCode = allowance.taxCategoryCode
+    }
+
 
     open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
         invoiceNumber = invoice.number,
@@ -63,7 +92,9 @@ open class MustangMapper {
         dueDate = map(invoice.dueDate ?: invoice.paymentTerms?.dueDate),
         paymentDescription = invoice.paymentTermDescription ?: invoice.paymentTerms?.description,
 
-        buyerReference = invoice.referenceNumber
+        buyerReference = invoice.referenceNumber,
+
+        amountAdjustments = mapAmountAdjustments(invoice),
     )
 
     open fun mapParty(party: TradeParty) = Party(
@@ -75,6 +106,23 @@ open class MustangMapper {
     open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
         item.product.name, item.quantity, item.product.unit, item.price, item.product.vatPercent, item.product.description.takeUnless { it.isBlank() }
     )
+
+    protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
+        if ((invoice.totalPrepaidAmount == null || invoice.totalPrepaidAmount == BigDecimal.ZERO) && invoice.zfCharges.isEmpty() && invoice.zfAllowances.isEmpty()) {
+            return null
+        }
+
+        return AmountAdjustments(
+            invoice.totalPrepaidAmount,
+            invoice.zfCharges.mapNotNull { mapChargeOrAllowance(it as? Charge) },
+            invoice.zfAllowances.mapNotNull { mapChargeOrAllowance(it as? Allowance ?: it as? Charge) }
+        )
+    }
+
+    private fun mapChargeOrAllowance(chargeOrAllowance: Charge?) = chargeOrAllowance?.let {
+        ChargeOrAllowance(it.totalAmount, null, null, it.percent, it.reason, it.reasonCode, it.taxPercent, it.categoryCode)
+    }
+
 
 
     @JvmName("mapNullable")

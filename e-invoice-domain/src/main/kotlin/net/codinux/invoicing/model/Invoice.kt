@@ -15,7 +15,9 @@ class Invoice(
     /**
      * Unique reference number of the buyer, e.g. the Leitweg-ID required by German authorities (Behörden)
      */
-    val buyerReference: String? = null
+    val buyerReference: String? = null,
+
+    val amountAdjustments: AmountAdjustments? = null,
 ) {
     override fun toString() = "$invoicingDate $invoiceNumber to $recipient"
 }
