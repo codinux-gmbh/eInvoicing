@@ -11,8 +11,8 @@ class EmailAttachment(
      * Should always be non-null, but can theoretically be null.
      */
     val mediaType: String?,
-    val invoice: Invoice?,
-    val file: File
+    val invoice: Invoice? = null,
+    val file: File? = null
 ) {
     override fun toString() = "$filename: $invoice"
 }

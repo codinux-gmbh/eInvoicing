@@ -146,14 +146,19 @@ open class EmailsFetcher(
     protected open fun findAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
         try {
             val part = messagePart.part
-            val invoice = tryToReadEInvoice(part, messagePart.mediaType, status)
+            val filename = File(part.fileName)
+            val extension = filename.extension
+
+            val invoice = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
 
             if (invoice != null || Part.ATTACHMENT.equals(part.description, ignoreCase = true)) {
-                val filename = File(part.fileName)
-                val file = File.createTempFile(filename.nameWithoutExtension, "." + filename.extension).also { file ->
-                    part.inputStream.use { it.copyTo(file.outputStream()) }
-                    file.deleteOnExit()
-                }
+                val file = if (extension !in status.options.downloadAttachmentsWithExtensions) null
+                        else {
+                            File.createTempFile(filename.nameWithoutExtension, "." + extension).also { file ->
+                                part.inputStream.use { it.copyTo(file.outputStream()) }
+                                file.deleteOnExit()
+                            }
+                        }
 
                 return EmailAttachment(part.fileName, messagePart.mediaType, invoice, file)
             }
@@ -165,12 +170,10 @@ open class EmailsFetcher(
         return null
     }
 
-    protected open fun tryToReadEInvoice(part: Part, mediaType: String?, status: FetchEmailsStatus): Invoice? = try {
-        val filename = part.fileName?.lowercase() ?: ""
-
-        if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
+    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Invoice? = try {
+        if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             eInvoiceReader.extractFromPdf(part.inputStream)
-        } else if (filename.endsWith(".xml") || mediaType == "application/xml" || mediaType == "text/xml") {
+        } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             eInvoiceReader.extractFromXml(part.inputStream)
         } else {
             null
