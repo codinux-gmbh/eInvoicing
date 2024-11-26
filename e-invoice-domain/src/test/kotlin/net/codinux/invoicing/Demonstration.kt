@@ -3,6 +3,7 @@ package net.codinux.invoicing
 import net.codinux.invoicing.creation.EInvoiceCreator
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.EmailsFetcher
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
@@ -76,9 +77,9 @@ class Demonstration {
         creator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
         // or if you already have the invoice XML:
-        val invoiceXml: String = "..." // e.g. creator.createZugferdXml(invoice)
+        val invoiceXml = creator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
 
-        creator.attachInvoiceXmlToPdf(invoiceXml, existingPdf, output)
+        creator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
     }
 
 

@@ -42,6 +42,19 @@ class EInvoiceCreatorTest {
         assertInvoiceXml(xml)
     }
 
+    @Test
+    fun createFacturXPdfWithXRechnungXML() {
+        val invoice = createInvoice()
+        val testFile = File.createTempFile("Zugferd", ".pdf")
+
+        underTest.createFacturXPdfWithXRechnungXML(invoice, testFile)
+
+        val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
+        val xml = String(importer.rawXML, Charsets.UTF_8)
+
+        assertInvoiceXml(xml)
+    }
+
 
     private fun createInvoice() = DataGenerator.createInvoice()
 

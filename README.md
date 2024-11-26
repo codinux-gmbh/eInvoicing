@@ -88,7 +88,7 @@ val creator = EInvoiceCreator()
 creator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
 // or if you already have the invoice XML:
-val invoiceXml: String = "..." // e.g. creator.createZugferdXml(invoice)
+val invoiceXml = creator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
 
-creator.attachInvoiceXmlToPdf(invoiceXml, existingPdf, output)
+creator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
 ```
