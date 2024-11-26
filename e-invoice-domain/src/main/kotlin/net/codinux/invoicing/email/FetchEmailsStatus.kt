@@ -4,6 +4,7 @@ import jakarta.mail.BodyPart
 import jakarta.mail.Message
 import jakarta.mail.Part
 import net.codinux.invoicing.email.model.EmailAccount
+import net.codinux.invoicing.filesystem.FileUtil
 import java.io.File
 
 data class FetchEmailsStatus(
@@ -13,7 +14,7 @@ data class FetchEmailsStatus(
 ) {
 
     val userAttachmentsDownloadDirectory: File by lazy {
-        val userDirName = account.username.map { if (it in FetchEmailsOptions.IllegalFileCharacters || it.code < 32) '_' else it }.joinToString("")
+        val userDirName = FileUtil.removeIllegalFileCharacters(account.username)
 
         File(options.attachmentsDownloadDirectory, userDirName).also { it.mkdirs() }
     }

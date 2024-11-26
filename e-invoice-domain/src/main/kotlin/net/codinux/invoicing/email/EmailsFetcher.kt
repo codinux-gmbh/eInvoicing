@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.model.EmailAttachment
 import net.codinux.invoicing.email.model.Email
+import net.codinux.invoicing.filesystem.FileUtil
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
@@ -199,7 +200,7 @@ open class EmailsFetcher(
     }
 
     private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
-        File(status.userAttachmentsDownloadDirectory, part.fileName).also { file ->
+        File(status.userAttachmentsDownloadDirectory, FileUtil.removeIllegalFileCharacters(part.fileName)).also { file ->
             part.inputStream.use { it.copyTo(file.outputStream()) }
         }
 
