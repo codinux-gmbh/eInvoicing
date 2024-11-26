@@ -28,7 +28,7 @@ val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
     username = "", // your mail account username
     password = "", // your mail account username
     serverAddress = "", // IMAP server address
-    port = null // IMAP server port, leave null if default port 993
+    port = null // IMAP server port, can be left null for default port 993
 ))
 ```
 

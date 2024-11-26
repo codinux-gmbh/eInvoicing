@@ -15,7 +15,7 @@ class MailReaderTest {
             username = "",
             password = "",
             serverAddress = "",
-            port = null // can be left as null if default port 993 is used
+            port = null // IMAP server port, can be left null for default port 993
         )
     }
 
