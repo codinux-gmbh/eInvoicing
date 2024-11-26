@@ -271,8 +271,8 @@ open class MailReader(
         put("mail.imap.port", account.port?.toString() ?: "993")  // Default IMAP over SSL
         put("mail.imap.ssl.enable", "true")
 
-        put("mail.imap.connectiontimeout", "5000")
-        put("mail.imap.timeout", "5000")
+        put("mail.imap.connectiontimeout", "10000")
+        put("mail.imap.timeout", "10000")
     }
 
 }
