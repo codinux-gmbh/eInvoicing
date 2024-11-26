@@ -40,7 +40,7 @@ open class EmailsFetcher(
     open fun listenForNewEmails(account: EmailAccount, options: ListenForNewMailsOptions) = runBlocking {
         try {
             connect(account) { store ->
-                val folder = store.getFolder(options.emailFolderName)
+                val folder = store.getFolder(options.emailFolderName) as IMAPFolder
                 folder.open(Folder.READ_ONLY)
 
                 val status = FetchEmailsStatus(options)
@@ -63,7 +63,7 @@ open class EmailsFetcher(
         }
     }
 
-    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: Folder, options: ListenForNewMailsOptions) {
+    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: IMAPFolder, options: ListenForNewMailsOptions) {
         log.info { "Listening to new emails of ${account.username}" }
 
         // Use IMAP IDLE to keep the connection alive
@@ -73,7 +73,7 @@ open class EmailsFetcher(
                 folder.open(Folder.READ_ONLY)
             }
 
-            (folder as IMAPFolder).idle()
+            folder.idle()
 
             delay(250)
         }
