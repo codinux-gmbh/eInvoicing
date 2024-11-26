@@ -34,7 +34,7 @@ open class EmailsFetcher(
     protected val log by logger()
 
 
-    open fun listenForNewEmails(account: EmailAccount, options: FetchEmailsOptions) = runBlocking {
+    open fun listenForNewEmails(account: EmailAccount, options: ListenForNewMailsOptions) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(options.emailFolderName)

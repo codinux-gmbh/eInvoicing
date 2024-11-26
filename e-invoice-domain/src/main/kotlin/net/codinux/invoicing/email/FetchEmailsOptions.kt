@@ -1,6 +1,6 @@
 package net.codinux.invoicing.email
 
-data class FetchEmailsOptions(
+open class FetchEmailsOptions(
     val downloadMessageBody: Boolean = false,
     val emailFolderName: String = "INBOX",
 
