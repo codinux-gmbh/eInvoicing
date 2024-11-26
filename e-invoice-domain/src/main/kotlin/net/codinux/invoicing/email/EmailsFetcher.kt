@@ -54,22 +54,20 @@ open class EmailsFetcher(
                 })
 
                 launch(coroutineDispatcher) {
-                    keepConnectionOpen(account, folder)
+                    keepConnectionOpen(account, folder, options)
                 }
             }
         } catch (e: Throwable) {
             log.error(e) { "Listening to new emails of '${account.username}' failed" }
             options.onError?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
         }
-
-        log.info { "Stopped listening to new emails of '${account.username}'" }
     }
 
-    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: Folder) {
+    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: Folder, options: ListenForNewMailsOptions) {
         log.info { "Listening to new emails of ${account.username}" }
 
         // Use IMAP IDLE to keep the connection alive
-        while (true) {
+        while (options.stopListening.get() == false) {
             if (!folder.isOpen) {
                 log.info { "Reopening inbox of ${account.username} ..." }
                 folder.open(Folder.READ_ONLY)
@@ -79,6 +77,8 @@ open class EmailsFetcher(
 
             delay(250)
         }
+
+        log.info { "Stopped listening to new emails of '${account.username}'" }
     }
 
 
