@@ -48,7 +48,7 @@ open class EmailsFetcher(
                 val folder = store.getFolder(options.emailFolderName) as IMAPFolder
                 folder.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(account, options)
+                val status = FetchEmailsStatus(account, folder, options)
 
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
@@ -91,13 +91,13 @@ open class EmailsFetcher(
     open fun fetchAllEmails(account: EmailAccount, options: FetchEmailsOptions = FetchEmailsOptions()): FetchEmailsResult {
         try {
             return connect(account, options) { store ->
-                val inbox = store.getFolder(options.emailFolderName)
-                inbox.open(Folder.READ_ONLY)
+                val folder = store.getFolder(options.emailFolderName) as IMAPFolder
+                folder.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(account, options)
+                val status = FetchEmailsStatus(account, folder, options)
 
-                val emails = fetchAllEmailsInFolder(inbox, status).also {
-                    inbox.close(false)
+                val emails = fetchAllEmailsInFolder(status).also {
+                    folder.close(false)
                 }
 
                 FetchEmailsResult(emails, null, status.messageSpecificErrors)
@@ -109,7 +109,8 @@ open class EmailsFetcher(
         }
     }
 
-    protected open fun fetchAllEmailsInFolder(folder: Folder, status: FetchEmailsStatus): List<Email> = runBlocking {
+    protected open fun fetchAllEmailsInFolder(status: FetchEmailsStatus): List<Email> = runBlocking {
+        val folder = status.folder
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
@@ -141,7 +142,7 @@ open class EmailsFetcher(
 
         val email = Email(
             message.from?.joinToString(), message.subject ?: "",
-            message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
+            message.sentDate?.let { map(it) }, map(message.receivedDate), status.folder.getUID(message),
             parts.any { it.mediaType == "application/pgp-encrypted" },
             getPlainTextBody(messageBodyParts, status), getHtmlBody(messageBodyParts, status),
             attachments

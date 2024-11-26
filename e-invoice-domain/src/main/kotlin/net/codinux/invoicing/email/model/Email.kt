@@ -8,14 +8,7 @@ class Email(
     val subject: String,
     val sent: Instant?,
     val received: Instant,
-    /**
-     * From documentation of underlying mail library:
-     * "Since message numbers can change within a session if the folder is expunged, clients are advised not to use
-     * message numbers as references to messages."
-     *
-     * -> use with care. Message numbers are not valid / the same anymore after expunging.
-     */
-    val messageNumber: Int,
+    val messageId: Long,
     val isEncrypted: Boolean = false,
     val plainTextBody: String?,
     val htmlBody: String?,
