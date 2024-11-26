@@ -27,10 +27,10 @@ class MailReaderTest {
     fun listAllMessagesWithEInvoice() {
         val result = underTest.listAllMessagesWithEInvoice(mailAccount, true)
 
-        assertThat(result).isNotEmpty()
+        assertThat(result.emails).isNotEmpty()
 
-        val messagesWithoutBody = result.filter { it.plainTextOrHtmlBody == null }
-        assertThat(messagesWithoutBody).isEmpty()
+        val emailsWithoutBody = result.emails.filter { it.plainTextOrHtmlBody == null }
+        assertThat(emailsWithoutBody).isEmpty()
     }
 
 }
