@@ -154,9 +154,8 @@ open class EmailsFetcher(
             if (invoice != null || Part.ATTACHMENT.equals(part.description, ignoreCase = true)) {
                 val file = if (extension !in status.options.downloadAttachmentsWithExtensions) null
                         else {
-                            File.createTempFile(filename.nameWithoutExtension, "." + extension).also { file ->
+                            File(status.options.attachmentsDownloadDirectory, part.fileName).also { file ->
                                 part.inputStream.use { it.copyTo(file.outputStream()) }
-                                file.deleteOnExit()
                             }
                         }
 
