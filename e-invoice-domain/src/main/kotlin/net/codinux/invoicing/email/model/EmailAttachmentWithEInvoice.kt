@@ -1,4 +1,4 @@
-package net.codinux.invoicing.email
+package net.codinux.invoicing.email.model
 
 import net.codinux.invoicing.model.Invoice
 import java.io.File

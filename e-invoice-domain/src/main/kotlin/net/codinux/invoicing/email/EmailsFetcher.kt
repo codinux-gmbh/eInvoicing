@@ -9,6 +9,9 @@ import jakarta.mail.Store
 import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
 import kotlinx.coroutines.*
+import net.codinux.invoicing.email.model.EmailAccount
+import net.codinux.invoicing.email.model.EmailAttachmentWithEInvoice
+import net.codinux.invoicing.email.model.EmailWithInvoice
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger

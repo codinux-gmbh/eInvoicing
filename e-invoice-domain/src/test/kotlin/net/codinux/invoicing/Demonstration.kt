@@ -1,7 +1,7 @@
 package net.codinux.invoicing
 
 import net.codinux.invoicing.creation.EInvoiceCreator
-import net.codinux.invoicing.email.EmailAccount
+import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.EmailsFetcher
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem

@@ -1,4 +1,4 @@
-package net.codinux.invoicing.email
+package net.codinux.invoicing.email.model
 
 class EmailAccount(
     val username: String,
