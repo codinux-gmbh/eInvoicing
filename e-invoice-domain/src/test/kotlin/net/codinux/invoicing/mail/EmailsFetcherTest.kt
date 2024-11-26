@@ -6,11 +6,11 @@ import assertk.assertions.isNotEmpty
 import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
 
-@Ignore // not an automatic test, set your mail account settings below
+@Ignore // not an automatic test, set your email account settings below
 class EmailsFetcherTest {
 
     companion object {
-        // specify your mail account here
+        // specify your email account here
         private val emailAccount = EmailAccount(
             username = "",
             password = "",
@@ -24,8 +24,8 @@ class EmailsFetcherTest {
 
 
     @Test
-    fun listAllMessagesWithEInvoice() {
-        val result = underTest.listAllMessagesWithEInvoice(emailAccount, true)
+    fun fetchAllEmails() {
+        val result = underTest.fetchAllEmails(emailAccount, true)
 
         assertThat(result.emails).isNotEmpty()
 

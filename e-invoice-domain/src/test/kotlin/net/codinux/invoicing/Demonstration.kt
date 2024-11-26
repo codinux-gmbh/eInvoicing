@@ -27,12 +27,16 @@ class Demonstration {
     fun fromEmail() {
         val emailsFetcher = EmailsFetcher()
 
-        val mailsWithEInvoices = emailsFetcher.listAllMessagesWithEInvoice(EmailAccount(
-            username = "", // your mail account username
-            password = "", // your mail account username
+        val fetchResult = emailsFetcher.fetchAllEmails(EmailAccount(
+            username = "", // your email account username
+            password = "", // your email account username
             serverAddress = "", // IMAP server address
             port = null // IMAP server port, can be left null for default port 993
         ))
+
+        fetchResult.emails.forEach { email ->
+            println("${email.sender}: ${email.attachmentsWithEInvoice.firstNotNullOfOrNull { it.invoice }?.totalAmounts?.duePayableAmount}")
+        }
     }
 
     fun validate() {

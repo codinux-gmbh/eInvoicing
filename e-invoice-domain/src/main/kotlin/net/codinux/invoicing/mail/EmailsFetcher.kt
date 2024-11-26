@@ -29,13 +29,13 @@ open class EmailsFetcher(
     )
 
 
-    protected open val mailDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
+    protected open val coroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 
     protected val log by logger()
 
 
-    open fun listenForNewReceivedEInvoices(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
-                                           error: ((FetchEmailsError) -> Unit)? = null, eInvoiceReceived: (EmailWithInvoice) -> Unit) = runBlocking {
+    open fun listenForNewEmails(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
+                                error: ((FetchEmailsError) -> Unit)? = null, emailReceived: (EmailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(emailFolderName)
@@ -47,26 +47,26 @@ open class EmailsFetcher(
                     override fun messagesAdded(event: MessageCountEvent) {
                         event.messages.forEach { message ->
                             findEInvoice(message, status)?.let {
-                                eInvoiceReceived(it)
+                                emailReceived(it)
                             }
                         }
                     }
                 })
 
-                launch(mailDispatcher) {
+                launch(coroutineDispatcher) {
                     keepConnectionOpen(account, folder)
                 }
             }
         } catch (e: Throwable) {
-            log.error(e) { "Listening to new received eInvoices of '${account.username}' failed" }
+            log.error(e) { "Listening to new emails of '${account.username}' failed" }
             error?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
         }
 
-        log.info { "Stopped listening to new received eInvoices of '${account.username}'" }
+        log.info { "Stopped listening to new emails of '${account.username}'" }
     }
 
     protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: Folder) {
-        log.info { "Listening to new mails of ${account.username}" }
+        log.info { "Listening to new emails of ${account.username}" }
 
         // Use IMAP IDLE to keep the connection alive
         while (true) {
@@ -82,7 +82,7 @@ open class EmailsFetcher(
     }
 
 
-    open fun listAllMessagesWithEInvoice(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): FetchEmailsResult {
+    open fun fetchAllEmails(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): FetchEmailsResult {
         try {
             return connect(account) { store ->
                 val inbox = store.getFolder(emailFolderName)
@@ -90,31 +90,31 @@ open class EmailsFetcher(
 
                 val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody))
 
-                val mails = listAllMessagesWithEInvoiceInFolder(inbox, status).also {
+                val emails = fetchAllEmailsInFolder(inbox, status).also {
                     inbox.close(false)
                 }
 
-                FetchEmailsResult(mails, null, status.messageSpecificErrors)
+                FetchEmailsResult(emails, null, status.messageSpecificErrors)
             }
         } catch (e: Throwable) {
-            log.error(e) { "Could not read mails of account $account" }
+            log.error(e) { "Could not fetch emails of account $account" }
 
             return FetchEmailsResult(emptyList(), e)
         }
     }
 
-    protected open fun listAllMessagesWithEInvoiceInFolder(folder: Folder, status: FetchEmailsStatus): List<EmailWithInvoice> = runBlocking {
+    protected open fun fetchAllEmailsInFolder(folder: Folder, status: FetchEmailsStatus): List<EmailWithInvoice> = runBlocking {
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
         }
 
         IntRange(1, messageCount).mapNotNull { messageNumber -> // message numbers start at 1
-            async(mailDispatcher) {
+            async(coroutineDispatcher) {
                 try {
                     findEInvoice(folder.getMessage(messageNumber), status)
                 } catch (e: Throwable) {
-                    log.error(e) { "Could not get message with messageNumber $messageNumber" }
+                    log.error(e) { "Could not get email with messageNumber $messageNumber" }
                     status.addError(FetchEmailsErrorType.GetEmail, messageNumber, e)
                     null
                 }
