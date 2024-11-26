@@ -1,8 +1,8 @@
 package net.codinux.invoicing
 
 import net.codinux.invoicing.creation.EInvoiceCreator
-import net.codinux.invoicing.mail.MailAccount
-import net.codinux.invoicing.mail.MailReader
+import net.codinux.invoicing.mail.EmailAccount
+import net.codinux.invoicing.mail.EmailsFetcher
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
@@ -24,10 +24,10 @@ class Demonstration {
         val invoiceFromXml = reader.extractFromXml(File("XRechnung.xml"))
     }
 
-    fun fromMail() {
-        val mailReader = MailReader()
+    fun fromEmail() {
+        val emailsFetcher = EmailsFetcher()
 
-        val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
+        val mailsWithEInvoices = emailsFetcher.listAllMessagesWithEInvoice(EmailAccount(
             username = "", // your mail account username
             password = "", // your mail account username
             serverAddress = "", // IMAP server address

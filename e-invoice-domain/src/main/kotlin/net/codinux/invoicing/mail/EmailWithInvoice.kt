@@ -3,7 +3,7 @@ package net.codinux.invoicing.mail
 import java.time.Instant
 import java.time.ZoneId
 
-class MailWithInvoice(
+class EmailWithInvoice(
     val sender: String?,
     val subject: String,
     val sent: Instant?,
@@ -13,13 +13,13 @@ class MailWithInvoice(
      * "Since message numbers can change within a session if the folder is expunged, clients are advised not to use
      * message numbers as references to messages."
      *
-     * -> use with care. Message numbers are not valid / the same anymore after expunge.
+     * -> use with care. Message numbers are not valid / the same anymore after expunging.
      */
     val messageNumber: Int,
     val isEncrypted: Boolean = false,
     val plainTextBody: String?,
     val htmlBody: String?,
-    val attachmentsWithEInvoice: List<MailAttachmentWithEInvoice>
+    val attachmentsWithEInvoice: List<EmailAttachmentWithEInvoice>
 ) {
     val plainTextOrHtmlBody: String? by lazy { plainTextBody ?: htmlBody }
 

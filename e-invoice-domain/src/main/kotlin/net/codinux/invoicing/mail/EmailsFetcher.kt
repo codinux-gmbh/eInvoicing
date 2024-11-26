@@ -19,7 +19,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.math.max
 
-open class MailReader(
+open class EmailsFetcher(
     protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader()
 ) {
 
@@ -34,14 +34,14 @@ open class MailReader(
     protected val log by logger()
 
 
-    open fun listenForNewReceivedEInvoices(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
-                                           error: ((ReadMailError) -> Unit)? = null, eInvoiceReceived: (MailWithInvoice) -> Unit) = runBlocking {
+    open fun listenForNewReceivedEInvoices(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
+                                           error: ((FetchEmailsError) -> Unit)? = null, eInvoiceReceived: (EmailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(emailFolderName)
                 folder.open(Folder.READ_ONLY)
 
-                val status = ReadMailsStatus(ReadMailsOptions(downloadMessageBody))
+                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody))
 
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
@@ -59,13 +59,13 @@ open class MailReader(
             }
         } catch (e: Throwable) {
             log.error(e) { "Listening to new received eInvoices of '${account.username}' failed" }
-            error?.invoke(ReadMailError(ReadMailsErrorType.ListenForNewEmails, null, e))
+            error?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
         }
 
         log.info { "Stopped listening to new received eInvoices of '${account.username}'" }
     }
 
-    protected open suspend fun keepConnectionOpen(account: MailAccount, folder: Folder) {
+    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: Folder) {
         log.info { "Listening to new mails of ${account.username}" }
 
         // Use IMAP IDLE to keep the connection alive
@@ -82,28 +82,28 @@ open class MailReader(
     }
 
 
-    open fun listAllMessagesWithEInvoice(account: MailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): ReadMailsResult {
+    open fun listAllMessagesWithEInvoice(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): FetchEmailsResult {
         try {
             return connect(account) { store ->
                 val inbox = store.getFolder(emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
-                val status = ReadMailsStatus(ReadMailsOptions(downloadMessageBody))
+                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody))
 
                 val mails = listAllMessagesWithEInvoiceInFolder(inbox, status).also {
                     inbox.close(false)
                 }
 
-                ReadMailsResult(mails, null, status.mailSpecificErrors)
+                FetchEmailsResult(mails, null, status.messageSpecificErrors)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not read mails of account $account" }
 
-            return ReadMailsResult(emptyList(), e)
+            return FetchEmailsResult(emptyList(), e)
         }
     }
 
-    protected open fun listAllMessagesWithEInvoiceInFolder(folder: Folder, status: ReadMailsStatus): List<MailWithInvoice> = runBlocking {
+    protected open fun listAllMessagesWithEInvoiceInFolder(folder: Folder, status: FetchEmailsStatus): List<EmailWithInvoice> = runBlocking {
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
@@ -115,7 +115,7 @@ open class MailReader(
                     findEInvoice(folder.getMessage(messageNumber), status)
                 } catch (e: Throwable) {
                     log.error(e) { "Could not get message with messageNumber $messageNumber" }
-                    status.addError(ReadMailsErrorType.GetEmail, messageNumber, e)
+                    status.addError(FetchEmailsErrorType.GetEmail, messageNumber, e)
                     null
                 }
             }
@@ -124,7 +124,7 @@ open class MailReader(
             .filterNotNull()
     }
 
-    protected open fun findEInvoice(message: Message, status: ReadMailsStatus): MailWithInvoice? {
+    protected open fun findEInvoice(message: Message, status: FetchEmailsStatus): EmailWithInvoice? {
         val parts = getAllMessageParts(message)
 
         val attachmentsWithEInvoice = parts.mapNotNull { part ->
@@ -132,7 +132,7 @@ open class MailReader(
         }
 
         if (attachmentsWithEInvoice.isNotEmpty()) {
-            return MailWithInvoice(
+            return EmailWithInvoice(
                 message.from?.joinToString(), message.subject ?: "",
                 message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                 parts.any { it.mediaType == "application/pgp-encrypted" },
@@ -144,7 +144,7 @@ open class MailReader(
         return null
     }
 
-    protected open fun findEInvoice(messagePart: MessagePart, status: ReadMailsStatus): MailAttachmentWithEInvoice? {
+    protected open fun findEInvoice(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachmentWithEInvoice? {
         try {
             val part = messagePart.part
             val invoice = tryToReadEInvoice(part, messagePart.mediaType, status)
@@ -156,17 +156,17 @@ open class MailReader(
                     file.deleteOnExit()
                 }
 
-                return MailAttachmentWithEInvoice(part.fileName, messagePart.mediaType, invoice, file)
+                return EmailAttachmentWithEInvoice(part.fileName, messagePart.mediaType, invoice, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
-            status.addError(ReadMailsErrorType.GetAttachment, messagePart.part, e)
+            status.addError(FetchEmailsErrorType.GetAttachment, messagePart.part, e)
         }
 
         return null
     }
 
-    protected open fun tryToReadEInvoice(part: Part, mediaType: String?, status: ReadMailsStatus): Invoice? = try {
+    protected open fun tryToReadEInvoice(part: Part, mediaType: String?, status: FetchEmailsStatus): Invoice? = try {
         val filename = part.fileName?.lowercase() ?: ""
 
         if (filename.endsWith(".pdf") || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
@@ -178,7 +178,7 @@ open class MailReader(
         }
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${part.fileName}" }
-        status.addError(ReadMailsErrorType.ExtractInvoice, part, e)
+        status.addError(FetchEmailsErrorType.ExtractInvoice, part, e)
         null
     }
 
@@ -219,13 +219,13 @@ open class MailReader(
         }
     }
 
-    protected open fun getPlainTextBody(parts: Collection<MessagePart>, status: ReadMailsStatus) =
+    protected open fun getPlainTextBody(parts: Collection<MessagePart>, status: FetchEmailsStatus) =
         if (status.options.downloadMessageBody) getBodyWithMediaType(parts, "text/plain", status) else null
 
-    protected open fun getHtmlBody(parts: Collection<MessagePart>, status: ReadMailsStatus) =
+    protected open fun getHtmlBody(parts: Collection<MessagePart>, status: FetchEmailsStatus) =
         if (status.options.downloadMessageBody) getBodyWithMediaType(parts, "text/html", status) else null
 
-    protected open fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String, status: ReadMailsStatus): String? = try {
+    protected open fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String, status: FetchEmailsStatus): String? = try {
         val partsForMediaType = parts.filter { it.mediaType == mediaType }
 
         if (partsForMediaType.size == 1) {
@@ -245,7 +245,7 @@ open class MailReader(
         }
     } catch (e: Throwable) {
         log.error(e) { "Could not get message body for media type '$mediaType'" }
-        status.addError(ReadMailsErrorType.GetMesssageBody, parts.map { it.part }, e)
+        status.addError(FetchEmailsErrorType.GetMesssageBody, parts.map { it.part }, e)
         null
     }
 
@@ -253,7 +253,7 @@ open class MailReader(
         date.toInstant()
 
 
-    protected open fun <T> connect(account: MailAccount, connected: (Store) -> T): T {
+    protected open fun <T> connect(account: EmailAccount, connected: (Store) -> T): T {
         val properties = mapAccountToJavaMailProperties(account)
 
         val session = Session.getInstance(properties)
@@ -264,7 +264,7 @@ open class MailReader(
         }
     }
 
-    protected open fun mapAccountToJavaMailProperties(account: MailAccount) = Properties().apply {
+    protected open fun mapAccountToJavaMailProperties(account: EmailAccount) = Properties().apply {
         put("mail.store.protocol", "imap")
 
         put("mail.imap.host", account.serverAddress)

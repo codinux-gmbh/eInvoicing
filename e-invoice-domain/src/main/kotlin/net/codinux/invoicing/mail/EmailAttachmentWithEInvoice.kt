@@ -3,7 +3,7 @@ package net.codinux.invoicing.mail
 import net.codinux.invoicing.model.Invoice
 import java.io.File
 
-class MailAttachmentWithEInvoice(
+class EmailAttachmentWithEInvoice(
     val filename: String,
     /**
      * Attachment's media type like "application/xml", "application/pdf", ...

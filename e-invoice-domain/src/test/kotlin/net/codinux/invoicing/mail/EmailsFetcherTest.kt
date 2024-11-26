@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
 
 @Ignore // not an automatic test, set your mail account settings below
-class MailReaderTest {
+class EmailsFetcherTest {
 
     companion object {
         // specify your mail account here
-        private val mailAccount = MailAccount(
+        private val emailAccount = EmailAccount(
             username = "",
             password = "",
             serverAddress = "",
@@ -20,12 +20,12 @@ class MailReaderTest {
     }
 
 
-    private val underTest = MailReader()
+    private val underTest = EmailsFetcher()
 
 
     @Test
     fun listAllMessagesWithEInvoice() {
-        val result = underTest.listAllMessagesWithEInvoice(mailAccount, true)
+        val result = underTest.listAllMessagesWithEInvoice(emailAccount, true)
 
         assertThat(result.emails).isNotEmpty()
 

@@ -1,5 +1,5 @@
 package net.codinux.invoicing.mail
 
-data class ReadMailsOptions(
+data class FetchEmailsOptions(
     val downloadMessageBody: Boolean = false
 )

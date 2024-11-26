@@ -22,9 +22,9 @@ val invoiceFromXml = reader.extractFromXml(File("XRechnung.xml"))
 ### Find all invoices of an IMAP email account
 
 ```kotlin
-val mailReader = MailReader()
+val emailsFetcher = EmailsFetcher()
 
-val mailsWithEInvoices = mailReader.listAllMessagesWithEInvoice(MailAccount(
+val mailsWithEInvoices = emailsFetcher.listAllMessagesWithEInvoice(EmailAccount(
     username = "", // your mail account username
     password = "", // your mail account username
     serverAddress = "", // IMAP server address
