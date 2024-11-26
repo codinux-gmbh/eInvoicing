@@ -33,6 +33,11 @@ open class EmailsFetcher(
     )
 
 
+    companion object {
+        private val MessageBodyMediaTypes = listOf("text/plain", "text/html")
+    }
+
+
     protected val log by logger()
 
 
@@ -126,8 +131,14 @@ open class EmailsFetcher(
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
         val parts = getAllMessageParts(message)
+        val messageBodyParts = parts.filter { it.part.fileName == null && it.mediaType in MessageBodyMediaTypes }
+        val attachmentParts = parts.filter { it !in messageBodyParts }
 
-        val attachments = parts.mapNotNull { part ->
+        if (attachmentParts.any { it.mediaType in MessageBodyMediaTypes }) {
+            log.info { "Ups, that does not seem to be a message part" }
+        }
+
+        val attachments = attachmentParts.mapNotNull { part ->
             findAttachment(part, status)
         }
 
@@ -135,7 +146,7 @@ open class EmailsFetcher(
             message.from?.joinToString(), message.subject ?: "",
             message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
             parts.any { it.mediaType == "application/pgp-encrypted" },
-            getPlainTextBody(parts, status), getHtmlBody(parts, status),
+            getPlainTextBody(messageBodyParts, status), getHtmlBody(messageBodyParts, status),
             attachments
         )
 
