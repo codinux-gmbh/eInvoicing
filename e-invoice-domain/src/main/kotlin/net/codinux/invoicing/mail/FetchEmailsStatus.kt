@@ -7,7 +7,7 @@ import jakarta.mail.Part
 data class FetchEmailsStatus(
     val options: FetchEmailsOptions,
     val messageSpecificErrors: MutableList<FetchEmailsError> = mutableListOf(),
-    val error: ((FetchEmailsError) -> Unit)? = null
+    val onError: ((FetchEmailsError) -> Unit)? = null
 ) {
 
     fun addError(type: FetchEmailsErrorType, parts: Collection<Part>, error: Throwable) =
@@ -19,10 +19,10 @@ data class FetchEmailsStatus(
     fun addError(type: FetchEmailsErrorType, messageNumber: Int?, error: Throwable) =
         addError(FetchEmailsError(type, messageNumber, error))
 
-    fun addError(mailError: FetchEmailsError) {
-        messageSpecificErrors.add(mailError)
+    fun addError(error: FetchEmailsError) {
+        messageSpecificErrors.add(error)
 
-        error?.invoke(mailError)
+        onError?.invoke(error)
     }
 
     private fun getMessage(part: Part): Message? {

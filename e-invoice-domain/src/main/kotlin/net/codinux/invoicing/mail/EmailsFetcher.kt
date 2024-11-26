@@ -35,13 +35,13 @@ open class EmailsFetcher(
 
 
     open fun listenForNewEmails(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
-                                error: ((FetchEmailsError) -> Unit)? = null, emailReceived: (EmailWithInvoice) -> Unit) = runBlocking {
+                                onError: ((FetchEmailsError) -> Unit)? = null, emailReceived: (EmailWithInvoice) -> Unit) = runBlocking {
         try {
             connect(account) { store ->
                 val folder = store.getFolder(emailFolderName)
                 folder.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody))
+                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody), onError = onError)
 
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
@@ -59,7 +59,7 @@ open class EmailsFetcher(
             }
         } catch (e: Throwable) {
             log.error(e) { "Listening to new emails of '${account.username}' failed" }
-            error?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
+            onError?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
         }
 
         log.info { "Stopped listening to new emails of '${account.username}'" }
