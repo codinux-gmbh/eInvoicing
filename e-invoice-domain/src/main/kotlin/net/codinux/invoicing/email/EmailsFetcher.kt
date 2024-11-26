@@ -135,10 +135,6 @@ open class EmailsFetcher(
         val messageBodyParts = parts.filter { it.part.fileName == null && it.mediaType in MessageBodyMediaTypes }
         val attachmentParts = parts.filter { it !in messageBodyParts }
 
-        if (attachmentParts.any { it.mediaType in MessageBodyMediaTypes }) {
-            log.info { "Ups, that does not seem to be a message part" }
-        }
-
         val attachments = attachmentParts.mapNotNull { part ->
             findAttachment(part, status)
         }
