@@ -1,9 +1,9 @@
 package net.codinux.invoicing.email
 
-import net.codinux.invoicing.email.model.EmailWithInvoice
+import net.codinux.invoicing.email.model.Email
 
 data class FetchEmailsResult(
-    val emails: List<EmailWithInvoice>,
+    val emails: List<Email>,
     val overallError: Throwable?,
     val messageSpecificErrors: List<FetchEmailsError> = emptyList()
 )

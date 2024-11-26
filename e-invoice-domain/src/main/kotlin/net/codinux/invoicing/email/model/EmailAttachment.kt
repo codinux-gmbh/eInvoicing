@@ -3,7 +3,7 @@ package net.codinux.invoicing.email.model
 import net.codinux.invoicing.model.Invoice
 import java.io.File
 
-class EmailAttachmentWithEInvoice(
+class EmailAttachment(
     val filename: String,
     /**
      * Attachment's media type like "application/xml", "application/pdf", ...
@@ -11,7 +11,7 @@ class EmailAttachmentWithEInvoice(
      * Should always be non-null, but can theoretically be null.
      */
     val mediaType: String?,
-    val invoice: Invoice,
+    val invoice: Invoice?,
     val file: File
 ) {
     override fun toString() = "$filename: $invoice"

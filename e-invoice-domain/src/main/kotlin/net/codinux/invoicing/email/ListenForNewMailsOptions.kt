@@ -1,6 +1,6 @@
 package net.codinux.invoicing.email
 
-import net.codinux.invoicing.email.model.EmailWithInvoice
+import net.codinux.invoicing.email.model.Email
 import java.util.concurrent.atomic.AtomicBoolean
 
 open class ListenForNewMailsOptions(
@@ -10,5 +10,5 @@ open class ListenForNewMailsOptions(
     emailFolderName: String = "INBOX",
 
     onError: ((FetchEmailsError) -> Unit)? = null,
-    onEmailReceived: (EmailWithInvoice) -> Unit
+    onEmailReceived: (Email) -> Unit
 ) : FetchEmailsOptions(downloadMessageBody, emailFolderName, onError, onEmailReceived)

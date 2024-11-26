@@ -10,8 +10,8 @@ import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
 import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.EmailAccount
-import net.codinux.invoicing.email.model.EmailAttachmentWithEInvoice
-import net.codinux.invoicing.email.model.EmailWithInvoice
+import net.codinux.invoicing.email.model.EmailAttachment
+import net.codinux.invoicing.email.model.Email
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
@@ -47,7 +47,7 @@ open class EmailsFetcher(
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
                         event.messages.forEach { message ->
-                            findEInvoice(message, status)
+                            getEmail(message, status)
                         }
                     }
                 })
@@ -102,7 +102,7 @@ open class EmailsFetcher(
         }
     }
 
-    protected open fun fetchAllEmailsInFolder(folder: Folder, status: FetchEmailsStatus): List<EmailWithInvoice> = runBlocking {
+    protected open fun fetchAllEmailsInFolder(folder: Folder, status: FetchEmailsStatus): List<Email> = runBlocking {
         val messageCount = folder.messageCount
         if (messageCount <= 0) {
             return@runBlocking emptyList()
@@ -111,7 +111,7 @@ open class EmailsFetcher(
         IntRange(1, messageCount).mapNotNull { messageNumber -> // message numbers start at 1
             async(coroutineDispatcher) {
                 try {
-                    findEInvoice(folder.getMessage(messageNumber), status)
+                    getEmail(folder.getMessage(messageNumber), status)
                 } catch (e: Throwable) {
                     log.error(e) { "Could not get email with messageNumber $messageNumber" }
                     status.addError(FetchEmailsErrorType.GetEmail, messageNumber, e)
@@ -123,43 +123,39 @@ open class EmailsFetcher(
             .filterNotNull()
     }
 
-    protected open fun findEInvoice(message: Message, status: FetchEmailsStatus): EmailWithInvoice? {
+    protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
         val parts = getAllMessageParts(message)
 
-        val attachmentsWithEInvoice = parts.mapNotNull { part ->
-            findEInvoice(part, status)
+        val attachments = parts.mapNotNull { part ->
+            findAttachment(part, status)
         }
 
-        if (attachmentsWithEInvoice.isNotEmpty()) {
-            val email = EmailWithInvoice(
-                message.from?.joinToString(), message.subject ?: "",
-                message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
-                parts.any { it.mediaType == "application/pgp-encrypted" },
-                getPlainTextBody(parts, status), getHtmlBody(parts, status),
-                attachmentsWithEInvoice
-            )
+        val email = Email(
+            message.from?.joinToString(), message.subject ?: "",
+            message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
+            parts.any { it.mediaType == "application/pgp-encrypted" },
+            getPlainTextBody(parts, status), getHtmlBody(parts, status),
+            attachments
+        )
 
-            status.options.emailReceived(email)
+        status.options.emailReceived(email)
 
-            return email
-        }
-
-        return null
+        return email
     }
 
-    protected open fun findEInvoice(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachmentWithEInvoice? {
+    protected open fun findAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
         try {
             val part = messagePart.part
             val invoice = tryToReadEInvoice(part, messagePart.mediaType, status)
 
-            if (invoice != null) {
+            if (invoice != null || Part.ATTACHMENT.equals(part.description, ignoreCase = true)) {
                 val filename = File(part.fileName)
                 val file = File.createTempFile(filename.nameWithoutExtension, "." + filename.extension).also { file ->
                     part.inputStream.use { it.copyTo(file.outputStream()) }
                     file.deleteOnExit()
                 }
 
-                return EmailAttachmentWithEInvoice(part.fileName, messagePart.mediaType, invoice, file)
+                return EmailAttachment(part.fileName, messagePart.mediaType, invoice, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
