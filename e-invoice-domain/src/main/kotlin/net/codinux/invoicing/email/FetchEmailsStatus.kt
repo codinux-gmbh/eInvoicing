@@ -39,8 +39,8 @@ data class FetchEmailsStatus(
             return part
         }
 
-        (part as? BodyPart)?.parent.let { parent ->
-            return getMessage(part)
+        (part as? BodyPart)?.parent?.parent?.let { parent ->
+            return getMessage(parent)
         }
 
         return null
