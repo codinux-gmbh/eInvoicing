@@ -4,6 +4,11 @@ import net.codinux.invoicing.email.model.Email
 import java.io.File
 
 open class FetchEmailsOptions(
+    /**
+     * The ID of the last retrieved message. If set, only messages newer than this ID will be fetched.
+     */
+    val lastRetrievedMessageId: Long? = null,
+
     val downloadMessageBody: Boolean = false,
     /**
      * Set the extension (without the dot) of files that should be downloaded.

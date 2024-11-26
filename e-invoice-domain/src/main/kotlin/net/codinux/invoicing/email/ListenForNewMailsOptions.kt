@@ -16,4 +16,4 @@ open class ListenForNewMailsOptions(
 
     onError: ((FetchEmailsError) -> Unit)? = null,
     onEmailReceived: (Email) -> Unit
-) : FetchEmailsOptions(downloadMessageBody, downloadAttachmentsWithExtensions, attachmentsDownloadDirectory, emailFolderName, connectTimeoutSeconds, onError, onEmailReceived)
+) : FetchEmailsOptions(null, downloadMessageBody, downloadAttachmentsWithExtensions, attachmentsDownloadDirectory, emailFolderName, connectTimeoutSeconds, onError, onEmailReceived)

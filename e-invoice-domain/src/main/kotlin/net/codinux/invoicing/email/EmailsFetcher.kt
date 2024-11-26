@@ -6,6 +6,7 @@ import jakarta.mail.Multipart
 import jakarta.mail.Part
 import jakarta.mail.Session
 import jakarta.mail.Store
+import jakarta.mail.UIDFolder
 import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
 import kotlinx.coroutines.*
@@ -116,19 +117,23 @@ open class EmailsFetcher(
             return@runBlocking emptyList()
         }
 
-        IntRange(1, messageCount).mapNotNull { messageNumber -> // message numbers start at 1
-            async(coroutineDispatcher) {
-                try {
-                    getEmail(folder.getMessage(messageNumber), status)
-                } catch (e: Throwable) {
-                    log.error(e) { "Could not get email with messageNumber $messageNumber" }
-                    status.addError(FetchEmailsErrorType.GetEmail, messageNumber, e)
-                    null
+        async(coroutineDispatcher) {
+            val startUid = max(status.options.lastRetrievedMessageId?.let { it + 1 } ?: 0, 1) // message numbers start at 1
+
+            folder.getMessagesByUID(startUid, UIDFolder.MAXUID).mapNotNull { message ->
+                async(coroutineDispatcher) {
+                    try {
+                        getEmail(message, status)
+                    } catch (e: Throwable) {
+                        log.error(e) { "Could not get email $message" }
+                        status.addError(FetchEmailsErrorType.GetEmail, message, e)
+                        null
+                    }
                 }
             }
-        }
-            .awaitAll()
-            .filterNotNull()
+                .awaitAll()
+                .filterNotNull()
+        }.await()
     }
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
