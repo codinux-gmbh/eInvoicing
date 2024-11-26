@@ -1,4 +1,4 @@
-package net.codinux.invoicing.mail
+package net.codinux.invoicing.email
 
 import jakarta.mail.BodyPart
 import jakarta.mail.Message

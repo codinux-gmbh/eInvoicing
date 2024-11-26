@@ -1,4 +1,4 @@
-package net.codinux.invoicing.mail
+package net.codinux.invoicing.email
 
 import assertk.assertThat
 import assertk.assertions.isEmpty

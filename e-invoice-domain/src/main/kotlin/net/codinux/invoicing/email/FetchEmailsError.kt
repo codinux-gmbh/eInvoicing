@@ -1,4 +1,4 @@
-package net.codinux.invoicing.mail
+package net.codinux.invoicing.email
 
 data class FetchEmailsError(
     val type: FetchEmailsErrorType,

@@ -1,8 +1,8 @@
 package net.codinux.invoicing
 
 import net.codinux.invoicing.creation.EInvoiceCreator
-import net.codinux.invoicing.mail.EmailAccount
-import net.codinux.invoicing.mail.EmailsFetcher
+import net.codinux.invoicing.email.EmailAccount
+import net.codinux.invoicing.email.EmailsFetcher
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
