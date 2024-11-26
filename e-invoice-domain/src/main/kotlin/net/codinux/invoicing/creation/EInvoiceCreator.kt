@@ -5,6 +5,8 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import org.mustangproject.ZUGFeRD.*
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 
 open class EInvoiceCreator(
     protected open val mapper: MustangMapper = MustangMapper()
@@ -42,18 +44,26 @@ open class EInvoiceCreator(
     open fun createPdfWithAttachedXml(invoice: Invoice, outputFile: File, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX) {
         val xml = createXml(invoice, format)
 
-        createFacturXPdf(xml, format, outputFile)
+        createPdfWithAttachedXml(xml, format, outputFile)
     }
 
-    protected open fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) {
-        val xmlFile = File.createTempFile(outputFile.nameWithoutExtension, ".xml")
+    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) {
+        outputFile.outputStream().use { outputStream ->
+            createPdfWithAttachedXml(invoiceXml, format, outputStream)
+        }
+    }
+
+    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream) {
+        val xmlFile = File.createTempFile("${format.name}-invoice", ".xml")
             .also { it.writeText(invoiceXml) }
         val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
 
         val visualizer = ZUGFeRDVisualizer()
         visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
 
-        attachInvoiceXmlToPdf(invoiceXml, format, pdfFile, outputFile)
+        pdfFile.inputStream().use { inputStream ->
+            attachInvoiceXmlToPdf(invoiceXml, format, inputStream, outputFile)
+        }
 
         xmlFile.delete()
         pdfFile.delete()
@@ -65,19 +75,29 @@ open class EInvoiceCreator(
         attachInvoiceXmlToPdf(createXml(invoice, format), format, pdfFile, outputFile)
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: File, outputFile: File) {
+        pdfFile.inputStream().use { inputStream ->
+            outputFile.outputStream().use { outputStream ->
+                attachInvoiceXmlToPdf(invoiceXml, format, inputStream, outputStream)
+            }
+        }
+    }
+
+    open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: InputStream, outputFile: OutputStream) =
+        attachInvoiceXmlToPdf(invoiceXml, format, pdfFile.readAllBytes(), outputFile)
+
+    open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: ByteArray, outputFile: OutputStream) {
         val exporter = ZUGFeRDExporterFromA3()
             .setZUGFeRDVersion(2)
             .setProfile(getProfileNameForFormat(format))
-            .disableFacturX()
+//            .disableFacturX()
             .setProducer("danki die geile Sau")
             .setCreator(System.getProperty("user.name"))
+            .setCreatorTool("Unglaublich geiles eInvoicing Tool von codinux")
 
-        pdfFile.inputStream().use { exporter.load(it) }
+        exporter.load(pdfFile)
         exporter.setXML(invoiceXml.toByteArray())
 
-        outputFile.outputStream().use { outputStream ->
-            exporter.export(outputStream)
-        }
+        exporter.export(outputFile)
     }
 
 
