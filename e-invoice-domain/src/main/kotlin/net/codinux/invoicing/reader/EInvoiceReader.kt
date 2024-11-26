@@ -17,7 +17,7 @@ open class EInvoiceReader(
     }
 
 
-    open fun extractFromXml(xmlFile: File) = extractFromXml(xmlFile.inputStream())
+    open fun extractFromXml(xmlFile: File) = xmlFile.inputStream().use { extractFromXml(it) }
 
     open fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
 
@@ -28,7 +28,7 @@ open class EInvoiceReader(
         return extractInvoice(importer)
     }
 
-    open fun extractFromPdf(pdfFile: File) = extractFromPdf(pdfFile.inputStream())
+    open fun extractFromPdf(pdfFile: File) = pdfFile.inputStream().use { extractFromPdf(it) }
 
     open fun extractFromPdf(stream: InputStream): Invoice {
         val importer = ZUGFeRDInvoiceImporter(stream)
@@ -36,7 +36,7 @@ open class EInvoiceReader(
         return extractInvoice(importer)
     }
 
-    open fun extractXmlFromPdf(pdfFile: File) = extractXmlFromPdf(pdfFile.inputStream())
+    open fun extractXmlFromPdf(pdfFile: File) = pdfFile.inputStream().use { extractXmlFromPdf(it) }
 
     open fun extractXmlFromPdf(stream: InputStream): String {
         val importer = ZUGFeRDInvoiceImporter(stream)

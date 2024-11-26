@@ -197,7 +197,11 @@ open class EmailsFetcher(
 
     private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
         File(status.userAttachmentsDownloadDirectory, FileUtil.removeIllegalFileCharacters(part.fileName)).also { file ->
-            part.inputStream.use { it.copyTo(file.outputStream()) }
+            part.inputStream.use { inputStream ->
+                file.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
         }
 
 

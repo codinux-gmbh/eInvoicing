@@ -61,10 +61,12 @@ open class EInvoiceCreator(
             .setProducer("danki die geile Sau")
             .setCreator(System.getProperty("user.name"))
 
-        exporter.load(pdfFile.inputStream())
+        pdfFile.inputStream().use { exporter.load(it) }
         exporter.setXML(invoiceXml.toByteArray())
 
-        exporter.export(outputFile.outputStream())
+        outputFile.outputStream().use { outputStream ->
+            exporter.export(outputStream)
+        }
     }
 
 

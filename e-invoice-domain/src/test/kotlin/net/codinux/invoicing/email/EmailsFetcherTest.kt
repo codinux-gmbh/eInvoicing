@@ -3,6 +3,7 @@ package net.codinux.invoicing.email
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNull
 import net.codinux.invoicing.email.model.EmailAccount
 import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
@@ -28,6 +29,7 @@ class EmailsFetcherTest {
     fun fetchAllEmails() {
         val result = underTest.fetchAllEmails(emailAccount, FetchEmailsOptions(true))
 
+        assertThat(result.overallError).isNull()
         assertThat(result.emails).isNotEmpty()
 
         val emailsWithoutBody = result.emails.filter { it.plainTextOrHtmlBody == null }

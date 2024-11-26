@@ -35,9 +35,13 @@ open class FilesystemInvoiceReader(
         val extension = file.extension.lowercase()
 
         if (extension == "pdf") {
-            eInvoiceReader.extractFromPdf(file.inputStream())
+            file.inputStream().use { inputStream ->
+                eInvoiceReader.extractFromPdf(inputStream)
+            }
         } else if (extension == "xml") {
-            eInvoiceReader.extractFromXml(file.inputStream())
+            file.inputStream().use { inputStream ->
+                eInvoiceReader.extractFromXml(inputStream)
+            }
         } else {
             null
         }

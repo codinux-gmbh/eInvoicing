@@ -65,8 +65,10 @@ open class EInvoiceConverter {
     protected open fun createXRechnungXml(invoice: Invoice): String = EInvoiceCreator().createXRechnungXml(invoice)
 
     protected open fun copyResource(resourceName: String, outputFile: File, outputFileExtension: String) {
-        javaClass.classLoader.getResourceAsStream(resourceName).use {
-            it?.copyTo(File(outputFile.parentFile, outputFile.nameWithoutExtension + outputFileExtension).outputStream())
+        javaClass.classLoader.getResourceAsStream(resourceName).use { inputStream ->
+            File(outputFile.parentFile, outputFile.nameWithoutExtension + outputFileExtension).outputStream().use { outputStream ->
+                inputStream?.copyTo(outputStream)
+            }
         }
     }
 
