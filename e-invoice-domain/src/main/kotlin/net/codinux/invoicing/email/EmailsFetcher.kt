@@ -23,7 +23,8 @@ import java.util.concurrent.Executors
 import kotlin.math.max
 
 open class EmailsFetcher(
-    protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader()
+    protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader(),
+    protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 ) {
 
     protected data class MessagePart(
@@ -31,8 +32,6 @@ open class EmailsFetcher(
         val part: Part
     )
 
-
-    protected open val coroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 
     protected val log by logger()
 
