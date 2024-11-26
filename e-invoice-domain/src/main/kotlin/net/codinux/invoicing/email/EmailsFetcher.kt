@@ -42,7 +42,7 @@ open class EmailsFetcher(
                 val folder = store.getFolder(options.emailFolderName) as IMAPFolder
                 folder.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(options)
+                val status = FetchEmailsStatus(account, options)
 
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
@@ -53,7 +53,7 @@ open class EmailsFetcher(
                 })
 
                 launch(coroutineDispatcher) {
-                    keepConnectionOpen(account, folder, options)
+                    keepConnectionOpen(status, folder, options)
                 }
             }
         } catch (e: Throwable) {
@@ -62,13 +62,14 @@ open class EmailsFetcher(
         }
     }
 
-    protected open suspend fun keepConnectionOpen(account: EmailAccount, folder: IMAPFolder, options: ListenForNewMailsOptions) {
-        log.info { "Listening to new emails of ${account.username}" }
+    protected open suspend fun keepConnectionOpen(status: FetchEmailsStatus, folder: IMAPFolder, options: ListenForNewMailsOptions) {
+        val account = status.account
+        log.info { "Listening to new emails of $account" }
 
         // Use IMAP IDLE to keep the connection alive
         while (options.stopListening.get() == false) {
             if (!folder.isOpen) {
-                log.info { "Reopening inbox of ${account.username} ..." }
+                log.info { "Reopening inbox of $account ..." }
                 folder.open(Folder.READ_ONLY)
             }
 
@@ -77,7 +78,7 @@ open class EmailsFetcher(
             delay(250)
         }
 
-        log.info { "Stopped listening to new emails of '${account.username}'" }
+        log.info { "Stopped listening to new emails of '$account}'" }
     }
 
 
@@ -87,7 +88,7 @@ open class EmailsFetcher(
                 val inbox = store.getFolder(options.emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(options)
+                val status = FetchEmailsStatus(account, options)
 
                 val emails = fetchAllEmailsInFolder(inbox, status).also {
                     inbox.close(false)
@@ -146,6 +147,10 @@ open class EmailsFetcher(
     protected open fun findAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
         try {
             val part = messagePart.part
+            if (part.fileName == null) { // not an attachment
+                return null
+            }
+
             val filename = File(part.fileName)
             val extension = filename.extension
 
@@ -166,11 +171,6 @@ open class EmailsFetcher(
         return null
     }
 
-    private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
-        File(status.options.attachmentsDownloadDirectory, part.fileName).also { file ->
-            part.inputStream.use { it.copyTo(file.outputStream()) }
-        }
-
     protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<Invoice, File>? = try {
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             val file = downloadAttachment(part, status)
@@ -186,6 +186,11 @@ open class EmailsFetcher(
         status.addError(FetchEmailsErrorType.ExtractInvoice, part, e)
         null
     }
+
+    private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
+        File(status.userAttachmentsDownloadDirectory, part.fileName).also { file ->
+            part.inputStream.use { it.copyTo(file.outputStream()) }
+        }
 
 
     protected open fun getAllMessageParts(part: Part): List<MessagePart> {

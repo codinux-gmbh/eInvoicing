@@ -19,7 +19,9 @@ open class FetchEmailsOptions(
     companion object {
         val DefaultDownloadedAttachmentsWithExtensions = listOf("pdf", "xml")
 
-        val DefaultAttachmentsDownloadDirectory: File = Files.createTempDirectory("eInvoices").toFile()
+        val DefaultAttachmentsDownloadDirectory: File = File(System.getProperty("java.io.tmpdir"), "eInvoices").also { it.mkdirs() }
+
+        val IllegalFileCharacters = listOf('\\', '/', ':', '*', '?', '"', '<', '>', '|', '\u0000')
     }
 
     fun emailReceived(email: Email) {

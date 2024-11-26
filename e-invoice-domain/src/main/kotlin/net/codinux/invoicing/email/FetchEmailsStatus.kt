@@ -3,11 +3,21 @@ package net.codinux.invoicing.email
 import jakarta.mail.BodyPart
 import jakarta.mail.Message
 import jakarta.mail.Part
+import net.codinux.invoicing.email.model.EmailAccount
+import java.io.File
 
 data class FetchEmailsStatus(
+    val account: EmailAccount,
     val options: FetchEmailsOptions,
     val messageSpecificErrors: MutableList<FetchEmailsError> = mutableListOf()
 ) {
+
+    val userAttachmentsDownloadDirectory: File by lazy {
+        val userDirName = account.username.map { if (it in FetchEmailsOptions.IllegalFileCharacters || it.code < 32) '_' else it }.joinToString("")
+
+        File(options.attachmentsDownloadDirectory, userDirName).also { it.mkdirs() }
+    }
+
 
     fun addError(type: FetchEmailsErrorType, parts: Collection<Part>, error: Throwable) =
         addError(FetchEmailsError(type, parts.firstNotNullOfOrNull { getMessage(it) }?.messageNumber, error))
