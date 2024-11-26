@@ -58,7 +58,7 @@ class Demonstration {
         val creator = EInvoiceCreator()
 
         // create a PDF that also contains the eInvoice as XML attachment
-        creator.createFacturXPdf(invoice, pdfResultFile)
+        creator.createPdfWithAttachedXml(invoice, pdfResultFile)
 
         // create only the XML file
         val xml = creator.createFacturXXml(invoice)

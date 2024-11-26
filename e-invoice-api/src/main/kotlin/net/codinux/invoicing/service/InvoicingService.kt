@@ -27,7 +27,7 @@ class InvoicingService {
     fun createFacturXPdf(invoice: Invoice): Path {
         val resultFile = createTempPdfFile()
 
-        creator.createFacturXPdf(invoice, resultFile.toFile())
+        creator.createPdfWithAttachedXml(invoice, resultFile.toFile())
 
         return resultFile
     }

@@ -1,5 +1,6 @@
 package net.codinux.invoicing.creation
 
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.InvoiceAsserter
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
@@ -30,11 +31,11 @@ class EInvoiceCreatorTest {
     }
 
     @Test
-    fun createFacturXPdf() {
+    fun createPdfWithAttachedXml_FacturX() {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createFacturXPdf(invoice, testFile)
+        underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.FacturX)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
         val xml = String(importer.rawXML, Charsets.UTF_8)
@@ -43,11 +44,11 @@ class EInvoiceCreatorTest {
     }
 
     @Test
-    fun createFacturXPdfWithXRechnungXML() {
+    fun createPdfWithAttachedXml_XRechnung() {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createFacturXPdfWithXRechnungXML(invoice, testFile)
+        underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.XRechnung)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
         val xml = String(importer.rawXML, Charsets.UTF_8)
