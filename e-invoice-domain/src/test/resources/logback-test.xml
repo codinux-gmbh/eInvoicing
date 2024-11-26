@@ -21,4 +21,12 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <!-- Apache FOP will flood otherwise the log so that test run crashes -->
+    <logger name="org.apache.fop" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="org.apache.xmlgraphics.image.loader.spi.ImageImplRegistry" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
 </configuration>
