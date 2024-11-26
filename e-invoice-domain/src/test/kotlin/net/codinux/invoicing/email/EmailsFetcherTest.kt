@@ -25,7 +25,7 @@ class EmailsFetcherTest {
 
     @Test
     fun fetchAllEmails() {
-        val result = underTest.fetchAllEmails(emailAccount, true)
+        val result = underTest.fetchAllEmails(emailAccount, FetchEmailsOptions(true))
 
         assertThat(result.emails).isNotEmpty()
 

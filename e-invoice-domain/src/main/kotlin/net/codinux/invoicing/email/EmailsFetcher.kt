@@ -34,21 +34,18 @@ open class EmailsFetcher(
     protected val log by logger()
 
 
-    open fun listenForNewEmails(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX",
-                                onError: ((FetchEmailsError) -> Unit)? = null, emailReceived: (EmailWithInvoice) -> Unit) = runBlocking {
+    open fun listenForNewEmails(account: EmailAccount, options: FetchEmailsOptions) = runBlocking {
         try {
             connect(account) { store ->
-                val folder = store.getFolder(emailFolderName)
+                val folder = store.getFolder(options.emailFolderName)
                 folder.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody), onError = onError)
+                val status = FetchEmailsStatus(options)
 
                 folder.addMessageCountListener(object : MessageCountAdapter() {
                     override fun messagesAdded(event: MessageCountEvent) {
                         event.messages.forEach { message ->
-                            findEInvoice(message, status)?.let {
-                                emailReceived(it)
-                            }
+                            findEInvoice(message, status)
                         }
                     }
                 })
@@ -59,7 +56,7 @@ open class EmailsFetcher(
             }
         } catch (e: Throwable) {
             log.error(e) { "Listening to new emails of '${account.username}' failed" }
-            onError?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
+            options.onError?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
         }
 
         log.info { "Stopped listening to new emails of '${account.username}'" }
@@ -82,13 +79,13 @@ open class EmailsFetcher(
     }
 
 
-    open fun fetchAllEmails(account: EmailAccount, downloadMessageBody: Boolean = false, emailFolderName: String = "INBOX"): FetchEmailsResult {
+    open fun fetchAllEmails(account: EmailAccount, options: FetchEmailsOptions = FetchEmailsOptions()): FetchEmailsResult {
         try {
             return connect(account) { store ->
-                val inbox = store.getFolder(emailFolderName)
+                val inbox = store.getFolder(options.emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
-                val status = FetchEmailsStatus(FetchEmailsOptions(downloadMessageBody))
+                val status = FetchEmailsStatus(options)
 
                 val emails = fetchAllEmailsInFolder(inbox, status).also {
                     inbox.close(false)
@@ -132,13 +129,17 @@ open class EmailsFetcher(
         }
 
         if (attachmentsWithEInvoice.isNotEmpty()) {
-            return EmailWithInvoice(
+            val email = EmailWithInvoice(
                 message.from?.joinToString(), message.subject ?: "",
                 message.sentDate?.let { map(it) }, map(message.receivedDate), message.messageNumber,
                 parts.any { it.mediaType == "application/pgp-encrypted" },
                 getPlainTextBody(parts, status), getHtmlBody(parts, status),
                 attachmentsWithEInvoice
             )
+
+            status.options.emailReceived(email)
+
+            return email
         }
 
         return null
