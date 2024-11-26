@@ -43,7 +43,7 @@ open class EmailsFetcher(
 
     open fun listenForNewEmails(account: EmailAccount, options: ListenForNewMailsOptions) = runBlocking {
         try {
-            connect(account) { store ->
+            connect(account, options) { store ->
                 val folder = store.getFolder(options.emailFolderName) as IMAPFolder
                 folder.open(Folder.READ_ONLY)
 
@@ -89,7 +89,7 @@ open class EmailsFetcher(
 
     open fun fetchAllEmails(account: EmailAccount, options: FetchEmailsOptions = FetchEmailsOptions()): FetchEmailsResult {
         try {
-            return connect(account) { store ->
+            return connect(account, options) { store ->
                 val inbox = store.getFolder(options.emailFolderName)
                 inbox.open(Folder.READ_ONLY)
 
@@ -274,8 +274,8 @@ open class EmailsFetcher(
         date.toInstant()
 
 
-    protected open fun <T> connect(account: EmailAccount, connected: (Store) -> T): T {
-        val properties = mapAccountToJavaMailProperties(account)
+    protected open fun <T> connect(account: EmailAccount, options: FetchEmailsOptions, connected: (Store) -> T): T {
+        val properties = mapAccountToJavaMailProperties(account, options)
 
         val session = Session.getInstance(properties)
         session.getStore("imap").use { store ->
@@ -285,15 +285,16 @@ open class EmailsFetcher(
         }
     }
 
-    protected open fun mapAccountToJavaMailProperties(account: EmailAccount) = Properties().apply {
+    protected open fun mapAccountToJavaMailProperties(account: EmailAccount, options: FetchEmailsOptions) = Properties().apply {
         put("mail.store.protocol", "imap")
 
         put("mail.imap.host", account.serverAddress)
         put("mail.imap.port", account.port?.toString() ?: "993")  // Default IMAP over SSL
         put("mail.imap.ssl.enable", "true")
 
-        put("mail.imap.connectiontimeout", "10000")
-        put("mail.imap.timeout", "10000")
+        val timeout = (options.connectTimeoutSeconds * 1000).toString()
+        put("mail.imap.connectiontimeout", timeout)
+        put("mail.imap.timeout", timeout)
     }
 
 }

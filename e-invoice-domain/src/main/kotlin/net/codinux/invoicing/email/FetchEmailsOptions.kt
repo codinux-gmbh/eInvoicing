@@ -2,7 +2,6 @@ package net.codinux.invoicing.email
 
 import net.codinux.invoicing.email.model.Email
 import java.io.File
-import java.nio.file.Files
 
 open class FetchEmailsOptions(
     val downloadMessageBody: Boolean = false,
@@ -11,7 +10,9 @@ open class FetchEmailsOptions(
      */
     val downloadAttachmentsWithExtensions: List<String> = DefaultDownloadedAttachmentsWithExtensions,
     val attachmentsDownloadDirectory: File = DefaultAttachmentsDownloadDirectory,
+
     val emailFolderName: String = "INBOX",
+    val connectTimeoutSeconds: Int = 5,
 
     val onError: ((FetchEmailsError) -> Unit)? = null,
     val onEmailReceived: ((Email) -> Unit)? = null
@@ -21,7 +22,7 @@ open class FetchEmailsOptions(
 
         val DefaultAttachmentsDownloadDirectory: File = File(System.getProperty("java.io.tmpdir"), "eInvoices").also { it.mkdirs() }
 
-        val IllegalFileCharacters = listOf('\\', '/', ':', '*', '?', '"', '<', '>', '|', '\u0000')
+        val IllegalFileCharacters = listOf('\\', '/', ':', '*', '?', '"', '<', '>', '|', '\u0000') // TODO: make generic for attachment filename
     }
 
     fun emailReceived(email: Email) {

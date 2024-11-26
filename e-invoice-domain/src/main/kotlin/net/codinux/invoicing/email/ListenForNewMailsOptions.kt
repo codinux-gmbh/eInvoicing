@@ -10,8 +10,10 @@ open class ListenForNewMailsOptions(
     downloadMessageBody: Boolean = false,
     downloadAttachmentsWithExtensions: List<String> = DefaultDownloadedAttachmentsWithExtensions,
     attachmentsDownloadDirectory: File = DefaultAttachmentsDownloadDirectory,
+
     emailFolderName: String = "INBOX",
+    connectTimeoutSeconds: Int = 5,
 
     onError: ((FetchEmailsError) -> Unit)? = null,
     onEmailReceived: (Email) -> Unit
-) : FetchEmailsOptions(downloadMessageBody, downloadAttachmentsWithExtensions, attachmentsDownloadDirectory, emailFolderName, onError, onEmailReceived)
+) : FetchEmailsOptions(downloadMessageBody, downloadAttachmentsWithExtensions, attachmentsDownloadDirectory, emailFolderName, connectTimeoutSeconds, onError, onEmailReceived)
