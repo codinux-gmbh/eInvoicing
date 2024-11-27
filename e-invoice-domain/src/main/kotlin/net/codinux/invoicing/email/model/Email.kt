@@ -4,10 +4,12 @@ import java.time.Instant
 import java.time.ZoneId
 
 class Email(
-    val sender: String?,
+    val sender: EmailAddress?,
     val subject: String,
-    val sent: Instant?,
-    val received: Instant,
+    val to: List<EmailAddress>,
+    val cc: List<EmailAddress>,
+    val replayTo: EmailAddress?,
+    val date: Instant,
     val messageId: Long,
     val isEncrypted: Boolean = false,
     val plainTextBody: String?,
@@ -16,5 +18,5 @@ class Email(
 ) {
     val plainTextOrHtmlBody: String? by lazy { plainTextBody ?: htmlBody }
 
-    override fun toString() = "${(sent ?: received).atZone(ZoneId.systemDefault()).toLocalDate()} $sender: $subject, ${attachments.size} attachment(s)"
+    override fun toString() = "${date.atZone(ZoneId.systemDefault()).toLocalDate()} $sender: $subject, ${attachments.size} attachment(s)"
 }

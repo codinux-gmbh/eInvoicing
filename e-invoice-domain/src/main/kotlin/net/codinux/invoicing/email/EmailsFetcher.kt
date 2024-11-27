@@ -3,10 +3,13 @@ package net.codinux.invoicing.email
 import jakarta.mail.*
 import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
+import jakarta.mail.internet.InternetAddress
+import jakarta.mail.internet.MimeUtility
 import kotlinx.coroutines.*
-import net.codinux.invoicing.email.model.EmailAccount
-import net.codinux.invoicing.email.model.EmailAttachment
 import net.codinux.invoicing.email.model.Email
+import net.codinux.invoicing.email.model.EmailAccount
+import net.codinux.invoicing.email.model.EmailAddress
+import net.codinux.invoicing.email.model.EmailAttachment
 import net.codinux.invoicing.filesystem.FileUtil
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -151,9 +154,13 @@ open class EmailsFetcher(
             getAttachment(part, status)
         }
 
+        val sender = message.from?.firstOrNull()?.let { map(it) }
+
         val email = Email(
-            message.from?.joinToString(), message.subject ?: "",
-            message.sentDate?.let { map(it) }, map(message.receivedDate), status.folder.getUID(message),
+            sender, message.subject ?: "",
+            message.getRecipients(Message.RecipientType.TO).map { map(it) }, message.getRecipients(Message.RecipientType.CC).map { map(it) },
+            (message.replyTo.firstOrNull() as? InternetAddress)?.let { if (it.address != sender?.address) map(it) else null }, // only set replyTo if it differs from sender
+            map(message.sentDate ?: message.receivedDate), status.folder.getUID(message),
             parts.any { it.mediaType == "application/pgp-encrypted" },
             getPlainTextBody(messageBodyParts, status), getHtmlBody(messageBodyParts, status),
             attachments
@@ -163,6 +170,13 @@ open class EmailsFetcher(
 
         return email
     }
+
+    protected open fun map(address: Address): EmailAddress =
+        if (address is InternetAddress) { // use MimeUtility to parse e.g. Quoted-printable names that e.g. start with "=?UTF-8?Q?"
+            EmailAddress(address.address, address.personal?.let { MimeUtility.decodeText(it) })
+        } else {
+            EmailAddress(address.toString())
+        }
 
     protected open fun getAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
         try {
