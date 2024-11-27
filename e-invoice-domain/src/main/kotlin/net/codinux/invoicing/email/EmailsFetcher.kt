@@ -117,23 +117,21 @@ open class EmailsFetcher(
             return@runBlocking emptyList()
         }
 
-        async(coroutineDispatcher) {
-            val startUid = max(status.options.lastRetrievedMessageId?.let { it + 1 } ?: 0, 1) // message numbers start at 1
+        val startUid = max(status.options.lastRetrievedMessageId?.let { it + 1 } ?: 0, 1) // message numbers start at 1
 
-            folder.getMessagesByUID(startUid, UIDFolder.MAXUID).mapNotNull { message ->
-                async(coroutineDispatcher) {
-                    try {
-                        getEmail(message, status)
-                    } catch (e: Throwable) {
-                        log.error(e) { "Could not get email $message" }
-                        status.addError(FetchEmailsErrorType.GetEmail, message, e)
-                        null
-                    }
+        folder.getMessagesByUID(startUid, UIDFolder.MAXUID).mapNotNull { message ->
+            async(coroutineDispatcher) {
+                try {
+                    getEmail(message, status)
+                } catch (e: Throwable) {
+                    log.error(e) { "Could not get email $message" }
+                    status.addError(FetchEmailsErrorType.GetEmail, message, e)
+                    null
                 }
             }
-                .awaitAll()
-                .filterNotNull()
-        }.await()
+        }
+            .awaitAll()
+            .filterNotNull()
     }
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
