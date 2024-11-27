@@ -140,7 +140,7 @@ open class EmailsFetcher(
         val attachmentParts = parts.filter { it !in messageBodyParts }
 
         val attachments = attachmentParts.mapNotNull { part ->
-            findAttachment(part, status)
+            getAttachment(part, status)
         }
 
         val email = Email(
@@ -156,7 +156,7 @@ open class EmailsFetcher(
         return email
     }
 
-    protected open fun findAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
+    protected open fun getAttachment(messagePart: MessagePart, status: FetchEmailsStatus): EmailAttachment? {
         try {
             val part = messagePart.part
             if (part.fileName == null) { // not an attachment
