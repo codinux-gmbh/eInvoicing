@@ -15,6 +15,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
 import org.eclipse.angus.mail.imap.IMAPFolder
+import org.eclipse.angus.mail.imap.IMAPMessage
 import java.io.File
 import java.time.Instant
 import java.util.*
@@ -146,6 +147,7 @@ open class EmailsFetcher(
     }
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
+        val imapMessage = message as? IMAPMessage
         val parts = getAllMessageParts(message)
         val messageBodyParts = parts.filter { it.part.fileName == null && it.mediaType in MessageBodyMediaTypes }
         val attachmentParts = parts.filter { it !in messageBodyParts }
@@ -162,6 +164,7 @@ open class EmailsFetcher(
             (message.replyTo.firstOrNull() as? InternetAddress)?.let { if (it.address != sender?.address) map(it) else null }, // only set replyTo if it differs from sender
             status.folder.getUID(message),
             parts.any { it.mediaType == "application/pgp-encrypted" },
+            imapMessage?.contentLanguage?.firstOrNull(),
             getPlainTextBody(messageBodyParts, status), getHtmlBody(messageBodyParts, status),
             attachments
         )
