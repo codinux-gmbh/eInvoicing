@@ -1,12 +1,6 @@
 package net.codinux.invoicing.email
 
-import jakarta.mail.Folder
-import jakarta.mail.Message
-import jakarta.mail.Multipart
-import jakarta.mail.Part
-import jakarta.mail.Session
-import jakarta.mail.Store
-import jakarta.mail.UIDFolder
+import jakarta.mail.*
 import jakarta.mail.event.MessageCountAdapter
 import jakarta.mail.event.MessageCountEvent
 import kotlinx.coroutines.*
@@ -117,9 +111,14 @@ open class EmailsFetcher(
             return@runBlocking emptyList()
         }
 
-        val startUid = max(status.options.lastRetrievedMessageId?.let { it + 1 } ?: 0, 1) // message numbers start at 1
+        val startUid = (status.options.lastRetrievedMessageId ?: 0) + 1 // message numbers start at 1
+        val messages = folder.getMessagesByUID(startUid, UIDFolder.MAXUID)
 
-        folder.getMessagesByUID(startUid, UIDFolder.MAXUID).mapNotNull { message ->
+        // for each data type like envelope (from, subject, ...), body structure, if message is unread, ... a network request is
+        // executed, making the overall process very slow -> use FetchProfile to prefetch requested data with a single request
+        folder.fetch(messages, getFetchProfile(status))
+
+        messages.mapNotNull { message ->
             async(coroutineDispatcher) {
                 try {
                     getEmail(message, status)
@@ -132,6 +131,15 @@ open class EmailsFetcher(
         }
             .awaitAll()
             .filterNotNull()
+    }
+
+    private fun getFetchProfile(status: FetchEmailsStatus) = FetchProfile().apply {
+        add(UIDFolder.FetchProfileItem.UID) // message UID
+        add(FetchProfile.Item.ENVELOPE) // from, subject, to, ...
+        add(FetchProfile.Item.CONTENT_INFO) // content type, disposition, ...
+
+        // add(FetchProfile.Item.FLAGS) // message status like unread, deleted, draft, ...
+        // add(IMAPFolder.FetchProfileItem.MESSAGE) // the entire message including all attachments, headers, ... there should be rarely a use case for it
     }
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
