@@ -6,15 +6,15 @@ import java.time.ZoneId
 class Email(
     val sender: EmailAddress?,
     val subject: String,
+    val date: Instant,
     val to: List<EmailAddress>,
     val cc: List<EmailAddress>,
-    val replayTo: EmailAddress?,
-    val date: Instant,
+    val replayTo: EmailAddress? = null,
     val messageId: Long,
     val isEncrypted: Boolean = false,
-    val plainTextBody: String?,
-    val htmlBody: String?,
-    val attachments: List<EmailAttachment>
+    val plainTextBody: String? = null,
+    val htmlBody: String? = null,
+    val attachments: List<EmailAttachment> = emptyList()
 ) {
     val plainTextOrHtmlBody: String? by lazy { plainTextBody ?: htmlBody }
 
