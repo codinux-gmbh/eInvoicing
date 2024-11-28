@@ -31,7 +31,9 @@ open class EmailsFetcher(
 
 
     companion object {
-        private val MessageBodyMediaTypes = listOf("text/plain", "text/html")
+        protected val MessageBodyMediaTypes = listOf("text/plain", "text/html")
+
+        protected val FileNotDownloadedOrErrorOccurred = Pair<Invoice?, File?>(null, null)
     }
 
 
@@ -193,14 +195,14 @@ open class EmailsFetcher(
             val filename = File(part.fileName)
             val extension = filename.extension
 
-            val invoiceAndFile = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
+            val (invoice, invoiceFile) = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
 
-            if (invoiceAndFile != null || Part.ATTACHMENT.equals(part.disposition, ignoreCase = true)) {
-                val file = invoiceAndFile?.second ?:
+            if (invoice != null || Part.ATTACHMENT.equals(part.disposition, ignoreCase = true)) {
+                val file = invoiceFile ?:
                             if (extension !in status.options.downloadAttachmentsWithExtensions) null
                             else downloadAttachment(part, status)
 
-                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoiceAndFile?.first, file)
+                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoice, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
@@ -217,21 +219,16 @@ open class EmailsFetcher(
         else -> ContentDisposition.Unknown
     }
 
-    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<Invoice, File>? = try {
+    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<Invoice?, File?> =
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             val file = downloadAttachment(part, status)
-            Pair(eInvoiceReader.extractFromPdf(part.inputStream), file)
+            Pair(eInvoiceReader.extractFromPdfOrNull(part.inputStream), file)
         } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             val file = downloadAttachment(part, status)
-            Pair(eInvoiceReader.extractFromXml(part.inputStream), file)
+            Pair(eInvoiceReader.extractFromXmlOrNull(part.inputStream), file)
         } else {
-            null
+            FileNotDownloadedOrErrorOccurred
         }
-    } catch (e: Throwable) {
-        log.debug(e) { "Could not extract invoices from ${part.fileName}" }
-        status.addError(FetchEmailsErrorType.ExtractInvoice, part, e)
-        null
-    }
 
     private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
         File(status.userAttachmentsDownloadDirectory, FileUtil.removeIllegalFileCharacters(part.fileName)).also { file ->
