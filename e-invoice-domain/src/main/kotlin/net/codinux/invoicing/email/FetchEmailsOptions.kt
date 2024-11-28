@@ -12,12 +12,12 @@ open class FetchEmailsOptions(
      */
     val lastRetrievedMessageId: Long? = null,
 
-    val downloadMessageBody: Boolean = false,
+    val downloadMessageBody: Boolean = true,
     /**
      * If set to true and message contains a plain text message body, then only the plain text message body is downloaded
      * and the HTML message body ignored / not downloaded. Reduces process time about 50 % (if no attachments get downloaded).
      */
-    val downloadOnlyPlainTextOrHtmlMessageBody: Boolean = false,
+    val downloadOnlyPlainTextOrHtmlMessageBody: Boolean = true,
     val downloadOnlyMessagesNewerThan: LocalDate? = null,
 
     /**

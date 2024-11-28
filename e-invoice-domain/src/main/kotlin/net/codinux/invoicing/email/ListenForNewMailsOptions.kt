@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 open class ListenForNewMailsOptions(
     val stopListening: AtomicBoolean = AtomicBoolean(false),
 
-    downloadMessageBody: Boolean = false,
-    downloadOnlyPlainTextOrHtmlMessageBody: Boolean = false,
+    downloadMessageBody: Boolean = true,
+    downloadOnlyPlainTextOrHtmlMessageBody: Boolean = true,
 
     downloadAttachmentsWithExtensions: List<String> = DefaultDownloadedAttachmentsWithExtensions,
     attachmentsDownloadDirectory: File = DefaultAttachmentsDownloadDirectory,
