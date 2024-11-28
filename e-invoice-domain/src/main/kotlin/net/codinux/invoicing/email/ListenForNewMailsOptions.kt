@@ -20,7 +20,7 @@ open class ListenForNewMailsOptions(
     onEmailReceived: (Email) -> Unit
 ) : FetchEmailsOptions(
     null,
-    downloadMessageBody, downloadOnlyPlainTextOrHtmlMessageBody,
+    downloadMessageBody, downloadOnlyPlainTextOrHtmlMessageBody, null,
     downloadAttachmentsWithExtensions, attachmentsDownloadDirectory,
     emailFolderName, connectTimeoutSeconds, onError, onEmailReceived
 )

@@ -146,6 +146,15 @@ open class EmailsFetcher(
     }
 
     protected open fun getEmail(message: Message, status: FetchEmailsStatus): Email? {
+        val date = map(message.sentDate ?: message.receivedDate)
+        status.options.minMessageDate?.let { minDate ->
+            if (date.isBefore(minDate)) {
+                log.debug { "Ignoring message $message with date $date as it is before downloadOnlyMessagesNewerThan date $minDate" }
+                return null
+            }
+        }
+
+
         val imapMessage = message as? IMAPMessage
         val messageId = status.folder.getUID(message)
 
@@ -162,7 +171,7 @@ open class EmailsFetcher(
 
         val email = Email(
             messageId,
-            sender, message.subject ?: "", map(message.sentDate ?: message.receivedDate),
+            sender, message.subject ?: "", date,
 
             message.getRecipients(Message.RecipientType.TO).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.CC).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.BCC).orEmpty().map { map(it) },
             (message.replyTo?.firstOrNull() as? InternetAddress)?.let { if (it.address != sender?.address) map(it) else null }, // only set replyTo if it differs from sender

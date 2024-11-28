@@ -2,6 +2,9 @@ package net.codinux.invoicing.email
 
 import net.codinux.invoicing.email.model.Email
 import java.io.File
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 open class FetchEmailsOptions(
     /**
@@ -15,6 +18,7 @@ open class FetchEmailsOptions(
      * and the HTML message body ignored / not downloaded. Reduces process time about 50 % (if no attachments get downloaded).
      */
     val downloadOnlyPlainTextOrHtmlMessageBody: Boolean = false,
+    val downloadOnlyMessagesNewerThan: LocalDate? = null,
 
     /**
      * Set the extension (without the dot) of files that should be downloaded.
@@ -33,6 +37,9 @@ open class FetchEmailsOptions(
 
         val DefaultAttachmentsDownloadDirectory: File = File(System.getProperty("java.io.tmpdir"), "eInvoices").also { it.mkdirs() }
     }
+
+
+    val minMessageDate: Instant? by lazy { downloadOnlyMessagesNewerThan?.atStartOfDay(ZoneId.systemDefault())?.toInstant() }
 
     fun emailReceived(email: Email) {
         onEmailReceived?.invoke(email)
