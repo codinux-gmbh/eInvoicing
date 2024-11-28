@@ -327,6 +327,7 @@ open class EmailsFetcher(
     }
 
     protected open fun mapAccountToJavaMailProperties(account: EmailAccount, options: FetchEmailsOptions) = Properties().apply {
+        // the documentation of all properties can be found here: https://javaee.github.io/javamail/docs/api/com/sun/mail/imap/package-summary.html
         put("mail.store.protocol", "imap")
 
         put("mail.imap.host", account.serverAddress)
@@ -336,6 +337,10 @@ open class EmailsFetcher(
         val timeout = (options.connectTimeoutSeconds * 1000).toString()
         put("mail.imap.connectiontimeout", timeout)
         put("mail.imap.timeout", timeout)
+
+        // speeds up fetching data tremendously
+        put("mail.imap.fetchsize", "819200") // Partial fetch size in bytes. Defaults to 16K.
+        put("mail.imap.partialfetch", "false") // Controls whether the IMAP partial-fetch capability should be used. Defaults to true.
     }
 
 }
