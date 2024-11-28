@@ -159,11 +159,15 @@ open class EmailsFetcher(
         val email = Email(
             status.folder.getUID(message),
             sender, message.subject ?: "", map(message.sentDate ?: message.receivedDate),
+
             message.getRecipients(Message.RecipientType.TO).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.CC).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.BCC).orEmpty().map { map(it) },
             (message.replyTo?.firstOrNull() as? InternetAddress)?.let { if (it.address != sender?.address) map(it) else null }, // only set replyTo if it differs from sender
-            parts.any { it.mediaType == "application/pgp-encrypted" },
-            imapMessage?.contentLanguage?.firstOrNull(),
+
             plainTextBody, getHtmlBody(messageBodyParts, status, plainTextBody),
+
+            imapMessage?.contentLanguage?.firstOrNull(),
+            parts.any { it.mediaType == "application/pgp-encrypted" },
+
             attachments
         )
 

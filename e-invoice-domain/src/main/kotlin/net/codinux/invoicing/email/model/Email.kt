@@ -24,10 +24,11 @@ class Email(
     val bcc: List<EmailAddress> = emptyList(),
     val replayTo: EmailAddress? = null,
 
-    val isEncrypted: Boolean = false,
-    val contentLanguage: String? = null,
     val plainTextBody: String? = null,
     val htmlBody: String? = null,
+
+    val contentLanguage: String? = null,
+    val isEncrypted: Boolean = false,
 
     val attachments: List<EmailAttachment> = emptyList()
 ) {
