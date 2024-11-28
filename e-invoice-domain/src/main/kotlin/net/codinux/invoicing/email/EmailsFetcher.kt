@@ -6,10 +6,7 @@ import jakarta.mail.event.MessageCountEvent
 import jakarta.mail.internet.InternetAddress
 import jakarta.mail.internet.MimeUtility
 import kotlinx.coroutines.*
-import net.codinux.invoicing.email.model.Email
-import net.codinux.invoicing.email.model.EmailAccount
-import net.codinux.invoicing.email.model.EmailAddress
-import net.codinux.invoicing.email.model.EmailAttachment
+import net.codinux.invoicing.email.model.*
 import net.codinux.invoicing.filesystem.FileUtil
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -198,7 +195,7 @@ open class EmailsFetcher(
                             if (extension !in status.options.downloadAttachmentsWithExtensions) null
                             else downloadAttachment(part, status)
 
-                return EmailAttachment(part.fileName, messagePart.mediaType, invoiceAndFile?.first, file)
+                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoiceAndFile?.first, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
@@ -206,6 +203,13 @@ open class EmailsFetcher(
         }
 
         return null
+    }
+
+    private fun mapDisposition(part: Part) = when (part.disposition?.lowercase()) {
+        "inline" -> ContentDisposition.Inline
+        "attachment" -> ContentDisposition.Attachment
+        null -> ContentDisposition.Body
+        else -> ContentDisposition.Unknown
     }
 
     protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<Invoice, File>? = try {
