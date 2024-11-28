@@ -32,7 +32,7 @@ class EmailsFetcherTest {
         assertThat(result.overallError).isNull()
         assertThat(result.emails).isNotEmpty()
 
-        val emailsWithoutBody = result.emails.filter { it.plainTextOrHtmlBody == null }
+        val emailsWithoutBody = result.emails.filter { it.plainTextOrHtmlBody == null && it.isEncrypted == false }
         assertThat(emailsWithoutBody).isEmpty()
     }
 
