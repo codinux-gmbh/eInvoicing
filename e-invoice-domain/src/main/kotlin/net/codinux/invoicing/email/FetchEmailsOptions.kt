@@ -29,7 +29,7 @@ open class FetchEmailsOptions(
     val onEmailReceived: ((Email) -> Unit)? = null
 ) {
     companion object {
-        val DefaultDownloadedAttachmentsWithExtensions = listOf("pdf", "xml")
+        val DefaultDownloadedAttachmentsWithExtensions = emptyList<String>()
 
         val DefaultAttachmentsDownloadDirectory: File = File(System.getProperty("java.io.tmpdir"), "eInvoices").also { it.mkdirs() }
     }
