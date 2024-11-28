@@ -18,5 +18,9 @@ class EmailAttachment(
     val invoice: Invoice? = null,
     val file: File? = null
 ) {
+    val containsEInvoice: Boolean by lazy { invoice != null }
+
+    val isPdfFile: Boolean by lazy { extension == "pdf" || mediaType == "application/pdf" }
+
     override fun toString() = "$filename: $invoice"
 }
