@@ -195,7 +195,7 @@ open class EmailsFetcher(
             }
 
             val filename = File(part.fileName)
-            val extension = filename.extension
+            val extension = filename.extension.lowercase()
 
             val (invoice, invoiceFile) = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
 
