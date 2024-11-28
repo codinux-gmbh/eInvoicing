@@ -4,8 +4,8 @@ import net.codinux.invoicing.model.Invoice
 import java.io.File
 
 class EmailAttachment(
-    val filename: String?,
-    val extension: String?,
+    val filename: String,
+    val extension: String,
     val size: Int?,
     val disposition: ContentDisposition,
     /**
