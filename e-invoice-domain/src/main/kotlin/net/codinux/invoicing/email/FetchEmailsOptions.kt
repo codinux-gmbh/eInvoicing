@@ -25,7 +25,7 @@ open class FetchEmailsOptions(
     val emailFolderName: String = "INBOX",
     val connectTimeoutSeconds: Int = 5,
 
-    val onError: ((FetchEmailsError) -> Unit)? = null,
+    val onError: ((FetchEmailError) -> Unit)? = null,
     val onEmailReceived: ((Email) -> Unit)? = null
 ) {
     companion object {

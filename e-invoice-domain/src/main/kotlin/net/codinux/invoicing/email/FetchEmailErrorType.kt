@@ -1,6 +1,6 @@
 package net.codinux.invoicing.email
 
-enum class FetchEmailsErrorType {
+enum class FetchEmailErrorType {
     GetEmail,
 
     GetMesssageBody,

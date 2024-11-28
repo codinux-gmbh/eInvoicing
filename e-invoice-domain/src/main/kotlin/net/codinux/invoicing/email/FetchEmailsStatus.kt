@@ -12,7 +12,7 @@ data class FetchEmailsStatus(
     val account: EmailAccount,
     val folder: IMAPFolder,
     val options: FetchEmailsOptions,
-    val messageSpecificErrors: MutableList<FetchEmailsError> = mutableListOf()
+    val messageSpecificErrors: MutableList<FetchEmailError> = mutableListOf()
 ) {
 
     val userAttachmentsDownloadDirectory: File by lazy {
@@ -22,16 +22,16 @@ data class FetchEmailsStatus(
     }
 
 
-    fun addError(type: FetchEmailsErrorType, parts: Collection<Part>, error: Throwable) =
-        addError(FetchEmailsError(type, parts.firstNotNullOfOrNull { getMessage(it) }?.messageNumber, error))
+    fun addError(type: FetchEmailErrorType, parts: Collection<Part>, error: Throwable) =
+        addError(FetchEmailError(type, parts.firstNotNullOfOrNull { getMessage(it) }?.messageNumber, error))
 
-    fun addError(type: FetchEmailsErrorType, part: Part, error: Throwable) =
-        addError(FetchEmailsError(type, getMessage(part)?.messageNumber, error))
+    fun addError(type: FetchEmailErrorType, part: Part, error: Throwable) =
+        addError(FetchEmailError(type, getMessage(part)?.messageNumber, error))
 
-    fun addError(type: FetchEmailsErrorType, messageNumber: Int?, error: Throwable) =
-        addError(FetchEmailsError(type, messageNumber, error))
+    fun addError(type: FetchEmailErrorType, messageNumber: Int?, error: Throwable) =
+        addError(FetchEmailError(type, messageNumber, error))
 
-    fun addError(error: FetchEmailsError) {
+    fun addError(error: FetchEmailError) {
         messageSpecificErrors.add(error)
 
         options.onError?.invoke(error)

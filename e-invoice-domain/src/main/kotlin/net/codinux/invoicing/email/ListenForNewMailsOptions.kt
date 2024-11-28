@@ -16,7 +16,7 @@ open class ListenForNewMailsOptions(
     emailFolderName: String = "INBOX",
     connectTimeoutSeconds: Int = 5,
 
-    onError: ((FetchEmailsError) -> Unit)? = null,
+    onError: ((FetchEmailError) -> Unit)? = null,
     onEmailReceived: (Email) -> Unit
 ) : FetchEmailsOptions(
     null,

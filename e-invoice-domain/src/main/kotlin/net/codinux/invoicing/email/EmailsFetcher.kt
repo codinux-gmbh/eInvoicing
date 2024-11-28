@@ -62,7 +62,7 @@ open class EmailsFetcher(
             }
         } catch (e: Throwable) {
             log.error(e) { "Listening to new emails of '${account.username}' failed" }
-            options.onError?.invoke(FetchEmailsError(FetchEmailsErrorType.ListenForNewEmails, null, e))
+            options.onError?.invoke(FetchEmailError(FetchEmailErrorType.ListenForNewEmails, null, e))
         }
     }
 
@@ -206,7 +206,7 @@ open class EmailsFetcher(
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
-            status.addError(FetchEmailsErrorType.GetAttachment, messagePart.part, e)
+            status.addError(FetchEmailErrorType.GetAttachment, messagePart.part, e)
         }
 
         return null
@@ -307,7 +307,7 @@ open class EmailsFetcher(
         }
     } catch (e: Throwable) {
         log.error(e) { "Could not get message body for media type '$mediaType'" }
-        status.addError(FetchEmailsErrorType.GetMesssageBody, parts.map { it.part }, e)
+        status.addError(FetchEmailErrorType.GetMesssageBody, parts.map { it.part }, e)
         null
     }
 

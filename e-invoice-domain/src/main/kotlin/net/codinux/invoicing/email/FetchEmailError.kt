@@ -1,7 +1,7 @@
 package net.codinux.invoicing.email
 
-data class FetchEmailsError(
-    val type: FetchEmailsErrorType,
+data class FetchEmailError(
+    val type: FetchEmailErrorType,
     val messageNumber: Int?,
     val error: Throwable
 )
