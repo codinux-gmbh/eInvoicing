@@ -12,6 +12,7 @@ class Email(
     val replayTo: EmailAddress? = null,
     val messageId: Long,
     val isEncrypted: Boolean = false,
+    val contentLanguage: String? = null,
     val plainTextBody: String? = null,
     val htmlBody: String? = null,
     val attachments: List<EmailAttachment> = emptyList()
