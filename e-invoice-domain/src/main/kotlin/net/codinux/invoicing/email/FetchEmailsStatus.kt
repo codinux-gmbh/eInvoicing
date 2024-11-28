@@ -22,14 +22,8 @@ data class FetchEmailsStatus(
     }
 
 
-    fun addError(type: FetchEmailErrorType, parts: Collection<Part>, error: Throwable) =
-        addError(FetchEmailError(type, parts.firstNotNullOfOrNull { getMessage(it) }?.messageNumber, error))
-
-    fun addError(type: FetchEmailErrorType, part: Part, error: Throwable) =
-        addError(FetchEmailError(type, getMessage(part)?.messageNumber, error))
-
-    fun addError(type: FetchEmailErrorType, messageNumber: Int?, error: Throwable) =
-        addError(FetchEmailError(type, messageNumber, error))
+    fun addError(type: FetchEmailErrorType, messageId: Long?, error: Throwable) =
+        addError(FetchEmailError(type, messageId, error))
 
     fun addError(error: FetchEmailError) {
         messageSpecificErrors.add(error)
