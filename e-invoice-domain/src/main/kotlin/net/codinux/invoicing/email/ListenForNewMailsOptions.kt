@@ -8,6 +8,8 @@ open class ListenForNewMailsOptions(
     val stopListening: AtomicBoolean = AtomicBoolean(false),
 
     downloadMessageBody: Boolean = false,
+    downloadOnlyPlainTextOrHtmlMessageBody: Boolean = false,
+
     downloadAttachmentsWithExtensions: List<String> = DefaultDownloadedAttachmentsWithExtensions,
     attachmentsDownloadDirectory: File = DefaultAttachmentsDownloadDirectory,
 
@@ -16,4 +18,9 @@ open class ListenForNewMailsOptions(
 
     onError: ((FetchEmailsError) -> Unit)? = null,
     onEmailReceived: (Email) -> Unit
-) : FetchEmailsOptions(null, downloadMessageBody, downloadAttachmentsWithExtensions, attachmentsDownloadDirectory, emailFolderName, connectTimeoutSeconds, onError, onEmailReceived)
+) : FetchEmailsOptions(
+    null,
+    downloadMessageBody, downloadOnlyPlainTextOrHtmlMessageBody,
+    downloadAttachmentsWithExtensions, attachmentsDownloadDirectory,
+    emailFolderName, connectTimeoutSeconds, onError, onEmailReceived
+)

@@ -11,6 +11,12 @@ open class FetchEmailsOptions(
 
     val downloadMessageBody: Boolean = false,
     /**
+     * If set to true and message contains a plain text message body, then only the plain text message body is downloaded
+     * and the HTML message body ignored / not downloaded. Reduces process time about 50 % (if no attachments get downloaded).
+     */
+    val downloadOnlyPlainTextOrHtmlMessageBody: Boolean = false,
+
+    /**
      * Set the extension (without the dot) of files that should be downloaded.
      */
     val downloadAttachmentsWithExtensions: List<String> = DefaultDownloadedAttachmentsWithExtensions,

@@ -154,6 +154,7 @@ open class EmailsFetcher(
         }
 
         val sender = message.from?.firstOrNull()?.let { map(it) }
+        val plainTextBody = getPlainTextBody(messageBodyParts, status)
 
         val email = Email(
             sender, message.subject ?: "", map(message.sentDate ?: message.receivedDate),
@@ -162,7 +163,7 @@ open class EmailsFetcher(
             status.folder.getUID(message),
             parts.any { it.mediaType == "application/pgp-encrypted" },
             imapMessage?.contentLanguage?.firstOrNull(),
-            getPlainTextBody(messageBodyParts, status), getHtmlBody(messageBodyParts, status),
+            plainTextBody, getHtmlBody(messageBodyParts, status, plainTextBody),
             attachments
         )
 
@@ -277,8 +278,13 @@ open class EmailsFetcher(
     protected open fun getPlainTextBody(parts: Collection<MessagePart>, status: FetchEmailsStatus) =
         if (status.options.downloadMessageBody) getBodyWithMediaType(parts, "text/plain", status) else null
 
-    protected open fun getHtmlBody(parts: Collection<MessagePart>, status: FetchEmailsStatus) =
-        if (status.options.downloadMessageBody) getBodyWithMediaType(parts, "text/html", status) else null
+    protected open fun getHtmlBody(parts: Collection<MessagePart>, status: FetchEmailsStatus, plainTextBody: String?) =
+        // in case of downloadOnlyPlainTextOrHtmlMessageBody == true, download html body only if there's no plain text body
+        if (status.options.downloadMessageBody && (status.options.downloadOnlyPlainTextOrHtmlMessageBody == false || plainTextBody == null)) {
+            getBodyWithMediaType(parts, "text/html", status)
+        } else {
+            null
+        }
 
     protected open fun getBodyWithMediaType(parts: Collection<MessagePart>, mediaType: String, status: FetchEmailsStatus): String? = try {
         val partsForMediaType = parts.filter { it.mediaType == mediaType }
