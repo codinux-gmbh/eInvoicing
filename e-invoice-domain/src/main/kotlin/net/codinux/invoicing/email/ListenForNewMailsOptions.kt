@@ -17,11 +17,13 @@ open class ListenForNewMailsOptions(
     emailFolderName: String = "INBOX",
     connectTimeoutSeconds: Int = 5,
 
+    showDebugOutputOnConsole: Boolean = false,
+
     onError: ((FetchEmailError) -> Unit)? = null,
     onEmailReceived: (Email) -> Unit
 ) : FetchEmailsOptions(
     null,
     downloadMessageBody, downloadOnlyPlainTextOrHtmlMessageBody, null,
     downloadAttachmentsWithExtensions, attachmentsDownloadDirectory,
-    emailFolderName, connectTimeoutSeconds, onError, onEmailReceived
+    emailFolderName, connectTimeoutSeconds, showDebugOutputOnConsole, onError, onEmailReceived
 )
