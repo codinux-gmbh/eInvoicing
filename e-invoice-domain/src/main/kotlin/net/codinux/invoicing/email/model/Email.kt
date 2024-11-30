@@ -36,9 +36,11 @@ class Email(
 
     val hasAttachments: Boolean by lazy { attachments.isNotEmpty() }
 
+    val hasPdfAttachment: Boolean by lazy { attachments.any { it.isPdfFile } }
+
     val hasEInvoiceAttachment: Boolean by lazy { attachments.any { it.containsEInvoice } }
 
-    val hasPdfAttachment: Boolean by lazy { attachments.any { it.isPdfFile } }
+    val hasAttachmentsWithExtractedInvoiceData: Boolean by lazy { attachments.any { it.couldExtractPdfInvoiceData } }
 
 
     override fun toString() = "${date.atZone(ZoneId.systemDefault()).toLocalDate()} $sender: $subject, ${attachments.size} attachment(s)"

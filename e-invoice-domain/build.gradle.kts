@@ -16,6 +16,9 @@ val kotlinCoroutinesVersion: String by project
 
 val mustangVersion: String by project
 
+val textInfoExtractor: String by project
+val pdfboxTextExtractor: String by project
+
 val angusMailVersion: String by project
 
 val klfVersion: String by project
@@ -29,6 +32,10 @@ dependencies {
 
     implementation("org.mustangproject:library:$mustangVersion")
     implementation("org.mustangproject:validator:$mustangVersion")
+
+    // pdf invoice data extraction
+    api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
+    api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
 
     implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
 

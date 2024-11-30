@@ -9,6 +9,8 @@ import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.*
 import net.codinux.invoicing.filesystem.FileUtil
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.pdf.PdfInvoiceData
+import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.log.logger
 import org.eclipse.angus.mail.imap.IMAPFolder
@@ -21,6 +23,7 @@ import kotlin.math.max
 
 open class EmailsFetcher(
     protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader(),
+    protected open val pdfInvoiceDataExtractor: PdfInvoiceDataExtractor = PdfInvoiceDataExtractor(),
     protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
 ) {
 
@@ -201,12 +204,14 @@ open class EmailsFetcher(
 
             val (invoice, invoiceFile) = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
 
+            val pdfInvoiceData: PdfInvoiceData? = tryToReadInvoiceDataFromPdf(extension, messagePart.mediaType, invoiceFile)
+
             if (invoice != null || Part.ATTACHMENT.equals(part.disposition, ignoreCase = true)) {
                 val file = invoiceFile ?:
                             if (extension !in status.options.downloadAttachmentsWithExtensions) null
                             else downloadAttachment(part, status)
 
-                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoice, file)
+                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoice, pdfInvoiceData, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
@@ -241,6 +246,14 @@ open class EmailsFetcher(
                     inputStream.copyTo(outputStream)
                 }
             }
+        }
+
+    private fun tryToReadInvoiceDataFromPdf(extension: String, mediaType: String, invoiceFile: File?): PdfInvoiceData? =
+        // if it's a PDF than () already downloaded invoiceFile, so it must be non null then
+        if (invoiceFile != null && (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream")) {
+            pdfInvoiceDataExtractor.tryToExtractInvoiceData(invoiceFile).data // TODO: pass result.error to status.onError()
+        } else {
+            null
         }
 
 
