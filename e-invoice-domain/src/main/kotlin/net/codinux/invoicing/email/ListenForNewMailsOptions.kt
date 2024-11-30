@@ -1,6 +1,7 @@
 package net.codinux.invoicing.email
 
 import net.codinux.invoicing.email.model.Email
+import net.codinux.invoicing.email.model.FetchEmailError
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 

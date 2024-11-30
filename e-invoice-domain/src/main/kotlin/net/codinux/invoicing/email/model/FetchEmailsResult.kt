@@ -1,6 +1,4 @@
-package net.codinux.invoicing.email
-
-import net.codinux.invoicing.email.model.Email
+package net.codinux.invoicing.email.model
 
 data class FetchEmailsResult(
     val emails: List<Email>,
