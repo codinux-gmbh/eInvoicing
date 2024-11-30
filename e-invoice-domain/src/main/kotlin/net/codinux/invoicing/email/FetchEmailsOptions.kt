@@ -29,6 +29,8 @@ open class FetchEmailsOptions(
     val emailFolderName: String = "INBOX",
     val connectTimeoutSeconds: Int = 5,
 
+    val showDebugOutputOnConsole: Boolean = false,
+
     val onError: ((FetchEmailError) -> Unit)? = null,
     val onEmailReceived: ((Email) -> Unit)? = null
 ) {

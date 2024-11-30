@@ -12,10 +12,14 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
+import net.codinux.invoicing.util.ExceptionHelper
 import net.codinux.log.logger
 import org.eclipse.angus.mail.imap.IMAPFolder
 import org.eclipse.angus.mail.imap.IMAPMessage
+import org.eclipse.angus.mail.util.MailConnectException
 import java.io.File
+import java.net.ConnectException
+import java.net.UnknownHostException
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.Executors
@@ -24,7 +28,8 @@ import kotlin.math.max
 open class EmailsFetcher(
     protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader(),
     protected open val pdfInvoiceDataExtractor: PdfInvoiceDataExtractor = PdfInvoiceDataExtractor(),
-    protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher()
+    protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher(),
+    protected open val exceptionHelper: ExceptionHelper = ExceptionHelper()
 ) {
 
     protected data class MessagePart(
@@ -41,6 +46,38 @@ open class EmailsFetcher(
 
 
     protected val log by logger()
+
+
+    open fun checkCredentials(account: EmailAccount): CheckCredentialsResult {
+        try {
+            val status = connect(account, FetchEmailsOptions(showDebugOutputOnConsole = true))
+
+            close(status)
+
+            return CheckCredentialsResult.Ok
+        } catch (e: Throwable) {
+            log.info(e) { "Could not connect to account '$account'" }
+            return mapConnectResultError(e)
+        }
+    }
+
+    protected open fun mapConnectResultError(exception: Throwable): CheckCredentialsResult {
+        if (exception is AuthenticationFailedException) {
+            return CheckCredentialsResult.WrongUsername
+        } else if (exception is MailConnectException) {
+            val innerInnerException = exceptionHelper.getInnerException(exception, 1)
+
+            if (innerInnerException is UnknownHostException) {
+                return CheckCredentialsResult.InvalidImapServerAddress
+            } else if (innerInnerException is ConnectException) {
+                return CheckCredentialsResult.InvalidImapServerPort
+            }
+        } else if (exception is MessagingException) { // MessagingException is derived from MailConnectException, so place after MailConnectException
+            return CheckCredentialsResult.WrongPassword
+        }
+
+        return CheckCredentialsResult.UnknownError // fallback for cases i am not aware of
+    }
 
 
     open fun listenForNewEmails(account: EmailAccount, options: ListenForNewMailsOptions) = runBlocking {
@@ -336,6 +373,8 @@ open class EmailsFetcher(
         val properties = mapAccountToJavaMailProperties(account, options)
 
         val session = Session.getInstance(properties)
+        session.debug = options.showDebugOutputOnConsole
+
         val store = session.getStore("imap")
         store.connect(account.serverAddress, account.username, account.password)
 
@@ -345,7 +384,7 @@ open class EmailsFetcher(
         return FetchEmailsStatus(account, store, folder, options)
     }
 
-    protected open fun mapAccountToJavaMailProperties(account: EmailAccount, options: FetchEmailsOptions) = Properties().apply {
+    protected open fun mapAccountToJavaMailProperties(account: EmailAccount, options: FetchEmailsOptions = FetchEmailsOptions()) = Properties().apply {
         // the documentation of all properties can be found here: https://javaee.github.io/javamail/docs/api/com/sun/mail/imap/package-summary.html
         put("mail.store.protocol", "imap")
 
