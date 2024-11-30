@@ -3,6 +3,7 @@ package net.codinux.invoicing.email
 import jakarta.mail.BodyPart
 import jakarta.mail.Message
 import jakarta.mail.Part
+import jakarta.mail.Store
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.filesystem.FileUtil
 import org.eclipse.angus.mail.imap.IMAPFolder
@@ -10,6 +11,7 @@ import java.io.File
 
 data class FetchEmailsStatus(
     val account: EmailAccount,
+    val store: Store,
     val folder: IMAPFolder,
     val options: FetchEmailsOptions,
     val messageSpecificErrors: MutableList<FetchEmailError> = mutableListOf()

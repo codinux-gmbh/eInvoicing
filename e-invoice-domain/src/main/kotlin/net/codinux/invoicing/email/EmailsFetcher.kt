@@ -42,32 +42,30 @@ open class EmailsFetcher(
 
     open fun listenForNewEmails(account: EmailAccount, options: ListenForNewMailsOptions) = runBlocking {
         try {
-            connect(account, options) { store ->
-                val folder = store.getFolder(options.emailFolderName) as IMAPFolder
-                folder.open(Folder.READ_ONLY)
+            val status = connect(account, options)
 
-                val status = FetchEmailsStatus(account, folder, options)
-
-                folder.addMessageCountListener(object : MessageCountAdapter() {
-                    override fun messagesAdded(event: MessageCountEvent) {
-                        event.messages.forEach { message ->
-                            getEmail(message, status)
-                        }
+            status.folder.addMessageCountListener(object : MessageCountAdapter() {
+                override fun messagesAdded(event: MessageCountEvent) {
+                    event.messages.forEach { message ->
+                        getEmail(message, status)
                     }
-                })
-
-                launch(coroutineDispatcher) {
-                    keepConnectionOpen(status, folder, options)
                 }
+            })
+
+            launch(coroutineDispatcher) {
+                keepConnectionOpen(status, options)
             }
+
+            close(status)
         } catch (e: Throwable) {
             log.error(e) { "Listening to new emails of '${account.username}' failed" }
             options.onError?.invoke(FetchEmailError(FetchEmailErrorType.ListenForNewEmails, null, e))
         }
     }
 
-    protected open suspend fun keepConnectionOpen(status: FetchEmailsStatus, folder: IMAPFolder, options: ListenForNewMailsOptions) {
+    protected open suspend fun keepConnectionOpen(status: FetchEmailsStatus, options: ListenForNewMailsOptions) {
         val account = status.account
+        val folder = status.folder
         log.info { "Listening to new emails of $account" }
 
         // Use IMAP IDLE to keep the connection alive
@@ -88,18 +86,13 @@ open class EmailsFetcher(
 
     open fun fetchAllEmails(account: EmailAccount, options: FetchEmailsOptions = FetchEmailsOptions()): FetchEmailsResult {
         try {
-            return connect(account, options) { store ->
-                val folder = store.getFolder(options.emailFolderName) as IMAPFolder
-                folder.open(Folder.READ_ONLY)
+            val status = connect(account, options)
 
-                val status = FetchEmailsStatus(account, folder, options)
+            val emails = fetchAllEmailsInFolder(status)
 
-                val emails = fetchAllEmailsInFolder(status).also {
-                    folder.close(false)
-                }
+            close(status)
 
-                FetchEmailsResult(emails, null, status.messageSpecificErrors)
-            }
+            return FetchEmailsResult(emails, null, status.messageSpecificErrors)
         } catch (e: Throwable) {
             log.error(e) { "Could not fetch emails of account $account" }
 
@@ -326,15 +319,17 @@ open class EmailsFetcher(
         date.toInstant()
 
 
-    protected open fun <T> connect(account: EmailAccount, options: FetchEmailsOptions, connected: (Store) -> T): T {
+    protected open fun connect(account: EmailAccount, options: FetchEmailsOptions): FetchEmailsStatus {
         val properties = mapAccountToJavaMailProperties(account, options)
 
         val session = Session.getInstance(properties)
-        session.getStore("imap").use { store ->
-            store.connect(account.serverAddress, account.username, account.password)
+        val store = session.getStore("imap")
+        store.connect(account.serverAddress, account.username, account.password)
 
-            return connected(store)
-        }
+        val folder = store.getFolder(options.emailFolderName) as IMAPFolder
+        folder.open(Folder.READ_ONLY)
+
+        return FetchEmailsStatus(account, store, folder, options)
     }
 
     protected open fun mapAccountToJavaMailProperties(account: EmailAccount, options: FetchEmailsOptions) = Properties().apply {
@@ -352,6 +347,16 @@ open class EmailsFetcher(
         // speeds up fetching data tremendously
         put("mail.imap.fetchsize", "819200") // Partial fetch size in bytes. Defaults to 16K.
         put("mail.imap.partialfetch", "false") // Controls whether the IMAP partial-fetch capability should be used. Defaults to true.
+    }
+
+    protected open fun close(status: FetchEmailsStatus) {
+        try {
+            status.folder.close(false)
+
+            status.store.close()
+        } catch (e: Exception) {
+            log.error(e) { "Could not close folder or store" }
+        }
     }
 
 }
