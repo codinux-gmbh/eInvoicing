@@ -28,4 +28,6 @@ rootProject.name = "eInvoicing"
 
 include("e-invoice-domain")
 
+include("invoice-creator")
+
 include("e-invoice-api")
