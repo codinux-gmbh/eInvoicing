@@ -50,7 +50,7 @@ open class EmailsFetcher(
 
     open fun checkCredentials(account: EmailAccount): CheckCredentialsResult {
         try {
-            val status = connect(account, FetchEmailsOptions(showDebugOutputOnConsole = true))
+            val status = connect(account, FetchEmailsOptions())
 
             close(status)
 
