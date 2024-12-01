@@ -154,7 +154,7 @@ open class EmailsFetcher(
         // executed, making the overall process very slow -> use FetchProfile to prefetch requested data with a single request
         folder.fetch(messages, getFetchProfile(status))
 
-        messages.mapNotNull { message ->
+        messages.reversed().mapNotNull { message ->
             async(coroutineDispatcher) {
                 try {
                     getEmail(message, status)
