@@ -1,9 +1,6 @@
 package net.codinux.invoicing.test
 
-import net.codinux.invoicing.model.BankDetails
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.InvoiceItem
-import net.codinux.invoicing.model.Party
+import net.codinux.invoicing.model.*
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -57,7 +54,7 @@ object DataGenerator {
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
         buyerReference: String? = null
-    ) = Invoice(invoiceNumber, invoiceDate, supplier, customer, items, dueDate, paymentDescription, buyerReference)
+    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, dueDate, paymentDescription), supplier, customer, items, buyerReference)
 
     fun createParty(
         name: String,

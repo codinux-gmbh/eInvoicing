@@ -1,16 +1,10 @@
 package net.codinux.invoicing.model
 
-import java.time.LocalDate
-
 class Invoice(
-    val invoiceNumber: String,
-    val invoiceDate: LocalDate,
+    val details: InvoiceDetails,
     val supplier: Party,
     val customer: Party,
     val items: List<InvoiceItem>,
-
-    val dueDate: LocalDate? = null,
-    val paymentDescription: String? = null,
 
     /**
      * Unique reference number of the customer, e.g. the Leitweg-ID required by German authorities (Behörden)
@@ -27,5 +21,5 @@ class Invoice(
      */
     var totalAmounts: TotalAmounts? = null
 ) {
-    override fun toString() = "$invoiceDate $invoiceNumber to $customer ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
+    override fun toString() = "$details to $customer ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }

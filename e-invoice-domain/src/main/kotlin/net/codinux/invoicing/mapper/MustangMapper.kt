@@ -1,11 +1,10 @@
 package net.codinux.invoicing.mapper
 
 import net.codinux.invoicing.calculator.AmountsCalculator
-import net.codinux.invoicing.model.AmountAdjustments
-import net.codinux.invoicing.model.ChargeOrAllowance
-import net.codinux.invoicing.model.InvoiceItem
-import net.codinux.invoicing.model.Party
+import net.codinux.invoicing.model.*
 import org.mustangproject.*
+import org.mustangproject.BankDetails
+import org.mustangproject.Invoice
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
 import java.math.BigDecimal
@@ -19,15 +18,15 @@ open class MustangMapper(
 ) {
 
     open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
-        this.number = invoice.invoiceNumber
-        this.issueDate = map(invoice.invoiceDate)
+        this.number = invoice.details.invoiceNumber
+        this.issueDate = map(invoice.details.invoiceDate)
         this.sender = mapParty(invoice.supplier)
         this.recipient = mapParty(invoice.customer)
 
         this.setZFItems(ArrayList(invoice.items.map { mapLineItem(it) }))
 
-        this.dueDate = map(invoice.dueDate)
-        this.paymentTermDescription = invoice.paymentDescription
+        this.dueDate = map(invoice.details.dueDate)
+        this.paymentTermDescription = invoice.details.paymentDescription
 
         this.referenceNumber = invoice.customerReference
 
@@ -92,14 +91,11 @@ open class MustangMapper(
 
 
     open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
-        invoiceNumber = invoice.number,
-        invoiceDate = map(invoice.issueDate),
+        details = InvoiceDetails(invoice.number, map(invoice.issueDate), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
+
         supplier = mapParty(invoice.sender),
         customer = mapParty(invoice.recipient),
         items = invoice.zfItems.map { mapLineItem(it) },
-
-        dueDate = map(invoice.dueDate ?: invoice.paymentTerms?.dueDate),
-        paymentDescription = invoice.paymentTermDescription ?: invoice.paymentTerms?.description,
 
         customerReference = invoice.referenceNumber,
 

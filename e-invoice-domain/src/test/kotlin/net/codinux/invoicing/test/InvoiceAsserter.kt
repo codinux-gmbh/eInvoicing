@@ -59,8 +59,8 @@ object InvoiceAsserter {
     fun assertInvoice(invoice: Invoice?) {
         assertThat(invoice).isNotNull()
 
-        assertThat(invoice!!.invoiceNumber).isEqualTo(DataGenerator.InvoiceNumber)
-        assertThat(invoice.invoiceDate).isEqualTo(DataGenerator.InvoiceDate)
+        assertThat(invoice!!.details.invoiceNumber).isEqualTo(DataGenerator.InvoiceNumber)
+        assertThat(invoice.details.invoiceDate).isEqualTo(DataGenerator.InvoiceDate)
 
         assertParty(invoice.supplier, DataGenerator.SupplierName, DataGenerator.SupplierAddress, DataGenerator.SupplierPostalCode, DataGenerator.SupplierCity, DataGenerator.SupplierCountry, DataGenerator.SupplierVatId, DataGenerator.SupplierEmail, DataGenerator.SupplierPhone, DataGenerator.SupplierBankDetails)
 
