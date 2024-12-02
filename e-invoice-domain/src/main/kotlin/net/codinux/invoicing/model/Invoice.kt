@@ -4,18 +4,18 @@ import java.time.LocalDate
 
 class Invoice(
     val invoiceNumber: String,
-    val invoicingDate: LocalDate,
-    val sender: Party,
-    val recipient: Party,
+    val invoiceDate: LocalDate,
+    val supplier: Party,
+    val customer: Party,
     val items: List<InvoiceItem>,
 
     val dueDate: LocalDate? = null,
     val paymentDescription: String? = null,
 
     /**
-     * Unique reference number of the buyer, e.g. the Leitweg-ID required by German authorities (Behörden)
+     * Unique reference number of the customer, e.g. the Leitweg-ID required by German authorities (Behörden)
      */
-    val buyerReference: String? = null,
+    val customerReference: String? = null,
 
     val amountAdjustments: AmountAdjustments? = null,
 
@@ -27,5 +27,5 @@ class Invoice(
      */
     var totalAmounts: TotalAmounts? = null
 ) {
-    override fun toString() = "$invoicingDate $invoiceNumber to $recipient ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
+    override fun toString() = "$invoiceDate $invoiceNumber to $customer ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }

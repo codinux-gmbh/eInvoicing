@@ -6,7 +6,8 @@ class Party(
     /**
      * Party's street and house number.
      */
-    val street: String,
+    val address: String,
+    val additionalAddressLine: String? = null,
     var postalCode: String?,
     val city: String,
     /**

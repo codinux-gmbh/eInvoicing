@@ -16,22 +16,22 @@ object InvoiceAsserter {
         val asserter = XPathAsserter(xml)
 
         asserter.xpathHasValue("//rsm:ExchangedDocument/ram:ID", DataGenerator.InvoiceNumber)
-        asserter.xpathHasValue("//rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString", DataGenerator.InvoicingDate.toString().replace("-", ""))
+        asserter.xpathHasValue("//rsm:ExchangedDocument/ram:IssueDateTime/udt:DateTimeString", DataGenerator.InvoiceDate.toString().replace("-", ""))
 
-        val senderXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty"
-        assertParty(asserter, senderXPath, DataGenerator.SenderName, DataGenerator.SenderStreet, DataGenerator.SenderPostalCode, DataGenerator.SenderCity, DataGenerator.SenderVatId, DataGenerator.SenderEmail, DataGenerator.SenderPhone)
+        val supplierXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerTradeParty"
+        assertParty(asserter, supplierXPath, DataGenerator.SupplierName, DataGenerator.SupplierAddress, DataGenerator.SupplierPostalCode, DataGenerator.SupplierCity, DataGenerator.SupplierVatId, DataGenerator.SupplierEmail, DataGenerator.SupplierPhone)
 
-        val receiverXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty"
-        assertParty(asserter, receiverXPath, DataGenerator.RecipientName, DataGenerator.RecipientStreet, DataGenerator.RecipientPostalCode, DataGenerator.RecipientCity, DataGenerator.RecipientVatId, DataGenerator.RecipientEmail, DataGenerator.RecipientPhone)
+        val customerXPath = "//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:BuyerTradeParty"
+        assertParty(asserter, customerXPath, DataGenerator.CustomerName, DataGenerator.CustomerAddress, DataGenerator.CustomerPostalCode, DataGenerator.CustomerCity, DataGenerator.CustomerVatId, DataGenerator.CustomerEmail, DataGenerator.CustomerPhone)
 
         val lineItemXPath = "//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem"
         assertLineItem(asserter, lineItemXPath, DataGenerator.ItemName, DataGenerator.ItemQuantity, DataGenerator.ItemUnit, DataGenerator.ItemUnitPrice, DataGenerator.ItemVatRate, DataGenerator.ItemDescription)
     }
 
-    private fun assertParty(asserter: XPathAsserter, partyXPath: String, name: String, street: String, postalCode: String, city: String, vatId: String, email: String, phone: String) {
+    private fun assertParty(asserter: XPathAsserter, partyXPath: String, name: String, address: String, postalCode: String, city: String, vatId: String, email: String, phone: String) {
         asserter.xpathHasValue("$partyXPath/ram:Name", name)
 
-        asserter.xpathHasValue("$partyXPath/ram:PostalTradeAddress/ram:LineOne", street)
+        asserter.xpathHasValue("$partyXPath/ram:PostalTradeAddress/ram:LineOne", address)
         asserter.xpathHasValue("$partyXPath/ram:PostalTradeAddress/ram:PostcodeCode", postalCode)
         asserter.xpathHasValue("$partyXPath/ram:PostalTradeAddress/ram:CityName", city)
 
@@ -60,20 +60,20 @@ object InvoiceAsserter {
         assertThat(invoice).isNotNull()
 
         assertThat(invoice!!.invoiceNumber).isEqualTo(DataGenerator.InvoiceNumber)
-        assertThat(invoice.invoicingDate).isEqualTo(DataGenerator.InvoicingDate)
+        assertThat(invoice.invoiceDate).isEqualTo(DataGenerator.InvoiceDate)
 
-        assertParty(invoice.sender, DataGenerator.SenderName, DataGenerator.SenderStreet, DataGenerator.SenderPostalCode, DataGenerator.SenderCity, DataGenerator.SenderCountry, DataGenerator.SenderVatId, DataGenerator.SenderEmail, DataGenerator.SenderPhone, DataGenerator.SenderBankDetails)
+        assertParty(invoice.supplier, DataGenerator.SupplierName, DataGenerator.SupplierAddress, DataGenerator.SupplierPostalCode, DataGenerator.SupplierCity, DataGenerator.SupplierCountry, DataGenerator.SupplierVatId, DataGenerator.SupplierEmail, DataGenerator.SupplierPhone, DataGenerator.SupplierBankDetails)
 
-        assertParty(invoice.recipient, DataGenerator.RecipientName, DataGenerator.RecipientStreet, DataGenerator.RecipientPostalCode, DataGenerator.RecipientCity, DataGenerator.RecipientCountry, DataGenerator.RecipientVatId, DataGenerator.RecipientEmail, DataGenerator.RecipientPhone, DataGenerator.RecipientBankDetails)
+        assertParty(invoice.customer, DataGenerator.CustomerName, DataGenerator.CustomerAddress, DataGenerator.CustomerPostalCode, DataGenerator.CustomerCity, DataGenerator.CustomerCountry, DataGenerator.CustomerVatId, DataGenerator.CustomerEmail, DataGenerator.CustomerPhone, DataGenerator.CustomerBankDetails)
 
         assertThat(invoice.items).hasSize(1)
         assertLineItem(invoice.items.first(), DataGenerator.ItemName, DataGenerator.ItemQuantity, DataGenerator.ItemUnit, DataGenerator.ItemUnitPrice, DataGenerator.ItemVatRate, DataGenerator.ItemDescription)
     }
 
-    private fun assertParty(party: Party, name: String, street: String, postalCode: String, city: String, country: String?, vatId: String, email: String, phone: String, bankDetails: BankDetails?) {
+    private fun assertParty(party: Party, name: String, address: String, postalCode: String, city: String, country: String?, vatId: String, email: String, phone: String, bankDetails: BankDetails?) {
         assertThat(party.name).isEqualTo(name)
 
-        assertThat(party.street).isEqualTo(street)
+        assertThat(party.address).isEqualTo(address)
         assertThat(party.postalCode).isEqualTo(postalCode)
         assertThat(party.city).isEqualTo(city)
         assertThat(party.countryIsoCode).isEqualTo(country)

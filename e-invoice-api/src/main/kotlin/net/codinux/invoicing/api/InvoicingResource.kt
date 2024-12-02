@@ -94,7 +94,7 @@ class InvoicingResource(
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
         Response.ok(pdfFile)
-            .header("Content-Disposition", "attachment;filename=\"${invoice.invoicingDate.toString().replace('-', '.')} ${invoice.recipient.name} ${invoice.invoiceNumber}.pdf\"")
+            .header("Content-Disposition", "attachment;filename=\"${invoice.invoiceDate.toString().replace('-', '.')} ${invoice.customer.name} ${invoice.invoiceNumber}.pdf\"")
             .build()
 
 }

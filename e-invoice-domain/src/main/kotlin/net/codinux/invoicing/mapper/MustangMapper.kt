@@ -20,16 +20,16 @@ open class MustangMapper(
 
     open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
         this.number = invoice.invoiceNumber
-        this.issueDate = map(invoice.invoicingDate)
-        this.sender = mapParty(invoice.sender)
-        this.recipient = mapParty(invoice.recipient)
+        this.issueDate = map(invoice.invoiceDate)
+        this.sender = mapParty(invoice.supplier)
+        this.recipient = mapParty(invoice.customer)
 
         this.setZFItems(ArrayList(invoice.items.map { mapLineItem(it) }))
 
         this.dueDate = map(invoice.dueDate)
         this.paymentTermDescription = invoice.paymentDescription
 
-        this.referenceNumber = invoice.buyerReference
+        this.referenceNumber = invoice.customerReference
 
         invoice.amountAdjustments?.let { adjustments ->
             this.totalPrepaidAmount = adjustments.prepaidAmounts
@@ -43,8 +43,10 @@ open class MustangMapper(
     }
 
     open fun mapParty(party: Party): TradeParty = TradeParty(
-        party.name, party.street, party.postalCode, party.city, party.countryIsoCode
+        party.name, party.address, party.postalCode, party.city, party.countryIsoCode
     ).apply {
+        this.setAdditionalAddress(party.additionalAddressLine)
+
         this.setVATID(party.vatId)
         // TODO: description?
 
@@ -91,15 +93,15 @@ open class MustangMapper(
 
     open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
         invoiceNumber = invoice.number,
-        invoicingDate = map(invoice.issueDate),
-        sender = mapParty(invoice.sender),
-        recipient = mapParty(invoice.recipient),
+        invoiceDate = map(invoice.issueDate),
+        supplier = mapParty(invoice.sender),
+        customer = mapParty(invoice.recipient),
         items = invoice.zfItems.map { mapLineItem(it) },
 
         dueDate = map(invoice.dueDate ?: invoice.paymentTerms?.dueDate),
         paymentDescription = invoice.paymentTermDescription ?: invoice.paymentTerms?.description,
 
-        buyerReference = invoice.referenceNumber,
+        customerReference = invoice.referenceNumber,
 
         amountAdjustments = mapAmountAdjustments(invoice),
 
@@ -107,7 +109,7 @@ open class MustangMapper(
     )
 
     open fun mapParty(party: TradeParty) = Party(
-        party.name, party.street, party.zip, party.location, party.country, party.vatID,
+        party.name, party.street, party.additionalAddress, party.zip, party.location, party.country, party.vatID,
         party.email ?: party.contact?.eMail, party.contact?.phone, party.contact?.fax, party.contact?.name,
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )

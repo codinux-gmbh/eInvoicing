@@ -11,28 +11,32 @@ import java.time.format.DateTimeFormatter
 object DataGenerator {
 
     const val InvoiceNumber = "12345"
-    val InvoicingDate = LocalDate.of(2015, 10, 21)
+    val InvoiceDate = LocalDate.of(2015, 10, 21)
     val DueDate = LocalDate.of(2016, 6, 15)
 
-    const val SenderName = "Hochwürdiger Leistungserbringer"
-    const val SenderStreet = "Fun Street 1"
-    const val SenderPostalCode = "12345"
-    const val SenderCity = "Glückstadt"
-    const val SenderCountry = "DE"
-    const val SenderVatId = "DE123456789"
-    const val SenderEmail = "working-class-hero@rock.me"
-    const val SenderPhone = "+4917012345678"
-    val SenderBankDetails = BankDetails("DE00123456780987654321", "ABZODEFFXXX", "Manuela Musterfrau")
+    const val SupplierName = "Hochwürdiger Leistungserbringer"
+    const val SupplierAddress = "Fun Street 1"
+    val SupplierAdditionalAddressLine: String? = null
+    const val SupplierPostalCode = "12345"
+    const val SupplierCity = "Glückstadt"
+    const val SupplierCountry = "DE"
+    const val SupplierVatId = "DE123456789"
+    const val SupplierEmail = "working-class-hero@rock.me"
+    const val SupplierPhone = "+4917012345678"
+    val SupplierFax: String? = null
+    val SupplierBankDetails = BankDetails("DE00123456780987654321", "ABZODEFFXXX", "Manuela Musterfrau")
 
-    const val RecipientName = "Untertänigster Leistungsempfänger"
-    const val RecipientStreet = "Party Street 1"
-    const val RecipientPostalCode = SenderPostalCode
-    const val RecipientCity = SenderCity
-    const val RecipientCountry = "DE"
-    const val RecipientVatId = "DE987654321"
-    const val RecipientEmail = "exploiter@your.boss"
-    const val RecipientPhone = "+491234567890"
-    val RecipientBankDetails: BankDetails? = null
+    const val CustomerName = "Untertänigster Leistungsempfänger"
+    const val CustomerAddress = "Party Street 1"
+    val CustomerAdditionalAddressLine: String? = null
+    const val CustomerPostalCode = SupplierPostalCode
+    const val CustomerCity = SupplierCity
+    const val CustomerCountry = "DE"
+    const val CustomerVatId = "DE987654321"
+    const val CustomerEmail = "exploiter@your.boss"
+    const val CustomerPhone = "+491234567890"
+    val CustomerFax: String? = null
+    val CustomerBankDetails: BankDetails? = null
 
     const val ItemName = "Erbrachte Dienstleistungen"
     val ItemQuantity = BigDecimal(1)
@@ -44,30 +48,31 @@ object DataGenerator {
 
     fun createInvoice(
         invoiceNumber: String = InvoiceNumber,
-        invoicingDate: LocalDate = InvoicingDate,
-        sender: Party = createParty(SenderName, SenderStreet, SenderPostalCode, SenderCity, SenderCountry, SenderVatId, SenderEmail, SenderPhone,
-            bankDetails = SenderBankDetails),
-        recipient: Party = createParty(RecipientName, RecipientStreet, RecipientPostalCode, RecipientCity, RecipientCountry, RecipientVatId, RecipientEmail, RecipientPhone,
-            bankDetails = RecipientBankDetails),
+        invoiceDate: LocalDate = InvoiceDate,
+        supplier: Party = createParty(SupplierName, SupplierAddress, SupplierAdditionalAddressLine, SupplierPostalCode, SupplierCity, SupplierCountry,
+            SupplierVatId, SupplierEmail, SupplierPhone, SupplierFax, bankDetails = SupplierBankDetails),
+        customer: Party = createParty(CustomerName, CustomerAddress, CustomerAdditionalAddressLine, CustomerPostalCode, CustomerCity, CustomerCountry,
+            CustomerVatId, CustomerEmail, CustomerPhone, CustomerFax, bankDetails = CustomerBankDetails),
         items: List<InvoiceItem> = listOf(createItem()),
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
         buyerReference: String? = null
-    ) = Invoice(invoiceNumber, invoicingDate, sender, recipient, items, dueDate, paymentDescription, buyerReference)
+    ) = Invoice(invoiceNumber, invoiceDate, supplier, customer, items, dueDate, paymentDescription, buyerReference)
 
     fun createParty(
         name: String,
-        streetName: String = SenderStreet,
-        postalCode: String = SenderPostalCode,
-        city: String = SenderCity,
-        country: String? = SenderCountry,
-        vatId: String? = SenderVatId,
-        email: String? = SenderEmail,
-        phone: String? = SenderPhone,
-        fax: String? = null,
+        address: String = SupplierAddress,
+        additionalAddressLine: String? = SupplierAdditionalAddressLine,
+        postalCode: String = SupplierPostalCode,
+        city: String = SupplierCity,
+        country: String? = SupplierCountry,
+        vatId: String? = SupplierVatId,
+        email: String? = SupplierEmail,
+        phone: String? = SupplierPhone,
+        fax: String? = SupplierFax,
         contactName: String? = null,
         bankDetails: BankDetails? = null
-    ) = Party(name, streetName, postalCode, city, country, vatId, email, phone, fax, contactName, bankDetails)
+    ) = Party(name, address, additionalAddressLine, postalCode, city, country, vatId, email, phone, fax, contactName, bankDetails)
 
     fun createItem(
         name: String = ItemName,
