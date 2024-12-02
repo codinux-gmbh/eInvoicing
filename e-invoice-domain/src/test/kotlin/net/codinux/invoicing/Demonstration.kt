@@ -33,7 +33,7 @@ class Demonstration {
         ))
 
         fetchResult.emails.forEach { email ->
-            println("${email.sender}: ${email.attachments.firstNotNullOfOrNull { it.invoice }?.totalAmounts?.duePayableAmount}")
+            println("${email.sender}: ${email.attachments.firstNotNullOfOrNull { it.invoice }?.totals?.duePayableAmount}")
         }
     }
 

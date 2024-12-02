@@ -1,5 +1,6 @@
 package net.codinux.invoicing.test
 
+import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -21,7 +22,7 @@ object DataGenerator {
     const val SupplierEmail = "working-class-hero@rock.me"
     const val SupplierPhone = "+4917012345678"
     val SupplierFax: String? = null
-    val SupplierBankDetails = BankDetails("DE00123456780987654321", "ABZODEFFXXX", "Manuela Musterfrau")
+    val SupplierBankDetails = BankDetails("DE00123456780987654321", "ABZODEFFXXX", "Manuela Musterfrau", "Abzock-Bank")
 
     const val CustomerName = "Untertänigster Leistungsempfänger"
     const val CustomerAddress = "Party Street 1"
@@ -40,6 +41,7 @@ object DataGenerator {
     const val ItemUnit = "HUR" // EN code for 'hour'
     val ItemUnitPrice = BigDecimal(99)
     val ItemVatRate = BigDecimal(19)
+    val ItemArticleNumber: String? = null
     val ItemDescription: String? = null
 
 
@@ -53,8 +55,9 @@ object DataGenerator {
         items: List<InvoiceItem> = listOf(createItem()),
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
-        buyerReference: String? = null
-    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, dueDate, paymentDescription), supplier, customer, items, buyerReference)
+    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, dueDate, paymentDescription), supplier, customer, items).apply {
+        this.totals = AmountsCalculator().calculateTotalAmounts(this)
+    }
 
     fun createParty(
         name: String,
@@ -77,7 +80,8 @@ object DataGenerator {
         unit: String = ItemUnit,
         unitPrice: BigDecimal = ItemUnitPrice,
         vatRate: BigDecimal = ItemVatRate,
+        articleNumber: String? = ItemArticleNumber,
         description: String? = ItemDescription,
-    ) = InvoiceItem(name, quantity, unit, unitPrice, vatRate, description)
+    ) = InvoiceItem(name, quantity, unit, unitPrice, vatRate, articleNumber, description)
 
 }

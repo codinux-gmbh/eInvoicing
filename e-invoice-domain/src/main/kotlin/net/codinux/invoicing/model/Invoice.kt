@@ -19,7 +19,7 @@ class Invoice(
      * For outgoing invoices: You don't have to calculate them, we do this for you. This ensures that all total amounts
      * are in accordance to other data of the invoice like the invoice item amounts and amount adjustments.
      */
-    var totalAmounts: TotalAmounts? = null
+    var totals: TotalAmounts? = null
 ) {
-    override fun toString() = "$details to $customer ${totalAmounts?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
+    override fun toString() = "$details to $customer ${totals?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }

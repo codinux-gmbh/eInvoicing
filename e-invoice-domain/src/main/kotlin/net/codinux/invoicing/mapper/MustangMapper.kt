@@ -36,8 +36,8 @@ open class MustangMapper(
             adjustments.allowances.forEach { this.addAllowance(mapAllowance(it)) }
         }
 
-        if (invoice.totalAmounts == null) {
-            invoice.totalAmounts = calculator.calculateTotalAmounts(this)
+        if (invoice.totals == null) {
+            invoice.totals = calculator.calculateTotalAmounts(this)
         }
     }
 
@@ -64,7 +64,10 @@ open class MustangMapper(
 
     open fun mapLineItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
-        Product(item.name, item.description ?: "", item.unit, item.vatRate), item.unitPrice, item.quantity
+        Product(item.name, item.description ?: "", item.unit, item.vatRate).apply {
+            this.sellerAssignedID = item.articleNumber // TODO: what is the articleNumber? sellerAssignedId, globalId, ...?
+        },
+        item.unitPrice, item.quantity
     ).apply {
 
     }
@@ -101,7 +104,7 @@ open class MustangMapper(
 
         amountAdjustments = mapAmountAdjustments(invoice),
 
-        totalAmounts = calculator.calculateTotalAmounts(invoice)
+        totals = calculator.calculateTotalAmounts(invoice)
     )
 
     open fun mapParty(party: TradeParty) = Party(
@@ -111,7 +114,7 @@ open class MustangMapper(
     )
 
     open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
-        item.product.name, item.quantity, item.product.unit, item.price, item.product.vatPercent, item.product.description.takeUnless { it.isBlank() }
+        item.product.name, item.quantity, item.product.unit, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
     )
 
     protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
