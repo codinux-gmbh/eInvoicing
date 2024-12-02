@@ -7,9 +7,20 @@ class Invoice(
     val items: List<InvoiceItem>,
 
     /**
-     * Unique reference number of the customer, e.g. the Leitweg-ID required by German authorities (Behörden)
+     * An identifier assigned by the Buyer used for internal routing purposes.
+     *
+     * The identifier is defined by the Buyer (e.g. contact ID, department, office id, project code), but provided by the
+     * Seller in the Invoice.
+     *
+     * In XRechnung mandatory for invoices to government agencies in Germany (B2G and G2G) to set the Leitweg-ID here.
+     *
+     * From XRechnung specification:
+     * "Anmerkung: Im Rahmen des Steuerungsprojekts eRechnung ist mit der so genannten Leitweg-ID eine Zuord-
+     * nungsmöglichkeit entwickelt worden, deren verbindliche Nutzung von Bund und mehreren Ländern vorgegeben
+     * wird. Die Leitweg-ID ist prinzipiell für Bund, Länder und Kommunen einsetzbar (B2G, G2G). Für die Darstellung
+     * der Leitweg-ID wird das in XRechnung verpflichtende Feld Buyer Reference benutzt."
      */
-    val customerReference: String? = null,
+    val customerReferenceNumber: String? = null,
 
     val amountAdjustments: AmountAdjustments? = null,
 

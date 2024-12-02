@@ -14,6 +14,11 @@
 - **Lieferdatum** – Delivery date
 
 
+**Leitweg-ID**: Routing ID
+
+**Regierungsstellen / Regierungsbehörden**: government agencies (/ government authorities)
+
+
 JetBrains Rechnung:
 
 ```text

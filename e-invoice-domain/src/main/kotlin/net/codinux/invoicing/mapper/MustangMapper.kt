@@ -28,7 +28,7 @@ open class MustangMapper(
         this.dueDate = map(invoice.details.dueDate)
         this.paymentTermDescription = invoice.details.paymentDescription
 
-        this.referenceNumber = invoice.customerReference
+        this.referenceNumber = invoice.customerReferenceNumber
 
         invoice.amountAdjustments?.let { adjustments ->
             this.totalPrepaidAmount = adjustments.prepaidAmounts
@@ -100,7 +100,7 @@ open class MustangMapper(
         customer = mapParty(invoice.recipient),
         items = invoice.zfItems.map { mapLineItem(it) },
 
-        customerReference = invoice.referenceNumber,
+        customerReferenceNumber = invoice.referenceNumber,
 
         amountAdjustments = mapAmountAdjustments(invoice),
 
