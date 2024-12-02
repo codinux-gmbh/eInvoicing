@@ -25,6 +25,12 @@ class Party(
 
     // actually there can be multiple bankDetails in eInvoice data model
     val bankDetails: BankDetails? = null,
+
+    /**
+     * Currently only used to display the logo of the supplier in generated PDF. There is an element for it in Factur-X
+     * and XRechnung, but the underlying library doesn't map it.
+     */
+    val logoUrl: String? = null,
 ) {
     override fun toString() = "$name, $city"
 }
