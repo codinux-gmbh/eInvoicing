@@ -68,8 +68,7 @@ fun create() {
 }
 
 private fun createInvoice() = Invoice(
-    invoiceNumber = "RE-00001",
-    invoicingDate = LocalDate.now(),
+    details = InvoiceDetails("RE-00001", LocalDate.now()),
     supplier = Party("codinux GmbH & Co. KG", "Fun Street 1", null, "12345", "Glückstadt"),
     customer = Party("Abzock GmbH", "Ausbeutstr.", null, "12345", "Abzockhausen"),
     items = listOf(InvoiceItem("Erbrachte Dienstleistungen", BigDecimal(170), "HUR", BigDecimal(105), BigDecimal(19))) // HUR = EN code for hour
