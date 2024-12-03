@@ -30,4 +30,6 @@ include("e-invoice-domain")
 
 include("invoice-creator")
 
+include("e-invoice-spec-parser")
+
 include("e-invoice-api")
