@@ -2,6 +2,8 @@ package net.codinux.invoicing.test
 
 import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
+import net.codinux.invoicing.model.codes.Country
+import net.codinux.invoicing.model.codes.Currency
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -17,7 +19,7 @@ object DataGenerator {
     val SupplierAdditionalAddressLine: String? = null
     const val SupplierPostalCode = "12345"
     const val SupplierCity = "Glückstadt"
-    const val SupplierCountry = "DE"
+    val SupplierCountry = Country.DE
     const val SupplierVatId = "DE123456789"
     const val SupplierEmail = "working-class-hero@rock.me"
     const val SupplierPhone = "+4917012345678"
@@ -29,7 +31,7 @@ object DataGenerator {
     val CustomerAdditionalAddressLine: String? = null
     const val CustomerPostalCode = SupplierPostalCode
     const val CustomerCity = SupplierCity
-    const val CustomerCountry = "DE"
+    val CustomerCountry = SupplierCountry
     const val CustomerVatId = "DE987654321"
     const val CustomerEmail = "exploiter@your.boss"
     const val CustomerPhone = "+491234567890"
@@ -53,9 +55,10 @@ object DataGenerator {
         customer: Party = createParty(CustomerName, CustomerAddress, CustomerAdditionalAddressLine, CustomerPostalCode, CustomerCity, CustomerCountry,
             CustomerVatId, CustomerEmail, CustomerPhone, CustomerFax, bankDetails = CustomerBankDetails),
         items: List<InvoiceItem> = listOf(createItem()),
+        currency: Currency = Currency.EUR,
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
-    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, dueDate, paymentDescription), supplier, customer, items).apply {
+    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, dueDate, paymentDescription), supplier, customer, items).apply {
         this.totals = AmountsCalculator().calculateTotalAmounts(this)
     }
 
@@ -65,7 +68,7 @@ object DataGenerator {
         additionalAddressLine: String? = SupplierAdditionalAddressLine,
         postalCode: String = SupplierPostalCode,
         city: String = SupplierCity,
-        country: String? = SupplierCountry,
+        country: Country = SupplierCountry,
         vatId: String? = SupplierVatId,
         email: String? = SupplierEmail,
         phone: String? = SupplierPhone,

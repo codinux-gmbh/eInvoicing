@@ -2,6 +2,8 @@ package net.codinux.invoicing.mapper
 
 import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
+import net.codinux.invoicing.model.codes.Country
+import net.codinux.invoicing.model.codes.Currency
 import org.mustangproject.*
 import org.mustangproject.BankDetails
 import org.mustangproject.Invoice
@@ -17,9 +19,18 @@ open class MustangMapper(
     protected open val calculator: AmountsCalculator = AmountsCalculator()
 ) {
 
+    companion object {
+        val CountriesByIsoCode = Country.entries.associateBy { it.alpha2Code }
+
+        val CurrenciesByIsoCode = Currency.entries.associateBy { it.alpha3Code }
+    }
+
+
     open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
         this.number = invoice.details.invoiceNumber
         this.issueDate = map(invoice.details.invoiceDate)
+        this.currency = invoice.details.currency.alpha3Code
+
         this.sender = mapParty(invoice.supplier)
         this.recipient = mapParty(invoice.customer)
 
@@ -42,7 +53,7 @@ open class MustangMapper(
     }
 
     open fun mapParty(party: Party): TradeParty = TradeParty(
-        party.name, party.address, party.postalCode, party.city, party.countryIsoCode
+        party.name, party.address, party.postalCode, party.city, party.country.alpha2Code
     ).apply {
         this.setAdditionalAddress(party.additionalAddressLine)
 
@@ -94,7 +105,8 @@ open class MustangMapper(
 
 
     open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
-        details = InvoiceDetails(invoice.number, map(invoice.issueDate), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
+        // TODO: what to do if currency code is unknown? Currently it throws an exception, but i don't like that mapping fails just due to an unknown currency code
+        details = InvoiceDetails(invoice.number, map(invoice.issueDate), mapCurrency(invoice.currency), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
 
         supplier = mapParty(invoice.sender),
         customer = mapParty(invoice.recipient),
@@ -108,7 +120,8 @@ open class MustangMapper(
     )
 
     open fun mapParty(party: TradeParty) = Party(
-        party.name, party.street, party.additionalAddress, party.zip, party.location, party.country, party.vatID,
+        // TODO: what to do if country code is unknown? Currently it throws an exception, but i don't like that mapping fails just due to an unknown country code
+        party.name, party.street, party.additionalAddress, party.zip, party.location, mapCountry(party.country), party.vatID,
         party.email ?: party.contact?.eMail, party.contact?.phone, party.contact?.fax, party.contact?.name,
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )
@@ -135,6 +148,13 @@ open class MustangMapper(
     }
 
 
+    private fun mapCountry(isoAlpha2CountryCode: String?): Country =
+        CountriesByIsoCode[isoAlpha2CountryCode]
+            ?: throw IllegalArgumentException("Unknown ISO Alpha-2 country code '$isoAlpha2CountryCode', therefore cannot map ISO code to Country")
+
+    private fun mapCurrency(isoCurrencyCode: String?): Currency =
+        CurrenciesByIsoCode[isoCurrencyCode]
+            ?: throw IllegalArgumentException("Unknown ISO currency code '$isoCurrencyCode', therefore cannot map ISO code to Currency")
 
     @JvmName("mapNullable")
     protected fun map(date: LocalDate?) =

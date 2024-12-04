@@ -1,5 +1,7 @@
 package net.codinux.invoicing.model
 
+import net.codinux.invoicing.model.codes.Country
+
 class Party(
     val name: String,
 
@@ -10,10 +12,7 @@ class Party(
     val additionalAddressLine: String? = null,
     var postalCode: String?,
     val city: String,
-    /**
-     * Two letter country ISO code, e.g. "us" for USA, "fr" for France, ...
-     */
-    val countryIsoCode: String? = null, // TODO: use the full country name here and map to ISO code in MustangMapper?
+    val country: Country = Country.DE,
 
     val vatId: String? = null,
 

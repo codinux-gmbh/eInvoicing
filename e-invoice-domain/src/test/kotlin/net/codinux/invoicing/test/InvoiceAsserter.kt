@@ -6,6 +6,7 @@ import net.codinux.invoicing.model.BankDetails
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
+import net.codinux.invoicing.model.codes.Country
 import java.math.BigDecimal
 
 object InvoiceAsserter {
@@ -70,13 +71,13 @@ object InvoiceAsserter {
         assertLineItem(invoice.items.first(), DataGenerator.ItemName, DataGenerator.ItemQuantity, DataGenerator.ItemUnit, DataGenerator.ItemUnitPrice, DataGenerator.ItemVatRate, DataGenerator.ItemDescription)
     }
 
-    private fun assertParty(party: Party, name: String, address: String, postalCode: String, city: String, country: String?, vatId: String, email: String, phone: String, bankDetails: BankDetails?) {
+    private fun assertParty(party: Party, name: String, address: String, postalCode: String, city: String, country: Country, vatId: String, email: String, phone: String, bankDetails: BankDetails?) {
         assertThat(party.name).isEqualTo(name)
 
         assertThat(party.address).isEqualTo(address)
         assertThat(party.postalCode).isEqualTo(postalCode)
         assertThat(party.city).isEqualTo(city)
-        assertThat(party.countryIsoCode).isEqualTo(country)
+        assertThat(party.country).isEqualTo(country)
 
         assertThat(party.vatId).isEqualTo(vatId)
 
