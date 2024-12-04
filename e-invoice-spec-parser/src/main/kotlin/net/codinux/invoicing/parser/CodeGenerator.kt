@@ -1,5 +1,6 @@
 package net.codinux.invoicing.parser
 
+import net.codinux.invoicing.model.codes.InvoiceTypeUseFor
 import net.codinux.invoicing.parser.genericode.CodeList
 import net.codinux.invoicing.parser.model.CodeListType
 import net.codinux.invoicing.parser.model.Column
@@ -18,8 +19,8 @@ class CodeGenerator {
             }
 
             // Factur-X has the better column names and often also a Description column
-            val (columns, rows) = filter(if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
-                                else codeLists.first.columns to codeLists.first.rows)
+            val (columns, rows) = map(filter(if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
+                                else codeLists.first.columns to codeLists.first.rows))
 
             File(outputDirectory, type.className + ".kt").bufferedWriter().use { writer ->
                 writer.appendLine("package net.codinux.invoicing.model.codes")
@@ -27,7 +28,7 @@ class CodeGenerator {
                 writer.appendLine("enum class ${type.className}(${columns.joinToString(", ") { "val ${getPropertyName(it)}: ${getDataType(it, columns, rows)}" } }) {")
 
                 rows.forEach { row ->
-                    writer.appendLine("\t${getEnumName(columns, row)}(${row.joinToString(", ") { it?.let { "\"${it.toString().replace("\n", "").replace('"', '\'')}\"" } ?: "null" } }),")
+                    writer.appendLine("\t${getEnumName(columns, row)}(${row.joinToString(", ") { getPropertyValue(it) } }),")
                 }
                 writer.append("}")
             }
@@ -52,6 +53,27 @@ class CodeGenerator {
         return columns.filterIndexed { index, _ -> index != indexToIgnore } to rows.map { it.filterIndexed { index, _ -> index != indexToIgnore } }
     }
 
+    private fun map(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
+        val (columns, rows) = columnsAndRows
+        val useForColumn = columns.firstOrNull { it.name == "EN16931 interpretation" }
+
+        if (useForColumn != null) {
+            val index = columns.indexOf(useForColumn)
+            val modifiedColumns = columns.toMutableList().apply {
+                removeAt(index)
+                add(Column(columns.last().index + 1, "UseFor", "InvoiceTypeUseFor", "UseFor"))
+            }
+            val modifiedRows = rows.map { it.toMutableList().apply {
+                val useFor = removeAt(index)?.toString()
+                add(if (useFor == "Credit Note") InvoiceTypeUseFor.CreditNote else InvoiceTypeUseFor.Invoice)
+            }}
+
+            return modifiedColumns to modifiedRows
+        }
+
+        return columnsAndRows
+    }
+
 
     private fun getPropertyName(column: Column): String = when (column.name) {
         "Unique code" -> "code"
@@ -65,6 +87,18 @@ class CodeGenerator {
         "Structure of code" -> "structureOfCode"
         "Name" -> "meaning" // cannot use 'name' as property name in an Enum
         else -> column.name.replace(" ", "").let { it[0].lowercase() + it.substring(1) }
+    }
+
+    private fun getPropertyValue(value: Any?): CharSequence {
+        if (value == null) {
+            return "null"
+        }
+
+        if (value is InvoiceTypeUseFor) {
+            return "InvoiceTypeUseFor.$value"
+        }
+
+        return "\"${value.toString().replace("\n", "").replace('"', '\'')}\""
     }
 
     private fun getDataType(column: Column, columns: List<Column>, rows: List<List<Any?>>): String {
