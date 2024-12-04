@@ -19,8 +19,8 @@ class CodeGenerator {
             }
 
             // Factur-X has the better column names and often also a Description column
-            val (columns, rows) = map(filter(if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
-                                else codeLists.first.columns to codeLists.first.rows))
+            val (columns, rows) = reorder(map(filter(if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
+                                else codeLists.first.columns to codeLists.first.rows)))
 
             File(outputDirectory, type.className + ".kt").bufferedWriter().use { writer ->
                 writer.appendLine("package net.codinux.invoicing.model.codes")
@@ -69,6 +69,31 @@ class CodeGenerator {
             }}
 
             return modifiedColumns to modifiedRows
+        }
+
+        return columnsAndRows
+    }
+
+    /**
+     * For Countries move englishNames column to the end, so that alpha2Code and alpha3Code are the first and second column.
+     * For SchemeIdentifier move the schemeId column, which in most cases is null, to the end, so that the code is the first column.
+     */
+    private fun reorder(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
+        val (columns, rows) = columnsAndRows
+        val reorderFirstColumn = columns.first().name in listOf("English Name", "Scheme ID")
+
+        if (reorderFirstColumn) {
+            val reorderedColumns = columns.toMutableList().apply {
+                val reorderedColumn = this.removeAt(0)
+                this.add(reorderedColumn)
+            }
+
+            val reorderedRows = rows.map { it.toMutableList().apply {
+                val reorderedRow = this.removeAt(0)
+                this.add(reorderedRow)
+            }}
+
+            return reorderedColumns to reorderedRows
         }
 
         return columnsAndRows
