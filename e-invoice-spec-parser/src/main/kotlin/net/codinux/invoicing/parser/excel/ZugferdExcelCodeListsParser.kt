@@ -15,7 +15,7 @@ class ZugferdExcelCodeListsParser {
         private val TableStartColumns = listOf("Code", "English Name", "Country", "Scheme ID")
 
         private val CodeListsWithDescription = listOf(CodeListType.UN_5189_AllowanceIdentificationCode, CodeListType.UN_7161_SpecialServiceDescriptionCodes,
-            CodeListType.IsoCountryCodes, CodeListType.UN_4451_TextSubjectCodeQualifier, CodeListType.UN_7143_ItemTypeIdentificationCode, CodeListType.UN_4461_PaymentCodes, CodeListType.UN_1153_ReferenceCode)
+            CodeListType.UN_4451_TextSubjectCodeQualifier, CodeListType.UN_7143_ItemTypeIdentificationCode, CodeListType.UN_4461_PaymentCodes, CodeListType.UN_1153_ReferenceCode)
     }
 
 

@@ -14,7 +14,7 @@ class CodeGenerator {
 
         matchedCodeLists.forEach { (type, codeLists) ->
             // ignore Currency and Country for now
-            if (type == CodeListType.IsoCurrencyCodes || type == CodeListType.IsoCountryCodes) {
+            if (type == CodeListType.IsoCurrencyCodes) {
                 return@forEach
             }
 
@@ -43,7 +43,7 @@ class CodeGenerator {
     // PaymentMeansCodeFacturX: ignore Sens
     private fun filter(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
         val (columns, rows) = columnsAndRows
-        val columnToIgnore = columns.firstOrNull { it.name == "Source" || it.name == "Comment" || it.name == "Sens" }
+        val columnToIgnore = columns.firstOrNull { it.name == "Source" || it.name == "Comment" || it.name == "Sens" || it.name == "French Name" }
 
         if (columnToIgnore == null) {
             return columnsAndRows
@@ -112,7 +112,10 @@ class CodeGenerator {
     }
 
     private fun getEnumName(columns: List<Column>, row: List<Any?>): String {
-        val column = if (columns.first().name == "Scheme ID") row[1] else if (columns.first().name == "Country") row[2] else if (columns.first().name == "English Name") row[3] else row[0]
+        val column = if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
+                    else if (columns.first().name == "English Name") row[1] // Country codes
+                    else if (columns.first().name == "Country") row[2] // Currency codes, but does not work yet due to duplicate Keys / Alpha3-Codes
+                    else row[0] // default case: the code is in the first column
 
         val name = (column?.toString() ?: "").replace(' ', '_').replace('/', '_').replace('.', '_').replace(',', '_')
             .replace('-', '_').replace('(', '_').replace(')', '_').replace('[', '_').replace(']', '_')
