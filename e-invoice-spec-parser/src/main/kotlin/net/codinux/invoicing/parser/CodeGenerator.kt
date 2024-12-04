@@ -5,6 +5,7 @@ import net.codinux.invoicing.parser.genericode.CodeList
 import net.codinux.invoicing.parser.model.CodeListType
 import net.codinux.invoicing.parser.model.Column
 import java.io.File
+import java.util.Currency
 
 class CodeGenerator {
 
@@ -13,14 +14,14 @@ class CodeGenerator {
         val matchedCodeLists = cefCodeLists.associateBy { it.type }.mapValues { it.value to zugferdCodeListsByType[it.key] }
 
         matchedCodeLists.forEach { (type, codeLists) ->
-            // ignore Currency and Country for now
-            if (type == CodeListType.IsoCurrencyCodes) {
-                return@forEach
+            val (columns, rows) = if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!) else {
+                // Factur-X has the better column names and often also a Description column
+                reorder(map(filter(
+                    if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
+                    else codeLists.first.columns to codeLists.first.rows
+                )))
             }
 
-            // Factur-X has the better column names and often also a Description column
-            val (columns, rows) = reorder(map(filter(if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
-                                else codeLists.first.columns to codeLists.first.rows)))
 
             File(outputDirectory, type.className + ".kt").bufferedWriter().use { writer ->
                 writer.appendLine("package net.codinux.invoicing.model.codes")
@@ -99,6 +100,26 @@ class CodeGenerator {
         return columnsAndRows
     }
 
+    private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<List<Any?>>> {
+        val columns = listOf(
+            Column(0, "alpha3Code", "String", "alpha3Code"),
+            Column(1, "currencySymbol", "String", "currencySymbol"),
+            Column(2, "englishName", "String", "englishName"),
+            Column(3, "countries", "Set<String>", "countries")
+        )
+
+        val cefByIsoCode = cefCodeList.rows.associateBy { it[0] }
+        val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it[2] }
+        val availableCurrencies = Currency.getAvailableCurrencies().associateBy { it.currencyCode } // TODO: there are 52 currencies in availableCurrencies that are not in CEF and Zugferd list
+
+        val rows = cefByIsoCode.map { (isoCode, cefRow) ->
+            val zugferdRows = zugferdByIsoCode[isoCode] ?: emptyList()
+            listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow[1], zugferdRows.map { it[0] }.toSet())
+        }
+
+        return columns to rows
+    }
+
 
     private fun getPropertyName(column: Column): String = when (column.name) {
         "Unique code" -> "code"
@@ -121,6 +142,10 @@ class CodeGenerator {
 
         if (value is InvoiceTypeUseFor) {
             return "InvoiceTypeUseFor.$value"
+        }
+
+        if (value is Set<*>) {
+            return if (value.isEmpty()) "emptySet()" else "setOf(${value.joinToString(", ") { getPropertyValue(it) } })"
         }
 
         return "\"${value.toString().replace("\n", "").replace('"', '\'')}\""
