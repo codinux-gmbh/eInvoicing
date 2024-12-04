@@ -137,6 +137,15 @@ class CodeGenerator {
     }
 
     private fun getEnumName(columns: List<Column>, row: List<Any?>): String {
+        // Mime types
+        val firstColumn = row[0]
+        if (firstColumn == "application/pdf") return "PDF"
+        else if (firstColumn == "image/png") return "PNG"
+        else if (firstColumn == "image/jpeg") return "JPEG"
+        else if (firstColumn == "text/csv") return "CSV"
+        else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
+        else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
+
         val column = if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
                     else if (columns.first().name == "English Name") row[1] // Country codes
                     else if (columns.first().name == "Country") row[2] // Currency codes, but does not work yet due to duplicate Keys / Alpha3-Codes
