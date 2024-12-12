@@ -250,6 +250,6 @@ enum class Country(val alpha2Code: String, val alpha3Code: String?, val englishN
 	Yemen("YE", "YEM", "Yemen"),
 	Zambia("ZM", "ZMB", "Zambia"),
 	Zimbabwe("ZW", "ZWE", "Zimbabwe"),
-	_1A("1A", null, "Kosovo"),
-	XI("XI", null, "United Kingdom (Northern Ireland)"),
+	Kosovo("1A", null, "Kosovo"),
+	NorthernIreland("XI", null, "United Kingdom (Northern Ireland)"),
 }

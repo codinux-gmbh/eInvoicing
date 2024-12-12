@@ -197,7 +197,7 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
-        val column = if (type == CodeListType.IsoCountryCodes) i18nRegionsByCode[firstColumn]?.name ?: firstColumn
+        val column = if (type == CodeListType.IsoCountryCodes) i18nRegionsByCode[firstColumn]?.name ?: fixCountryName(row[2])
                     else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[2]) // as fallback use currency's English name from Zugferd list
                     else if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
                     else row[0] // default case: the code is in the first column
@@ -209,6 +209,11 @@ class CodeGenerator {
         return if (name.isEmpty()) "_"
         else if (name[0].isDigit()) "_" + name
         else name
+    }
+
+    private fun fixCountryName(countryName: Any?): String = when (countryName) {
+        "United Kingdom (Northern Ireland)" -> "NorthernIreland"
+        else -> countryName.toString()
     }
 
     private fun fixCurrencyName(currencyName: Any?): String = when (currencyName) {
