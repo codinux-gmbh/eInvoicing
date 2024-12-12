@@ -10,6 +10,11 @@ import java.util.Currency
 
 class CodeGenerator {
 
+    companion object {
+        private val i18nCurrenciesByCode = net.codinux.i18n.Currency.entries.associateBy { it.alpha3Code }
+    }
+
+
     fun generateCodeFiles(cefCodeLists: List<CodeList>, zugferdCodeLists: List<net.codinux.invoicing.parser.excel.CodeList>, outputDirectory: File) {
         val zugferdCodeListsByType = zugferdCodeLists.associateBy { it.type }
         val matchedCodeLists = cefCodeLists.associateBy { it.type }.mapValues { it.value to zugferdCodeListsByType[it.key] }
@@ -30,7 +35,7 @@ class CodeGenerator {
                 writer.appendLine("enum class ${type.className}(${columns.joinToString(", ") { "val ${getPropertyName(it)}: ${getDataType(it, columns, rows)}" } }) {")
 
                 rows.forEach { row ->
-                    writer.appendLine("\t${getEnumName(columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it) } }),")
+                    writer.appendLine("\t${getEnumName(type, columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it) } }),")
                 }
                 writer.append("}")
             }
@@ -179,7 +184,7 @@ class CodeGenerator {
         }
     }
 
-    private fun getEnumName(columns: List<Column>, row: List<Any?>): String {
+    private fun getEnumName(type: CodeListType, columns: List<Column>, row: List<Any?>): String {
         // Mime types
         val firstColumn = row[0]
         if (firstColumn == "application/pdf") return "PDF"
@@ -189,9 +194,9 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
-        val column = if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
+        val column = if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: row[2] // as fallback use currency's English name from Zugferd list
+                    else if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
                     else if (columns.first().name == "English Name") row[1] // Country codes
-                    else if (columns.first().name == "Country") row[2] // Currency codes, but does not work yet due to duplicate Keys / Alpha3-Codes
                     else row[0] // default case: the code is in the first column
 
         val name = (column?.toString() ?: "").replace(' ', '_').replace('/', '_').replace('.', '_').replace(',', '_')
