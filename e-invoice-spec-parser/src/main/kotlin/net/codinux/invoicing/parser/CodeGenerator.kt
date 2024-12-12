@@ -224,7 +224,6 @@ class CodeGenerator {
     }
 
     private fun fixCurrencyName(currencyName: Any?): String = when (currencyName) {
-        "Sierra Leone (new valuation 2022)" -> "SierraLeone_NewValuation2022"
         "Bolívar Soberano, new valuation" -> "BolivarSoberano_NewValuation"
         else -> currencyName.toString().replace(" ", "")
     }

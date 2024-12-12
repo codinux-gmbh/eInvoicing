@@ -51,7 +51,7 @@ enum class Country(val alpha2Code: String, val alpha3Code: String?, val englishN
 	CocosKeelingIslands("CC", "CCK", "Cocos (Keeling) Islands (the)"),
 	Colombia("CO", "COL", "Colombia"),
 	Comoros("KM", "COM", "Comoros (the)"),
-	CongoDemocraticRepublic("CD", "COD", "Congo (the Democratic Republic of the)"),
+	Congo_DemocraticRepublic("CD", "COD", "Congo (the Democratic Republic of the)"),
 	Congo("CG", "COG", "Congo (the)"),
 	CookIslands("CK", "COK", "Cook Islands (the)"),
 	CostaRica("CR", "CRI", "Costa Rica"),
