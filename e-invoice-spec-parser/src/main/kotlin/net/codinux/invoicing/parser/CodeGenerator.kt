@@ -150,10 +150,10 @@ class CodeGenerator {
             val i18nCurrency = i18nCurrenciesByCode[isoCode]
             // as Zugferd list only lists current currencies, there's currently no use for i18n.Currency.isCurrentCurrency and .withdrawalDate
             val isFrequentlyUsedValue = zugferdRows.any { it.isFrequentlyUsedValue }
-            Row(listOf(isoCode, i18nCurrency?.numericCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet(), isFrequentlyUsedValue), isFrequentlyUsedValue)
+            Row(listOf(isoCode, i18nCurrency?.numericCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet(), isFrequentlyUsedValue), isFrequentlyUsedValue, fixCurrencyName(i18nCurrency?.name ?: cefRow.values[1]))
         }
 
-        return columns to rows
+        return columns to rows.sortedBy { it.enumName!! } // sort by English name
     }
 
     private fun addFrequentlyUsedColumn(columnsToRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
@@ -228,8 +228,7 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
-        val column = if (type == CodeListType.IsoCountryCodes) row.enumName
-                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(values[3]) // as fallback use currency's English name from Zugferd list
+        val column = if (row.enumName != null) row.enumName
                     else if (columns.first().name == "Scheme ID") values[1] // ISO 6523 Scheme Identifier codes
                     else firstColumn // default case: the code is in the first column
 
