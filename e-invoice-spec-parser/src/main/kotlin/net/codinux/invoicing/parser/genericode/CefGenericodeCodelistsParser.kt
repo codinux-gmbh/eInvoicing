@@ -4,6 +4,7 @@ import com.helger.genericode.Genericode10CodeListMarshaller
 import com.helger.xml.serialize.read.DOMReader
 import net.codinux.invoicing.parser.model.CodeListType
 import net.codinux.invoicing.parser.model.Column
+import net.codinux.invoicing.parser.model.Row
 import net.codinux.log.logger
 import java.io.File
 import java.io.InputStream
@@ -44,7 +45,7 @@ class CefGenericodeCodelistsParser {
         val columns = columnSet?.columnChoice.orEmpty().filterIsInstance<com.helger.genericode.v10.Column>().mapIndexed { index, col -> Column(index, col.id!!, col.data?.type!!, col.shortNameValue!!) }
         val rows = simpleCodeList?.row.orEmpty().map { row -> columns.map { column -> row.value.firstOrNull { (it.columnRef as? com.helger.genericode.v10.Column)?.id == column.id }?.simpleValueValue } }
 
-        return CodeList(getType(name), name, version, canonicalUri, canonicalVersionUri, columns, rows)
+        return CodeList(getType(name), name, version, canonicalUri, canonicalVersionUri, columns, rows.map { Row(it) })
     }
 
     private fun getType(name: String): CodeListType = when (name) {

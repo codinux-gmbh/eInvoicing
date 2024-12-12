@@ -4,6 +4,7 @@ import net.codinux.invoicing.model.codes.InvoiceTypeUseFor
 import net.codinux.invoicing.parser.genericode.CodeList
 import net.codinux.invoicing.parser.model.CodeListType
 import net.codinux.invoicing.parser.model.Column
+import net.codinux.invoicing.parser.model.Row
 import java.io.File
 import java.util.Currency
 
@@ -15,9 +16,9 @@ class CodeGenerator {
 
         matchedCodeLists.forEach { (type, codeLists) ->
             val (columns, rows) = if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!) else {
-                // Factur-X has the better column names and often also a Description column
                 reorder(map(filter(
-                    if (codeLists.second !=  null) codeLists.second!!.columns to codeLists.second!!.rows
+                    // Factur-X (= codeLists.second) has the better column names and often also a Description column
+                    if (codeLists.second != null) codeLists.second!!.columns to codeLists.second!!.rows
                     else codeLists.first.columns to codeLists.first.rows
                 )))
             }
@@ -29,7 +30,7 @@ class CodeGenerator {
                 writer.appendLine("enum class ${type.className}(${columns.joinToString(", ") { "val ${getPropertyName(it)}: ${getDataType(it, columns, rows)}" } }) {")
 
                 rows.forEach { row ->
-                    writer.appendLine("\t${getEnumName(columns, row)}(${row.joinToString(", ") { getPropertyValue(it) } }),")
+                    writer.appendLine("\t${getEnumName(columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it) } }),")
                 }
                 writer.append("}")
             }
@@ -42,7 +43,7 @@ class CodeGenerator {
     // ElectronicAddressScheme: ignore Source
     // Unit: ignore Source
     // PaymentMeansCodeFacturX: ignore Sens
-    private fun filter(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
+    private fun filter(columnsAndRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
         val (columns, rows) = columnsAndRows
         val columnToIgnore = columns.firstOrNull { it.name == "Source" || it.name == "Comment" || it.name == "Sens" || it.name == "French Name" }
 
@@ -51,10 +52,10 @@ class CodeGenerator {
         }
 
         val indexToIgnore = columns.indexOf(columnToIgnore)
-        return columns.filterIndexed { index, _ -> index != indexToIgnore } to rows.map { it.filterIndexed { index, _ -> index != indexToIgnore } }
+        return columns.filterIndexed { index, _ -> index != indexToIgnore } to rows.onEach { it.removeValueAtIndex(indexToIgnore) }
     }
 
-    private fun map(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
+    private fun map(columnsAndRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
         val (columns, rows) = columnsAndRows
         val useForColumn = columns.firstOrNull { it.name == "EN16931 interpretation" }
 
@@ -64,10 +65,10 @@ class CodeGenerator {
                 removeAt(index)
                 add(Column(columns.last().index + 1, "UseFor", "InvoiceTypeUseFor", "UseFor"))
             }
-            val modifiedRows = rows.map { it.toMutableList().apply {
-                val useFor = removeAt(index)?.toString()
-                add(if (useFor == "Credit Note") InvoiceTypeUseFor.CreditNote else InvoiceTypeUseFor.Invoice)
-            }}
+            val modifiedRows = rows.onEach {
+                val useFor = it.removeValueAtIndex(index)?.toString()
+                it.addValue(if (useFor == "Credit Note") InvoiceTypeUseFor.CreditNote else InvoiceTypeUseFor.Invoice)
+            }
 
             return modifiedColumns to modifiedRows
         }
@@ -79,7 +80,7 @@ class CodeGenerator {
      * For Countries move englishNames column to the end, so that alpha2Code and alpha3Code are the first and second column.
      * For SchemeIdentifier move the schemeId column, which in most cases is null, to the end, so that the code is the first column.
      */
-    private fun reorder(columnsAndRows: Pair<List<Column>, List<List<Any?>>>): Pair<List<Column>, List<List<Any?>>> {
+    private fun reorder(columnsAndRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
         val (columns, rows) = columnsAndRows
         val reorderFirstColumn = columns.first().name in listOf("English Name", "Scheme ID")
 
@@ -89,10 +90,10 @@ class CodeGenerator {
                 this.add(reorderedColumn)
             }
 
-            val reorderedRows = rows.map { it.toMutableList().apply {
-                val reorderedRow = this.removeAt(0)
-                this.add(reorderedRow)
-            }}
+            val reorderedRows = rows.onEach {
+                val reorderedRow = it.removeValueAtIndex(0)
+                it.addValue(reorderedRow)
+            }
 
             return reorderedColumns to reorderedRows
         }
@@ -100,7 +101,7 @@ class CodeGenerator {
         return columnsAndRows
     }
 
-    private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<List<Any?>>> {
+    private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
         val columns = listOf(
             Column(0, "alpha3Code", "String", "alpha3Code"),
             Column(1, "currencySymbol", "String", "currencySymbol"),
@@ -108,13 +109,13 @@ class CodeGenerator {
             Column(3, "countries", "Set<String>", "countries")
         )
 
-        val cefByIsoCode = cefCodeList.rows.associateBy { it[0] }
-        val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it[2] }
+        val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
+        val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it.values[2] }
         val availableCurrencies = Currency.getAvailableCurrencies().associateBy { it.currencyCode } // TODO: there are 52 currencies in availableCurrencies that are not in CEF and Zugferd list
 
         val rows = cefByIsoCode.map { (isoCode, cefRow) ->
             val zugferdRows = zugferdByIsoCode[isoCode] ?: emptyList()
-            listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow[1], zugferdRows.map { it[0] }.toSet())
+            Row(listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet()))
         }
 
         return columns to rows
@@ -151,9 +152,9 @@ class CodeGenerator {
         return "\"${value.toString().replace("\n", "").replace('"', '\'')}\""
     }
 
-    private fun getDataType(column: Column, columns: List<Column>, rows: List<List<Any?>>): String {
+    private fun getDataType(column: Column, columns: List<Column>, rows: List<Row>): String {
         val index = columns.indexOf(column)
-        val containsNullValues = rows.any { it[index] == null }
+        val containsNullValues = rows.any { it.values[index] == null }
 
         return when (column.dataType) {
             "string" -> "String" + (if (containsNullValues) "?" else "")

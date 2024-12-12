@@ -76,9 +76,10 @@ class ZugferdExcelCodeListsParser {
 
             // if this Code List has a description, ignore every second row, as in the second row is the description
             val rows = allRows.drop(5).filterIndexed { index, _ -> isTypeWithDescription == false || index % 2 == 0 }.map { row ->
-                columnIndices.map { getCellValue(row.getCell(it)) } +
+                val values = columnIndices.map { getCellValue(row.getCell(it)) } +
                         ( if (isTypeWithDescription) listOf(getCellValue(allRows.get(row.rowNum + 1).getCell(descriptionColumnIndex))) else emptyList())
-            }.filterNot { it.all { it == null } } // filter out empty rows
+                net.codinux.invoicing.parser.model.Row(values)
+            }.filterNot { it.values.all { it == null } } // filter out empty rows
 
             if (isTypeWithDescription) {
                 columns.add(Column(indexOfNextEmptyCell!! - 1, "Description", "String", "Description"))
