@@ -6,6 +6,7 @@ import net.codinux.log.logger
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.xssf.usermodel.XSSFColor
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 
@@ -76,9 +77,14 @@ class ZugferdExcelCodeListsParser {
 
             // if this Code List has a description, ignore every second row, as in the second row is the description
             val rows = allRows.drop(5).filterIndexed { index, _ -> isTypeWithDescription == false || index % 2 == 0 }.map { row ->
-                val values = columnIndices.map { getCellValue(row.getCell(it)) } +
+                val cells = columnIndices.map { row.getCell(it) }
+                // if the cell is filled with color "FF4BACC6" (but not gray) that means this value is frequently used
+                val isFrequentlyUsedValue = cells.all { (it?.cellStyle?.fillForegroundColorColor as? XSSFColor)?.argbHex == "FF4BACC6"
+                        || it?.columnIndex == sourceColumn?.columnIndex } // only the source column never has a background color
+
+                val values = cells.map { getCellValue(it) } +
                         ( if (isTypeWithDescription) listOf(getCellValue(allRows.get(row.rowNum + 1).getCell(descriptionColumnIndex))) else emptyList())
-                net.codinux.invoicing.parser.model.Row(values)
+                net.codinux.invoicing.parser.model.Row(values, isFrequentlyUsedValue)
             }.filterNot { it.values.all { it == null } } // filter out empty rows
 
             if (isTypeWithDescription) {

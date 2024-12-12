@@ -15,13 +15,13 @@ class CodeGenerator {
         val matchedCodeLists = cefCodeLists.associateBy { it.type }.mapValues { it.value to zugferdCodeListsByType[it.key] }
 
         matchedCodeLists.forEach { (type, codeLists) ->
-            val (columns, rows) = if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!) else {
-                reorder(map(filter(
+            val (columns, rows) = (if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!) else {
+                addFrequentlyUsedColumn(reorder(map(filter(
                     // Factur-X (= codeLists.second) has the better column names and often also a Description column
                     if (codeLists.second != null) codeLists.second!!.columns to codeLists.second!!.rows
                     else codeLists.first.columns to codeLists.first.rows
-                )))
-            }
+                ))))
+            })
 
 
             File(outputDirectory, type.className + ".kt").bufferedWriter().use { writer ->
@@ -106,7 +106,8 @@ class CodeGenerator {
             Column(0, "alpha3Code", "String", "alpha3Code"),
             Column(1, "currencySymbol", "String", "currencySymbol"),
             Column(2, "englishName", "String", "englishName"),
-            Column(3, "countries", "Set<String>", "countries")
+            Column(3, "countries", "Set<String>", "countries"),
+            Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean", "isFrequentlyUsedValue")
         )
 
         val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
@@ -115,10 +116,22 @@ class CodeGenerator {
 
         val rows = cefByIsoCode.map { (isoCode, cefRow) ->
             val zugferdRows = zugferdByIsoCode[isoCode] ?: emptyList()
-            Row(listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet()))
+            val isFrequentlyUsedValue = zugferdRows.any { it.isFrequentlyUsedValue }
+            Row(listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet(), isFrequentlyUsedValue), isFrequentlyUsedValue)
         }
 
         return columns to rows
+    }
+
+    private fun addFrequentlyUsedColumn(columnsToRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
+        val hasFrequentlyUsedValue = columnsToRows.second.any { it.isFrequentlyUsedValue }
+
+        return if (hasFrequentlyUsedValue) {
+            (columnsToRows.first + Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean", "isFrequentlyUsedValue")) to
+                    columnsToRows.second.onEach { it.addIsFrequentlyUsedValueCell() }
+        } else {
+            columnsToRows
+        }
     }
 
 
@@ -143,6 +156,10 @@ class CodeGenerator {
 
         if (value is InvoiceTypeUseFor) {
             return "InvoiceTypeUseFor.$value"
+        }
+
+        if (value is Boolean) {
+            return "$value"
         }
 
         if (value is Set<*>) {
