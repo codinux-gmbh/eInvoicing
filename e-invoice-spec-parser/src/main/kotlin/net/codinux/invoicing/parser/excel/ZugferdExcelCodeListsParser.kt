@@ -82,7 +82,7 @@ class ZugferdExcelCodeListsParser {
                 val isFrequentlyUsedValue = cells.all { (it?.cellStyle?.fillForegroundColorColor as? XSSFColor)?.argbHex == "FF4BACC6"
                         || it?.columnIndex == sourceColumn?.columnIndex } // only the source column never has a background color
 
-                val values = cells.map { getCellValue(it) } +
+                val values = cells.map { getCellValue(it, type) } +
                         ( if (isTypeWithDescription) listOf(getCellValue(allRows.get(row.rowNum + 1).getCell(descriptionColumnIndex))) else emptyList())
                 net.codinux.invoicing.parser.model.Row(values, isFrequentlyUsedValue)
             }.filterNot { it.values.all { it == null } } // filter out empty rows
@@ -125,12 +125,16 @@ class ZugferdExcelCodeListsParser {
         return Column(cell.columnIndex, name, "String", name)
     }
 
-    private fun getCellValue(cell: Cell?) = when (cell?.cellType) {
-        CellType.STRING -> cell.stringCellValue.trim().takeUnless { it.isBlank() }
+    private fun getCellValue(cell: Cell?, type: CodeListType? = null) = when (cell?.cellType) {
+        CellType.STRING -> cell.stringCellValue.trim().takeUnless { it.isBlank() }?.let { sanitize(it, type) }
         CellType.NUMERIC -> cell.numericCellValue.toInt()
         CellType.BLANK -> null
         else -> null
     }
+
+    private fun sanitize(value: String, type: CodeListType?): String =
+        if (type == CodeListType.IsoCountryCodes && value == "c") "MK" // bug in Zugferd list, country code of NorthMacedonia is stated as "c" instead of "MK"
+        else value
 
     private fun <T> Iterator<T>.toList(): List<T> =
         this.asSequence().toList()

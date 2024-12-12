@@ -165,7 +165,7 @@ enum class Country(val alpha2Code: String, val alpha3Code: String?, val englishN
 	NG("NG", "NGA", "Nigeria"),
 	NU("NU", "NIU", "Niue"),
 	NF("NF", "NFK", "Norfolk Island"),
-	c("c", "MKD", "North Macedonia"),
+	MK("MK", "MKD", "North Macedonia"),
 	MP("MP", "MNP", "Northern Mariana Islands (the)"),
 	NO("NO", "NOR", "Norway"),
 	OM("OM", "OMN", "Oman"),
