@@ -23,13 +23,15 @@ class CodeGenerator {
         val matchedCodeLists = cefCodeLists.associateBy { it.type }.mapValues { it.value to zugferdCodeListsByType[it.key] }
 
         matchedCodeLists.forEach { (type, codeLists) ->
-            val (columns, rows) = (if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!) else {
-                addFrequentlyUsedColumn(reorder(map(filter(
-                    // Factur-X (= codeLists.second) has the better column names and often also a Description column
-                    if (codeLists.second != null) codeLists.second!!.columns to codeLists.second!!.rows
-                    else codeLists.first.columns to codeLists.first.rows
-                ))))
-            })
+            val (columns, rows) = (if (type == CodeListType.IsoCountryCodes) mergeCountryData(codeLists.first, codeLists.second!!)
+                    else if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!)
+                    else {
+                        addFrequentlyUsedColumn(reorder(map(filter(
+                            // Factur-X (= codeLists.second) has the better column names and often also a Description column
+                            if (codeLists.second != null) codeLists.second!!.columns to codeLists.second!!.rows
+                            else codeLists.first.columns to codeLists.first.rows
+                        ))))
+                    })
 
 
             File(outputDirectory, type.className + ".kt").bufferedWriter().use { writer ->
@@ -38,7 +40,7 @@ class CodeGenerator {
                 writer.appendLine("enum class ${type.className}(${columns.joinToString(", ") { "val ${getPropertyName(it)}: ${getDataType(it, columns, rows)}" } }) {")
 
                 rows.forEach { row ->
-                    writer.appendLine("\t${getEnumName(type, columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it, type != CodeListType.IsoCurrencyCodes) } }),")
+                    writer.appendLine("\t${getEnumName(type, columns, row)}(${row.values.joinToString(", ") { getPropertyValue(it, type !in listOf(CodeListType.IsoCountryCodes, CodeListType.IsoCurrencyCodes)) } }),")
                 }
                 writer.append("}")
             }
@@ -85,12 +87,11 @@ class CodeGenerator {
     }
 
     /**
-     * For Countries move englishNames column to the end, so that alpha2Code and alpha3Code are the first and second column.
      * For SchemeIdentifier move the schemeId column, which in most cases is null, to the end, so that the code is the first column.
      */
     private fun reorder(columnsAndRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
         val (columns, rows) = columnsAndRows
-        val reorderFirstColumn = columns.first().name in listOf("English Name", "Scheme ID")
+        val reorderFirstColumn = columns.first().name in listOf("Scheme ID")
 
         if (reorderFirstColumn) {
             val reorderedColumns = columns.toMutableList().apply {
@@ -107,6 +108,27 @@ class CodeGenerator {
         }
 
         return columnsAndRows
+    }
+
+    private fun mergeCountryData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
+        val columns = listOf(
+            Column(0, "alpha2Code", "String", "alpha2Code"),
+            Column(1, "alpha3Code", "String", "alpha3Code"),
+            Column(2, "numericCode", "Int", "numericCode"),
+            Column(3, "numericCodeAsString", "String", "numericCodeAsString"),
+            Column(4, "englishName", "String", "englishName"),
+        )
+
+        val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
+        val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it.values[2] }
+
+        val rows = cefByIsoCode.map { (isoCode, cefRow) ->
+            val values = zugferdByIsoCode[isoCode]!!.first().values
+            val i18nRegion = i18nRegionsByCode[isoCode]
+            Row(listOf(isoCode, i18nRegion?.alpha3Code ?: values[2], i18nRegion?.numericCode, i18nRegion?.numericCodeAsString, i18nRegion?.englishName ?: values[0]), false, fixCountryName(i18nRegion?.name ?: values[0]))
+        }
+
+        return columns to rows.sortedBy { it.enumName!! } // sort by englishName
     }
 
     private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
@@ -194,9 +216,11 @@ class CodeGenerator {
         }
     }
 
-    private fun getEnumName(type: CodeListType, columns: List<Column>, row: List<Any?>): String {
+    private fun getEnumName(type: CodeListType, columns: List<Column>, row: Row): String {
+        val values = row.values
+        val firstColumn = values[0]
+
         // Mime types
-        val firstColumn = row[0]
         if (firstColumn == "application/pdf") return "PDF"
         else if (firstColumn == "image/png") return "PNG"
         else if (firstColumn == "image/jpeg") return "JPEG"
@@ -204,10 +228,10 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
-        val column = if (type == CodeListType.IsoCountryCodes) i18nRegionsByCode[firstColumn]?.name ?: fixCountryName(row[2])
-                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[3]) // as fallback use currency's English name from Zugferd list
-                    else if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
-                    else row[0] // default case: the code is in the first column
+        val column = if (type == CodeListType.IsoCountryCodes) row.enumName
+                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(values[3]) // as fallback use currency's English name from Zugferd list
+                    else if (columns.first().name == "Scheme ID") values[1] // ISO 6523 Scheme Identifier codes
+                    else firstColumn // default case: the code is in the first column
 
         val name = (column?.toString() ?: "").replace(' ', '_').replace('/', '_').replace('.', '_').replace(',', '_')
             .replace('-', '_').replace('(', '_').replace(')', '_').replace('[', '_').replace(']', '_')

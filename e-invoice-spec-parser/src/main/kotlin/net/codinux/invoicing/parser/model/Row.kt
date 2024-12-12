@@ -2,7 +2,8 @@ package net.codinux.invoicing.parser.model
 
 class Row(
     values: List<Any?>,
-    val isFrequentlyUsedValue: Boolean = false
+    val isFrequentlyUsedValue: Boolean = false,
+    var enumName: String? = null
 ) {
 
     val values: List<Any?> = values.toMutableList()
