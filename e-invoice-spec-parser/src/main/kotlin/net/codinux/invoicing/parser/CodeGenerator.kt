@@ -38,7 +38,7 @@ class CodeGenerator {
                 writer.appendLine("enum class ${type.className}(${columns.joinToString(", ") { "val ${getPropertyName(it)}: ${getDataType(it, columns, rows)}" } }) {")
 
                 rows.forEach { row ->
-                    writer.appendLine("\t${getEnumName(type, columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it) } }),")
+                    writer.appendLine("\t${getEnumName(type, columns, row.values)}(${row.values.joinToString(", ") { getPropertyValue(it, type != CodeListType.IsoCurrencyCodes) } }),")
                 }
                 writer.append("}")
             }
@@ -112,9 +112,10 @@ class CodeGenerator {
     private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
         val columns = listOf(
             Column(0, "alpha3Code", "String", "alpha3Code"),
-            Column(1, "currencySymbol", "String", "currencySymbol"),
-            Column(2, "englishName", "String", "englishName"),
-            Column(3, "countries", "Set<String>", "countries"),
+            Column(1, "numericCode", "Int", "numericCode"),
+            Column(2, "currencySymbol", "String", "currencySymbol"),
+            Column(3, "englishName", "String", "englishName"),
+            Column(4, "countries", "Set<String>", "countries"),
             Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean", "isFrequentlyUsedValue")
         )
 
@@ -124,8 +125,10 @@ class CodeGenerator {
 
         val rows = cefByIsoCode.map { (isoCode, cefRow) ->
             val zugferdRows = zugferdByIsoCode[isoCode] ?: emptyList()
+            val i18nCurrency = i18nCurrenciesByCode[isoCode]
+            // as Zugferd list only lists current currencies, there's currently no use for i18n.Currency.isCurrentCurrency and .withdrawalDate
             val isFrequentlyUsedValue = zugferdRows.any { it.isFrequentlyUsedValue }
-            Row(listOf(isoCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet(), isFrequentlyUsedValue), isFrequentlyUsedValue)
+            Row(listOf(isoCode, i18nCurrency?.numericCode, availableCurrencies[isoCode]?.symbol, cefRow.values[1], zugferdRows.map { it.values[0] }.toSet(), isFrequentlyUsedValue), isFrequentlyUsedValue)
         }
 
         return columns to rows
@@ -157,17 +160,21 @@ class CodeGenerator {
         else -> column.name.replace(" ", "").let { it[0].lowercase() + it.substring(1) }
     }
 
-    private fun getPropertyValue(value: Any?): CharSequence {
+    private fun getPropertyValue(value: Any?, writeNumbersAsString: Boolean = true): CharSequence {
         if (value == null) {
             return "null"
         }
 
-        if (value is InvoiceTypeUseFor) {
-            return "InvoiceTypeUseFor.$value"
-        }
-
         if (value is Boolean) {
             return "$value"
+        }
+
+        if (value is Number && writeNumbersAsString == false) {
+            return "$value"
+        }
+
+        if (value is InvoiceTypeUseFor) {
+            return "InvoiceTypeUseFor.$value"
         }
 
         if (value is Set<*>) {
@@ -198,7 +205,7 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
         val column = if (type == CodeListType.IsoCountryCodes) i18nRegionsByCode[firstColumn]?.name ?: fixCountryName(row[2])
-                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[2]) // as fallback use currency's English name from Zugferd list
+                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[3]) // as fallback use currency's English name from Zugferd list
                     else if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
                     else row[0] // default case: the code is in the first column
 
