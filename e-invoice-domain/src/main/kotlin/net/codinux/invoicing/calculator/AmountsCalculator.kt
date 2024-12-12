@@ -1,16 +1,23 @@
 package net.codinux.invoicing.calculator
 
 import net.codinux.invoicing.mapper.MustangMapper
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.TotalAmounts
+import net.codinux.invoicing.model.*
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.TransactionCalculator
 import java.math.BigDecimal
+import java.time.LocalDate
 
 open class AmountsCalculator {
 
     protected open val mapper by lazy { MustangMapper() } // lazy to avoid circular dependency creation with MustangMapper
 
+    private val invoiceDetails by lazy { InvoiceDetails("", LocalDate.now()) }
+
+    private val party by lazy { Party("", "", null, null, "") }
+
+
+    open fun calculateTotalAmounts(items: List<InvoiceItem>) =
+        calculateTotalAmounts(Invoice(invoiceDetails, party, party, items))
 
     open fun calculateTotalAmounts(invoice: Invoice) =
         calculateTotalAmounts(mapper.mapToTransaction(invoice))
