@@ -1,5 +1,6 @@
 package net.codinux.invoicing.parser
 
+import net.codinux.i18n.Region
 import net.codinux.invoicing.model.codes.InvoiceTypeUseFor
 import net.codinux.invoicing.parser.genericode.CodeList
 import net.codinux.invoicing.parser.model.CodeListType
@@ -11,6 +12,8 @@ import java.util.Currency
 class CodeGenerator {
 
     companion object {
+        private val i18nRegionsByCode = Region.entries.associateBy { it.code }
+
         private val i18nCurrenciesByCode = net.codinux.i18n.Currency.entries.associateBy { it.alpha3Code }
     }
 
@@ -194,9 +197,9 @@ class CodeGenerator {
         else if (firstColumn == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "ExcelSpreadsheet"
         else if (firstColumn == "application/vnd.oasis.opendocument.spreadsheet") return "OpenDocumentSpreadsheet"
 
-        val column = if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[2]) // as fallback use currency's English name from Zugferd list
+        val column = if (type == CodeListType.IsoCountryCodes) i18nRegionsByCode[firstColumn]?.name ?: firstColumn
+                    else if (type == CodeListType.IsoCurrencyCodes) i18nCurrenciesByCode[firstColumn]?.name ?: fixCurrencyName(row[2]) // as fallback use currency's English name from Zugferd list
                     else if (columns.first().name == "Scheme ID") row[1] // ISO 6523 Scheme Identifier codes
-                    else if (columns.first().name == "English Name") row[1] // Country codes
                     else row[0] // default case: the code is in the first column
 
         val name = (column?.toString() ?: "").replace(' ', '_').replace('/', '_').replace('.', '_').replace(',', '_')
