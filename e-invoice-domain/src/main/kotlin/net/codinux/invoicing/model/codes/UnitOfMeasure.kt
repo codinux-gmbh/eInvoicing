@@ -1,6 +1,6 @@
 package net.codinux.invoicing.model.codes
 
-enum class Unit(val code: String, val englishName: String, val symbol: String?, val isFrequentlyUsedValue: Boolean) {
+enum class UnitOfMeasure(val code: String, val englishName: String, val symbol: String?, val isFrequentlyUsedValue: Boolean) {
 	_10("10", "group", null, false),
 	_11("11", "outfit", null, false),
 	_13("13", "ration", null, false),

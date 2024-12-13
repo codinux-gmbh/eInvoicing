@@ -16,7 +16,7 @@ enum class CodeListType(val className: String, val usesFullList: Boolean, val us
     UN_7143_ItemTypeIdentificationCode("ItemTypeIdentificationCode", true, listOf("BT-158-1")), // tab Item
     UN_7161_SpecialServiceDescriptionCodes("ChargeReasonCode", true, listOf("BT-105", "BT-145")), // tab Charge
 
-    Units("Unit", true, listOf("BT-130", "BT-150")), // UN/ECE Recommendation N°20 and UN/ECE Recommendation N°21 — Unit codes
+    Units("UnitOfMeasure", true, listOf("BT-130", "BT-150")), // UN/ECE Recommendation N°20 and UN/ECE Recommendation N°21 — Unit codes
 
     EAS("ElectronicAddressSchemeIdentifier", true, listOf("BT-34-1", "BT-49-1")),
     VATEX("VatExemptionReasonCode", true, listOf("BT-121")),
