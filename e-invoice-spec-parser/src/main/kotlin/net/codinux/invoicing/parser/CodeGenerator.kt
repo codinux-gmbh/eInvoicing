@@ -121,6 +121,8 @@ class CodeGenerator {
             Column(2, "numericCode", "Int"),
             Column(3, "numericCodeAsString", "String"),
             Column(4, "englishName", "String"),
+            Column(5, "isContainedIn", "Set<String>"),
+            Column(6, "contains", "Set<String>"),
         )
 
         val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
@@ -129,7 +131,8 @@ class CodeGenerator {
         val rows = cefByIsoCode.map { (isoCode, cefRow) ->
             val values = zugferdByIsoCode[isoCode]!!.first().values
             val i18nRegion = i18nRegionsByCode[isoCode]
-            Row(listOf(isoCode, i18nRegion?.alpha3Code ?: values[2], i18nRegion?.numericCode, i18nRegion?.numericCodeAsString, i18nRegion?.englishName ?: values[0]), false, fixCountryName(i18nRegion?.name ?: values[0]))
+            Row(listOf(isoCode, i18nRegion?.alpha3Code ?: values[2], i18nRegion?.numericCode, i18nRegion?.numericCodeAsString, i18nRegion?.englishName ?: values[0],
+                i18nRegion?.isContainedIn.orEmpty().toSet(), i18nRegion?.contains.orEmpty().toSet()), false, fixCountryName(i18nRegion?.name ?: values[0]))
         }
 
         return columns to rows.sortedBy { it.enumName!! } // sort by englishName
