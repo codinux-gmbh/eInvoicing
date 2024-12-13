@@ -1,6 +1,7 @@
 package net.codinux.invoicing.parser
 
 import net.codinux.i18n.Region
+import net.codinux.i18n.UnitAll
 import net.codinux.invoicing.model.codes.InvoiceTypeUseFor
 import net.codinux.invoicing.parser.genericode.CodeList
 import net.codinux.invoicing.parser.model.CodeListType
@@ -15,6 +16,8 @@ class CodeGenerator {
         private val i18nRegionsByCode = Region.entries.associateBy { it.code }
 
         private val i18nCurrenciesByCode = net.codinux.i18n.Currency.entries.associateBy { it.alpha3Code }
+
+        private val i18nUnitsByCode = UnitAll.entries.associateBy { it.code }
     }
 
 
@@ -161,6 +164,7 @@ class CodeGenerator {
         val columns = listOf(
             Column(0, "code", "String"),
             Column(1, "englishName", "String"),
+            Column(2, "symbol", "String"),
             Column(3, "isFrequentlyUsedValue", "Boolean"),
         )
 
@@ -170,8 +174,9 @@ class CodeGenerator {
         val rows = cefByIsoCode.map { (code, cefRow) ->
             val row = zugferdByIsoCode[code]!!.first()
             val values = row.values
+            val i18nUnit = i18nUnitsByCode[code]
 
-            Row(listOf(code, values[0], row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
+            Row(listOf(code, values[1], i18nUnit?.symbol, row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
         }
 
         return columns to rows
