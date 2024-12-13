@@ -59,4 +59,4 @@ tasks.test {
 
 ext["customArtifactId"] = "e-invoice"
 
-apply(from = "../gradle/scripts/publish-codinux-repo.gradle.kts")
+apply(from = "../gradle/scripts/publish-codinux.gradle.kts")
