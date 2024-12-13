@@ -10,7 +10,8 @@ kotlin {
 
 val phGenericodeVersion: String by project
 
-val apachePoiVersion: String = "5.3.0"
+val apachePoiVersion: String by project
+val kI18nVersion: String by project
 
 val klfVersion: String by project
 
@@ -23,6 +24,8 @@ dependencies {
     implementation("com.helger:ph-genericode:$phGenericodeVersion")
 
     implementation("org.apache.poi:poi-ooxml:$apachePoiVersion")
+
+    implementation("net.codinux.i18n:k-i18n:$kI18nVersion")
 
     implementation("net.codinux.log:klf:$klfVersion")
 
