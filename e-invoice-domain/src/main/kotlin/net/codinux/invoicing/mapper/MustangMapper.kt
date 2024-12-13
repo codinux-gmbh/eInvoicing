@@ -4,6 +4,7 @@ import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import org.mustangproject.*
 import org.mustangproject.BankDetails
 import org.mustangproject.Invoice
@@ -23,6 +24,8 @@ open class MustangMapper(
         val CountriesByIsoCode = Country.entries.associateBy { it.alpha2Code }
 
         val CurrenciesByIsoCode = Currency.entries.associateBy { it.alpha3Code }
+
+        val UnitsByCode = UnitOfMeasure.entries.associateBy { it.code }
     }
 
 
@@ -75,7 +78,7 @@ open class MustangMapper(
 
     open fun mapLineItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
-        Product(item.name, item.description ?: "", item.unit, item.vatRate).apply {
+        Product(item.name, item.description ?: "", item.unit.code, item.vatRate).apply {
             this.sellerAssignedID = item.articleNumber // TODO: what is the articleNumber? sellerAssignedId, globalId, ...?
         },
         item.unitPrice, item.quantity
@@ -127,7 +130,8 @@ open class MustangMapper(
     )
 
     open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
-        item.product.name, item.quantity, item.product.unit, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
+        // TODO: what to use as fallback if unit cannot be determined?
+        item.product.name, item.quantity, item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ASM, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
     )
 
     protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
