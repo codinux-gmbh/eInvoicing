@@ -19,8 +19,8 @@ Sources of Code Lists according to XRechnung specification p. 105, enhanced by i
 | UNTDID 7161  | Special service description coded                                                                  | d20a    | urn:xoev-de:kosit:codeliste:untdid.7161_3     | full list | BT-105, BT-145                                                          |
 | EAS          | Electronic Address Scheme Code list                                                                | 9.0     | urn:xoev-de:kosit:codeliste:eas_5             | full list | BT-34-1, BT-49-1                                                        |
 | VATEX        | VAT exemption reason code list                                                                     | 4.0     | urn:xoev-de:kosit:codeliste:vatex_1           | full list | BT-121                                                                  |
-| Rec 20       | UN/EC Recommendation Nº20 – Codes for Units of Measure Used in International Trade                 | Rev. 17 | urn:xoev-de:kosit:codeliste:rec20_3           | full list | BT-130, BT-150                                                          |
-| Rec 21       | UN/EC Recommendation Nº21 – Codes for Passengers, Types of Cargo, Packages and Packaging Materials | Rev. 12 | urn:xoev-de:kosit:codeliste:rec21_3           | full list | BT-130, BT-150                                                          |
+| Rec 20       | UN/ECE Recommendation Nº20 – Codes for Units of Measure Used in International Trade                | Rev. 17 | urn:xoev-de:kosit:codeliste:rec20_3           | full list | BT-130, BT-150                                                          |
+| Rec 21       | UN/ECE Recommendation Nº21 – Codes for Passengers, Types of Cargo, Packages and Packaging Materials | Rev. 12 | urn:xoev-de:kosit:codeliste:rec21_3           | full list | BT-130, BT-150                                                          |
 | VAT ID       | VAT Identifier; has only code "VAT" for Value added tax; code list only in EN Excel file           |         |                                               | subset    | BT-31, BT-48, BT-63                                                     |
 | VAT Cat      | VAT Category code; has only code "VAT" for Value added tax; code list only in EN Excel file        |         |                                               | subset    | BT-95, BT-102, BT-118, BT-151                                           |
 | MIME         | Mime type codes — Mime codes; code list only in EN Excel file                                      |         |                                               | subset    | BT-125-1                                                                |
@@ -32,7 +32,7 @@ All **UNTDID code lists** can be found at https://unece.org/fileadmin/DAM/trade/
 
 https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred1001.htm
 
-The **UN/EC Recommendation Nº20 and Nº21** can be found at:
+The **UN/ECE Recommendation Nº20 and Nº21** can be found at:
 
 https://unece.org/trade/uncefact/cl-recommendations
 
