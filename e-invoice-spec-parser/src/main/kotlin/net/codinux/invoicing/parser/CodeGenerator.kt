@@ -25,6 +25,7 @@ class CodeGenerator {
         matchedCodeLists.forEach { (type, codeLists) ->
             val (columns, rows) = (if (type == CodeListType.IsoCountryCodes) mergeCountryData(codeLists.first, codeLists.second!!)
                     else if (type == CodeListType.IsoCurrencyCodes) mergeCurrencyData(codeLists.first, codeLists.second!!)
+                    else if (type == CodeListType.Units) mergeUnitData(codeLists.first, codeLists.second!!)
                     else {
                         addFrequentlyUsedColumn(reorder(map(filter(
                             // Factur-X (= codeLists.second) has the better column names and often also a Description column
@@ -73,7 +74,7 @@ class CodeGenerator {
             val index = columns.indexOf(useForColumn)
             val modifiedColumns = columns.toMutableList().apply {
                 removeAt(index)
-                add(Column(columns.last().index + 1, "UseFor", "InvoiceTypeUseFor", "UseFor"))
+                add(Column(columns.last().index + 1, "UseFor", "InvoiceTypeUseFor"))
             }
             val modifiedRows = rows.onEach {
                 val useFor = it.removeValueAtIndex(index)?.toString()
@@ -112,11 +113,11 @@ class CodeGenerator {
 
     private fun mergeCountryData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
         val columns = listOf(
-            Column(0, "alpha2Code", "String", "alpha2Code"),
-            Column(1, "alpha3Code", "String", "alpha3Code"),
-            Column(2, "numericCode", "Int", "numericCode"),
-            Column(3, "numericCodeAsString", "String", "numericCodeAsString"),
-            Column(4, "englishName", "String", "englishName"),
+            Column(0, "alpha2Code", "String"),
+            Column(1, "alpha3Code", "String"),
+            Column(2, "numericCode", "Int"),
+            Column(3, "numericCodeAsString", "String"),
+            Column(4, "englishName", "String"),
         )
 
         val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
@@ -133,12 +134,12 @@ class CodeGenerator {
 
     private fun mergeCurrencyData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
         val columns = listOf(
-            Column(0, "alpha3Code", "String", "alpha3Code"),
-            Column(1, "numericCode", "Int", "numericCode"),
-            Column(2, "currencySymbol", "String", "currencySymbol"),
-            Column(3, "englishName", "String", "englishName"),
-            Column(4, "countries", "Set<String>", "countries"),
-            Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean", "isFrequentlyUsedValue")
+            Column(0, "alpha3Code", "String"),
+            Column(1, "numericCode", "Int"),
+            Column(2, "currencySymbol", "String"),
+            Column(3, "englishName", "String"),
+            Column(4, "countries", "Set<String>"),
+            Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean")
         )
 
         val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
@@ -156,11 +157,31 @@ class CodeGenerator {
         return columns to rows.sortedBy { it.enumName!! } // sort by English name
     }
 
+    private fun mergeUnitData(cefCodeList: CodeList, zugferdCodeList: net.codinux.invoicing.parser.excel.CodeList): Pair<List<Column>, List<Row>> {
+        val columns = listOf(
+            Column(0, "code", "String"),
+            Column(1, "englishName", "String"),
+            Column(3, "isFrequentlyUsedValue", "Boolean"),
+        )
+
+        val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
+        val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it.values[0] }
+
+        val rows = cefByIsoCode.map { (code, cefRow) ->
+            val row = zugferdByIsoCode[code]!!.first()
+            val values = row.values
+
+            Row(listOf(code, values[0], row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
+        }
+
+        return columns to rows
+    }
+
     private fun addFrequentlyUsedColumn(columnsToRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
         val hasFrequentlyUsedValue = columnsToRows.second.any { it.isFrequentlyUsedValue }
 
         return if (hasFrequentlyUsedValue) {
-            (columnsToRows.first + Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean", "isFrequentlyUsedValue")) to
+            (columnsToRows.first + Column(Int.MAX_VALUE, "isFrequentlyUsedValue", "Boolean")) to
                     columnsToRows.second.onEach { it.addIsFrequentlyUsedValueCell() }
         } else {
             columnsToRows

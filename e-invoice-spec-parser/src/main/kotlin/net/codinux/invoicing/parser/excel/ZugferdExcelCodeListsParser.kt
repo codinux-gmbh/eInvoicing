@@ -88,7 +88,7 @@ class ZugferdExcelCodeListsParser {
             }.filterNot { it.values.all { it == null } } // filter out empty rows
 
             if (isTypeWithDescription) {
-                columns.add(Column(indexOfNextEmptyCell!! - 1, "Description", "String", "Description"))
+                columns.add(Column(indexOfNextEmptyCell!! - 1, "Description", "String"))
             }
 
             return CodeList(type, name, url, usedInInvoiceFields, additionalUsedInInvoiceFields, columns, rows)
@@ -122,7 +122,7 @@ class ZugferdExcelCodeListsParser {
 
     private fun mapColumn(cell: Cell?): Column? = cell?.let {
         val name = cell.stringCellValue ?: ""
-        return Column(cell.columnIndex, name, "String", name)
+        return Column(cell.columnIndex, name, "String")
     }
 
     private fun getCellValue(cell: Cell?, type: CodeListType? = null) = when (cell?.cellType) {
