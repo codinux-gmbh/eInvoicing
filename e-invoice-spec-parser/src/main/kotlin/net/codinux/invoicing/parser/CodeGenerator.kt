@@ -179,7 +179,7 @@ class CodeGenerator {
             Row(listOf(code, values[1], i18nUnit?.symbol, row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
         }
 
-        return columns to rows
+        return columns to rows.sortedBy { it.values[0].toString() } // sort by code
     }
 
     private fun addFrequentlyUsedColumn(columnsToRows: Pair<List<Column>, List<Row>>): Pair<List<Column>, List<Row>> {
