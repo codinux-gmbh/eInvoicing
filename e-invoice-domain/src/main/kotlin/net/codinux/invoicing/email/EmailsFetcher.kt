@@ -14,7 +14,6 @@ import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.reader.FileEInvoiceExtractionResult
 import net.codinux.invoicing.util.ExceptionHelper
 import net.codinux.log.logger
-import net.codinux.util.stopwatch.Stopwatch
 import org.eclipse.angus.mail.imap.IMAPFolder
 import org.eclipse.angus.mail.imap.IMAPMessage
 import org.eclipse.angus.mail.util.MailConnectException
