@@ -6,10 +6,10 @@ import kotlin.io.path.toPath
 
 object TestUtils {
 
-    fun getTestFileAsStream(filename: String): InputStream =
-        this.javaClass.classLoader.getResourceAsStream("files/$filename")!!
+    fun getTestFileAsStream(filename: String, testFileFolder: String = "files"): InputStream =
+        this.javaClass.classLoader.getResourceAsStream("$testFileFolder/$filename")!!
 
-    fun getTestFile(filename: String): Path =
-        this.javaClass.classLoader.getResource("files/$filename")!!.toURI().toPath()
+    fun getTestFile(filename: String, testFileFolder: String = "files"): Path =
+        this.javaClass.classLoader.getResource("$testFileFolder/$filename")!!.toURI().toPath()
 
 }

@@ -12,7 +12,15 @@ class PdfBoxPdfAttachmentReaderTest {
 
     @Test
     fun notAPdf() {
-        val result = underTest.getFileAttachments(getTestFile("ZUGFeRD.xml"))
+        val result = underTest.getFileAttachments(getValidTestFile("ZUGFeRD.xml"))
+
+        assertThat(result.type).isEqualTo(PdfAttachmentExtractionResultType.NotAPdf)
+        assertThat(result.attachments).isEmpty()
+    }
+
+    @Test
+    fun notAValidPdf() {
+        val result = underTest.getFileAttachments(getTestFile("NotAValidPdf.pdf"))
 
         assertThat(result.type).isEqualTo(PdfAttachmentExtractionResultType.NotAPdf)
         assertThat(result.attachments).isEmpty()
@@ -42,7 +50,7 @@ class PdfBoxPdfAttachmentReaderTest {
 
     @Test
     fun facturXPdf() {
-        val result = underTest.getFileAttachments(getTestFile("ZUGFeRD.pdf"))
+        val result = underTest.getFileAttachments(getValidTestFile("ZUGFeRD.pdf"))
 
         assertThat(result.type).isEqualTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
         assertThat(result.attachments).hasSize(1)
