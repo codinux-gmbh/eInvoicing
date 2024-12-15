@@ -8,12 +8,13 @@ import jakarta.mail.internet.MimeUtility
 import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.*
 import net.codinux.invoicing.filesystem.FileUtil
-import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
+import net.codinux.invoicing.reader.FileEInvoiceExtractionResult
 import net.codinux.invoicing.util.ExceptionHelper
 import net.codinux.log.logger
+import net.codinux.util.stopwatch.Stopwatch
 import org.eclipse.angus.mail.imap.IMAPFolder
 import org.eclipse.angus.mail.imap.IMAPMessage
 import org.eclipse.angus.mail.util.MailConnectException
@@ -41,7 +42,7 @@ open class EmailsFetcher(
     companion object {
         protected val MessageBodyMediaTypes = listOf("text/plain", "text/html")
 
-        protected val FileNotDownloadedOrErrorOccurred = Pair<Invoice?, File?>(null, null)
+        protected val FileNotDownloadedOrErrorOccurred = Pair<FileEInvoiceExtractionResult?, File?>(null, null)
     }
 
 
@@ -239,16 +240,16 @@ open class EmailsFetcher(
             val filename = File(part.fileName)
             val extension = filename.extension.lowercase()
 
-            val (invoice, invoiceFile) = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
+            val (readInvoiceResult, invoiceFile) = tryToReadEInvoice(part, extension, messagePart.mediaType, status)
 
             val pdfInvoiceData: PdfInvoiceData? = tryToReadInvoiceDataFromPdf(extension, messagePart.mediaType, invoiceFile)
 
-            if (invoice != null || Part.ATTACHMENT.equals(part.disposition, ignoreCase = true)) {
+            if (readInvoiceResult != null || Part.ATTACHMENT.equals(part.disposition, ignoreCase = true)) {
                 val file = invoiceFile ?:
                             if (extension !in status.options.downloadAttachmentsWithExtensions) null
                             else downloadAttachment(part, status)
 
-                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, invoice, pdfInvoiceData, file)
+                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, readInvoiceResult?.invoice, pdfInvoiceData, file)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }
@@ -265,13 +266,11 @@ open class EmailsFetcher(
         else -> ContentDisposition.Unknown
     }
 
-    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<Invoice?, File?> =
-        if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
+    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<FileEInvoiceExtractionResult?, File?> =
+        if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream" ||
+            extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             val file = downloadAttachment(part, status)
-            Pair(eInvoiceReader.extractFromPdfOrNull(part.inputStream), file)
-        } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
-            val file = downloadAttachment(part, status)
-            Pair(eInvoiceReader.extractFromXmlOrNull(part.inputStream), file)
+            Pair(eInvoiceReader.extractFromFile(part.inputStream, part.fileName, null, mediaType), file)
         } else {
             FileNotDownloadedOrErrorOccurred
         }

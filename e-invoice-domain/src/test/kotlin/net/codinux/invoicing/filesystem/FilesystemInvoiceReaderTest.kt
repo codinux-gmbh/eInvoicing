@@ -18,7 +18,7 @@ class FilesystemInvoiceReaderTest {
 
         val result = underTest.readAllInvoicesOfDirectory(testDirectory)
 
-        assertThat(result).hasSize(3)
+        assertThat(result).hasSize(5)
     }
 
     @Test
@@ -27,7 +27,7 @@ class FilesystemInvoiceReaderTest {
 
         val result = underTest.readInvoiceFromFile(xRechnung)
 
-        assertInvoice(result)
+        assertInvoice(result.invoice)
     }
 
 

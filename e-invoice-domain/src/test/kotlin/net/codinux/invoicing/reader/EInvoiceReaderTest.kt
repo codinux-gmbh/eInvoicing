@@ -14,21 +14,21 @@ class EInvoiceReaderTest {
     fun extractFromXml() {
         val result = underTest.extractFromXml(getTestFile("XRechnung.xml"))
 
-        assertInvoice(result)
+        assertInvoice(result.invoice)
     }
 
     @Test
     fun extractFromPdf() {
         val result = underTest.extractFromPdf(getTestFile("ZUGFeRD.pdf"))
 
-        assertInvoice(result)
+        assertInvoice(result.invoice)
     }
 
     @Test
     fun extractXmlFromPdf() {
         val result = underTest.extractXmlFromPdf(getTestFile("ZUGFeRD.pdf"))
 
-        InvoiceAsserter.assertInvoiceXml(result)
+        InvoiceAsserter.assertInvoiceXml(result.invoiceXml)
     }
 
 

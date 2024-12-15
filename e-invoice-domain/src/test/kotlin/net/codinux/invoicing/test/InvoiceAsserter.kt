@@ -12,8 +12,9 @@ import java.math.BigDecimal
 
 object InvoiceAsserter {
 
-    fun assertInvoiceXml(xml: String) {
-        assertThat(xml).isNotEmpty()
+    fun assertInvoiceXml(xml: String?) {
+        assertThat(xml).isNotNull()
+        assertThat(xml!!).isNotEmpty()
 
         val asserter = XPathAsserter(xml)
 
