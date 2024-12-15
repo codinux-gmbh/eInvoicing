@@ -64,6 +64,8 @@ class PdfBoxPdfAttachmentReaderTest {
     }
 
 
-    private fun getTestFile(filename: String) = TestUtils.getTestFileAsStream(filename)
+    private fun getTestFile(filename: String) = TestUtils.getInvalidInvoiceFileAsStream(filename)
+
+    private fun getValidTestFile(filename: String) = TestUtils.getTestFileAsStream(filename)
 
 }
