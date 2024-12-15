@@ -154,11 +154,11 @@ open class MustangMapper(
 
     private fun mapCountry(isoAlpha2CountryCode: String?): Country =
         CountriesByIsoCode[isoAlpha2CountryCode]
-            ?: throw IllegalArgumentException("Unknown ISO Alpha-2 country code '$isoAlpha2CountryCode', therefore cannot map ISO code to Country")
+            ?: throw IllegalArgumentException("Unknown ISO Alpha-2 country code \"$isoAlpha2CountryCode\", therefore cannot map ISO code to Country")
 
     private fun mapCurrency(isoCurrencyCode: String?): Currency =
         CurrenciesByIsoCode[isoCurrencyCode]
-            ?: throw IllegalArgumentException("Unknown ISO currency code '$isoCurrencyCode', therefore cannot map ISO code to Currency")
+            ?: throw IllegalArgumentException("Unknown ISO currency code \"$isoCurrencyCode\", therefore cannot map ISO code to Currency")
 
     @JvmName("mapNullable")
     protected fun map(date: LocalDate?) =

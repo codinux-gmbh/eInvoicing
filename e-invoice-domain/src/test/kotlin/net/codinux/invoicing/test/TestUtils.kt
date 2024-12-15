@@ -9,7 +9,14 @@ object TestUtils {
     fun getTestFileAsStream(filename: String, testFileFolder: String = "files"): InputStream =
         this.javaClass.classLoader.getResourceAsStream("$testFileFolder/$filename")!!
 
+    fun getInvalidInvoiceFileAsStream(filename: String) =
+        getTestFileAsStream(filename, "erroneousInvoiceFiles")
+
+
     fun getTestFile(filename: String, testFileFolder: String = "files"): Path =
         this.javaClass.classLoader.getResource("$testFileFolder/$filename")!!.toURI().toPath()
+
+    fun getInvalidInvoiceFile(filename: String, testFileFolder: String = "files") =
+        getTestFile(filename, "erroneousInvoiceFiles")
 
 }

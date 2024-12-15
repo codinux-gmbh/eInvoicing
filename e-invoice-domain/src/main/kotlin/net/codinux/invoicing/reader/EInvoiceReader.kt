@@ -37,15 +37,22 @@ open class EInvoiceReader(
 
     open fun extractFromXmlOrNull(xml: String) = orNull { extractFromXml(xml) }
 
-    open fun extractFromXml(xml: String): ReadEInvoiceXmlResult =
-        try {
+    open fun extractFromXml(xml: String): ReadEInvoiceXmlResult {
+        return try {
             val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
-            importer.fromXML(xml)
+            try {
+                importer.fromXML(xml)
+            } catch (e: Throwable) {
+                log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
+                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, null, e)
+            }
 
-            ReadEInvoiceXmlResult(extractInvoice(importer), null)
+            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
         } catch (e: Throwable) {
-            ReadEInvoiceXmlResult(null, e)
+            log.error(e) { "Could not extract invoice from XML:\n$xml" }
+            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
         }
+    }
 
 
     open fun extractFromPdfOrNull(pdfFile: File) = orNull { extractFromPdf(pdfFile) }
