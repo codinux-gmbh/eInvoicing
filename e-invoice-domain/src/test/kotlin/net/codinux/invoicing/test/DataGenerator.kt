@@ -4,6 +4,7 @@ import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -19,7 +20,7 @@ object DataGenerator {
     val SupplierAdditionalAddressLine: String? = null
     const val SupplierPostalCode = "12345"
     const val SupplierCity = "Glückstadt"
-    val SupplierCountry = Country.DE
+    val SupplierCountry = Country.Germany
     const val SupplierVatId = "DE123456789"
     const val SupplierEmail = "working-class-hero@rock.me"
     const val SupplierPhone = "+4917012345678"
@@ -40,7 +41,7 @@ object DataGenerator {
 
     const val ItemName = "Erbrachte Dienstleistungen"
     val ItemQuantity = BigDecimal(1)
-    const val ItemUnit = "HUR" // EN code for 'hour'
+    val ItemUnit = UnitOfMeasure.HUR
     val ItemUnitPrice = BigDecimal(99)
     val ItemVatRate = BigDecimal(19)
     val ItemArticleNumber: String? = null
@@ -55,7 +56,7 @@ object DataGenerator {
         customer: Party = createParty(CustomerName, CustomerAddress, CustomerAdditionalAddressLine, CustomerPostalCode, CustomerCity, CustomerCountry,
             CustomerVatId, CustomerEmail, CustomerPhone, CustomerFax, bankDetails = CustomerBankDetails),
         items: List<InvoiceItem> = listOf(createItem()),
-        currency: Currency = Currency.EUR,
+        currency: Currency = Currency.Euro,
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
     ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, dueDate, paymentDescription), supplier, customer, items).apply {
@@ -80,7 +81,7 @@ object DataGenerator {
     fun createItem(
         name: String = ItemName,
         quantity: BigDecimal = ItemQuantity,
-        unit: String = ItemUnit,
+        unit: UnitOfMeasure = ItemUnit,
         unitPrice: BigDecimal = ItemUnitPrice,
         vatRate: BigDecimal = ItemVatRate,
         articleNumber: String? = ItemArticleNumber,

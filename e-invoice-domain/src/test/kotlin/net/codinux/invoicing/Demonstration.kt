@@ -4,6 +4,7 @@ import net.codinux.invoicing.creation.EInvoiceCreator
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.EmailsFetcher
 import net.codinux.invoicing.model.*
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
@@ -84,6 +85,6 @@ class Demonstration {
         details = InvoiceDetails("RE-00001", LocalDate.now()),
         supplier = Party("codinux GmbH & Co. KG", "Fun Street 1", null, "12345", "Glückstadt"),
         customer = Party("Abzock GmbH", "Ausbeutstr.", null, "12345", "Abzockhausen"),
-        items = listOf(InvoiceItem("Erbrachte Dienstleistungen", BigDecimal(170), "HUR", BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
+        items = listOf(InvoiceItem("Erbrachte Dienstleistungen", BigDecimal(170), UnitOfMeasure.HUR, BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour
     )
 }

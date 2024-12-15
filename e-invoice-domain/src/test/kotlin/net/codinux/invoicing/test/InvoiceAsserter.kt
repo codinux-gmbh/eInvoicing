@@ -7,6 +7,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.model.codes.Country
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.math.BigDecimal
 
 object InvoiceAsserter {
@@ -43,10 +44,10 @@ object InvoiceAsserter {
         asserter.xpathHasValue("$partyXPath/ram:DefinedTradeContact/ram:TelephoneUniversalCommunication/ram:CompleteNumber", phone)
     }
 
-    private fun assertLineItem(asserter: XPathAsserter, itemXPath: String, name: String, quantity: BigDecimal, unit: String, unitPrice: BigDecimal, vatRate: BigDecimal, description: String?) {
+    private fun assertLineItem(asserter: XPathAsserter, itemXPath: String, name: String, quantity: BigDecimal, unit: UnitOfMeasure, unitPrice: BigDecimal, vatRate: BigDecimal, description: String?) {
         asserter.xpathHasValue("$itemXPath/ram:SpecifiedTradeProduct/ram:Name", name)
 
-        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode", unit)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode", unit.code)
         asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity", quantity, 4)
 
         asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount", unitPrice, 2)
@@ -94,10 +95,10 @@ object InvoiceAsserter {
         }
     }
 
-    private fun assertLineItem(item: InvoiceItem, name: String, quantity: BigDecimal, unit: String, unitPrice: BigDecimal, vatRate: BigDecimal, description: String?) {
+    private fun assertLineItem(item: InvoiceItem, name: String, quantity: BigDecimal, unit: UnitOfMeasure, unitPrice: BigDecimal, vatRate: BigDecimal, description: String?) {
         assertThat(item.name).isEqualTo(name)
 
-        assertThat(item.unit).isEqualTo(unit)
+        assertThat(item.unit).isEqualTo(unit.code)
         assertThat(item.quantity).isEqualTo(quantity.setScale(4))
 
         assertThat(item.unitPrice).isEqualTo(unitPrice.setScale(4))

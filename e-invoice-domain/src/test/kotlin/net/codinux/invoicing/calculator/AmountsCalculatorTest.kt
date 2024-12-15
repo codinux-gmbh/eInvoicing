@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isEqualTo
 import net.codinux.invoicing.model.InvoiceItem
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.test.Test
@@ -16,8 +17,8 @@ class AmountsCalculatorTest {
     @Test
     fun calculateTotalAmounts() {
         val items = listOf(
-            InvoiceItem("", BigDecimal(7), "", BigDecimal(5), BigDecimal(19)),
-            InvoiceItem("", BigDecimal(20), "", BigDecimal(5), BigDecimal(7)),
+            InvoiceItem("", BigDecimal(7), UnitOfMeasure.HUR, BigDecimal(5), BigDecimal(19)),
+            InvoiceItem("", BigDecimal(20), UnitOfMeasure.HUR, BigDecimal(5), BigDecimal(7)),
         )
 
         val result = underTest.calculateTotalAmounts(items)
