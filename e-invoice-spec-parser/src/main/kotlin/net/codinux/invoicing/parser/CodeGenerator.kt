@@ -177,7 +177,12 @@ class CodeGenerator {
         val rows = cefByIsoCode.map { (code, cefRow) ->
             val row = zugferdByIsoCode[code]!!.first()
             val values = row.values
-            val i18nUnit = i18nUnitsByCode[code]
+            val i18nUnit = i18nUnitsByCode[code] ?: run {
+                // TODO: check what is correct, if units (from Annex V and VI?) should as Zugferd does start with an X -> also add 'X' in k-i18n
+                //  or should not start with an 'X' -> remove here?
+                if (code.toString().startsWith("X")) i18nUnitsByCode[code.toString().substring(1)]
+                else null
+            }
 
             Row(listOf(code, values[1], i18nUnit?.symbol, row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
         }
