@@ -2,12 +2,15 @@ package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.pdf.PdfBoxPdfAttachmentReader
 import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import java.io.InputStream
 
 open class EInvoiceReader(
+    protected open val pdfAttachmentReader: PdfAttachmentReader = PdfBoxPdfAttachmentReader(),
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
@@ -31,7 +34,7 @@ open class EInvoiceReader(
     open fun extractFromXmlOrNull(xml: String) = orNull { extractFromXml(xml) }
 
     open fun extractFromXml(xml: String): Invoice {
-        val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to a Invoice object
+        val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
         importer.fromXML(xml)
 
         return extractInvoice(importer)
@@ -45,9 +48,7 @@ open class EInvoiceReader(
     open fun extractFromPdfOrNull(stream: InputStream) = orNull { extractFromPdf(stream) }
 
     open fun extractFromPdf(stream: InputStream): Invoice {
-        val importer = ZUGFeRDInvoiceImporter(stream)
-
-        return extractInvoice(importer)
+        return extractFromXml(extractXmlFromPdf(stream))
     }
 
 
@@ -58,9 +59,9 @@ open class EInvoiceReader(
     open fun extractXmlFromPdfOrNull(stream: InputStream) = orNull { extractXmlFromPdf(stream) }
 
     open fun extractXmlFromPdf(stream: InputStream): String {
-        val importer = ZUGFeRDInvoiceImporter(stream)
+        val attachments = pdfAttachmentReader.getFileAttachments(stream)
 
-        return String(importer.rawXML, Charsets.UTF_8)
+        return attachments.attachments.first { it.isXmlFile }.xml!! // we add error handling soon
     }
 
 

@@ -54,6 +54,6 @@ class EInvoiceValidatorTest {
     }
 
 
-    private fun getTestFile(filename: String) = TestUtils.getTestFile(filename)
+    private fun getTestFile(filename: String) = TestUtils.getTestFile(filename).toFile()
 
 }

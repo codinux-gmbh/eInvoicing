@@ -98,7 +98,7 @@ object InvoiceAsserter {
     private fun assertLineItem(item: InvoiceItem, name: String, quantity: BigDecimal, unit: UnitOfMeasure, unitPrice: BigDecimal, vatRate: BigDecimal, description: String?) {
         assertThat(item.name).isEqualTo(name)
 
-        assertThat(item.unit).isEqualTo(unit.code)
+        assertThat(item.unit).isEqualTo(unit)
         assertThat(item.quantity).isEqualTo(quantity.setScale(4))
 
         assertThat(item.unitPrice).isEqualTo(unitPrice.setScale(4))

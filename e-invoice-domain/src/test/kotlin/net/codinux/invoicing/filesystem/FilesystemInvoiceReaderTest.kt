@@ -32,7 +32,7 @@ class FilesystemInvoiceReaderTest {
 
 
     private fun getTestFile(filename: String): Path =
-        TestUtils.getTestFile(filename).toPath()
+        TestUtils.getTestFile(filename)
 
     private fun assertInvoice(invoice: Invoice?) {
         InvoiceAsserter.assertInvoice(invoice)
