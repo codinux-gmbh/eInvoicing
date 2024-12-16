@@ -3,6 +3,8 @@ package net.codinux.invoicing.api
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.codinux.invoicing.api.dto.DtoMapper
+import net.codinux.invoicing.api.dto.ExtractInvoiceDataFromXmlDto
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -24,6 +26,9 @@ class InvoicingResource(
     companion object {
         private const val MediaTypePdf = "application/pdf"
     }
+
+
+    private val mapper: DtoMapper = DtoMapper()
 
 
     @Path("create/xrechnung")
@@ -75,7 +80,7 @@ class InvoicingResource(
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
     fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path) =
-        service.extractInvoiceDataFromPdf(invoice)
+        mapper.mapPdfExtractionResult(service.extractInvoiceDataFromPdf(invoice))
 
     @Path("extract")
     @POST
@@ -88,7 +93,9 @@ class InvoicingResource(
     )
     @Tag(name = "Extract")
     fun extractInvoiceDataFromXml(invoiceXml: String) =
-        service.extractInvoiceDataFromXml(invoiceXml)
+        service.extractInvoiceDataFromXml(invoiceXml).let {
+            ExtractInvoiceDataFromXmlDto(it.type, it.invoice)
+        }
 
 
     @Path("validate")
