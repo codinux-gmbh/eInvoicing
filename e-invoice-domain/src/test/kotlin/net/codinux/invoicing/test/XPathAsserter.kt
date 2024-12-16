@@ -2,7 +2,6 @@ package net.codinux.invoicing.test
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import net.codinux.log.Platform
 import org.xmlunit.builder.Input
 import org.xmlunit.xpath.JAXPXPathEngine
 import java.math.BigDecimal
