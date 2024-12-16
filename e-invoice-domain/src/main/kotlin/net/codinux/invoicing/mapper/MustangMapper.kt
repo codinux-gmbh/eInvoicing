@@ -142,8 +142,8 @@ open class MustangMapper(
 
         return AmountAdjustments(
             invoice.totalPrepaidAmount,
-            invoice.zfCharges.mapNotNull { mapChargeOrAllowance(it as? Charge) },
-            invoice.zfAllowances.mapNotNull { mapChargeOrAllowance(it as? Allowance ?: it as? Charge) }
+            invoice.zfCharges.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Charge) },
+            invoice.zfAllowances.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Allowance ?: it as? Charge) }
         )
     }
 
