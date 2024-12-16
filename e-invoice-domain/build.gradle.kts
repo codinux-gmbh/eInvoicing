@@ -1,58 +1,110 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
 }
 
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        // suppresses compiler warning: [EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING] 'expect'/'actual' classes (including interfaces, objects, annotations, enums, and 'actual' typealiases) are in Beta.
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
+
     jvmToolchain(11)
-}
 
-java {
-    withSourcesJar()
-}
+    jvm()
 
+    js {
+        moduleName = "k-i18n"
+        binaries.executable()
 
-val kotlinCoroutinesVersion: String by project
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    useFirefoxHeadless()
+                }
+            }
+        }
 
-val mustangVersion: String by project
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "20s" // Mocha times out after 2 s, which is too short for some tests
+                }
+            }
+        }
+    }
 
-val textInfoExtractor: String by project
-val pdfboxTextExtractor: String by project
-
-val angusMailVersion: String by project
-
-val klfVersion: String by project
-
-val assertKVersion: String by project
-val xunitVersion: String by project
-val logbackVersion: String by project
-
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
-
-    implementation("org.mustangproject:library:$mustangVersion")
-    implementation("org.mustangproject:validator:$mustangVersion")
-
-    // pdf invoice data extraction
-    api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
-    api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
-
-    implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
-
-    implementation("net.codinux.log:klf:$klfVersion")
+    wasmJs {
+        browser()
+    }
 
 
-    testImplementation(kotlin("test"))
+    linuxX64()
+    mingwX64()
 
-    testImplementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
-    testImplementation("org.xmlunit:xmlunit-core:$xunitVersion")
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    macosX64()
+    macosArm64()
+    watchosArm64()
+    watchosSimulatorArm64()
+    tvosArm64()
+    tvosSimulatorArm64()
 
-    testImplementation("ch.qos.logback:logback-classic:$logbackVersion")
-}
+    applyDefaultHierarchyTemplate()
 
 
-tasks.test {
-    useJUnitPlatform()
+    val kotlinCoroutinesVersion: String by project
+
+    val mustangVersion: String by project
+
+    val textInfoExtractor: String by project
+    val pdfboxTextExtractor: String by project
+
+    val angusMailVersion: String by project
+
+    val klfVersion: String by project
+
+    val assertKVersion: String by project
+    val xunitVersion: String by project
+    val logbackVersion: String by project
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
+
+            implementation("net.codinux.log:klf:$klfVersion")
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+
+            implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
+        }
+
+        jvmMain.dependencies {
+            implementation("org.mustangproject:library:$mustangVersion")
+            implementation("org.mustangproject:validator:$mustangVersion")
+
+            // pdf invoice data extraction
+            api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
+            api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
+
+            implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
+        }
+        jvmTest.dependencies {
+            implementation("org.xmlunit:xmlunit-core:$xunitVersion")
+
+            implementation("ch.qos.logback:logback-classic:$logbackVersion")
+
+            implementation("ch.qos.logback:logback-classic:$logbackVersion")
+        }
+    }
 }
 
 
