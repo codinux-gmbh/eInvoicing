@@ -38,7 +38,7 @@ class EInvoiceCreatorTest {
         underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.FacturX)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
-        val xml = String(importer.rawXML, Charsets.UTF_8)
+        val xml = importer.utF8
 
         assertInvoiceXml(xml)
     }
@@ -51,7 +51,7 @@ class EInvoiceCreatorTest {
         underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.XRechnung)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
-        val xml = String(importer.rawXML, Charsets.UTF_8)
+        val xml = importer.utF8
 
         assertInvoiceXml(xml)
     }

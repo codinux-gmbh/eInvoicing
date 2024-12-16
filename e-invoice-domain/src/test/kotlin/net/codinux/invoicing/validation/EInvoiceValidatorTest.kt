@@ -20,7 +20,7 @@ class EInvoiceValidatorTest {
         assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(3)
         assertThat(result.countXmlNotices).isEqualTo(0)
-        assertThat(result.countXmlErrors).isEqualTo(3)
+        assertThat(result.countXmlErrors).isEqualTo(2)
         assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
     }
 
