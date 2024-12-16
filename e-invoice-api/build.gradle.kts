@@ -13,6 +13,8 @@ kotlin {
 
 val quarkusVersion: String by project
 
+val mustangVersion: String by project
+
 val klfVersion: String by project
 val lokiLogAppenderVersion: String by project
 
@@ -29,6 +31,8 @@ dependencies {
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
     implementation(project(":e-invoice-domain"))
+
+    compileOnly("org.mustangproject:library:$mustangVersion") // only required for documenting REST API
 
     implementation("net.codinux.log:klf:$klfVersion")
     implementation("net.codinux.log:quarkus-loki-log-appender:$lokiLogAppenderVersion")

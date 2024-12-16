@@ -6,6 +6,9 @@ import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
@@ -67,7 +70,7 @@ class InvoicingResource(
 
     @Path("extract")
     @POST
-    @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM)
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM, MediaTypePdf)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
@@ -78,10 +81,15 @@ class InvoicingResource(
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
+    @Operation(operationId = "extractFromXML", summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung XML")
+    @RequestBody(
+        description = "The Factur-X/ZUGFeRD or XRechnung XML",
+        content = arrayOf(Content(mediaType = MediaType.APPLICATION_XML, schema = Schema(implementation = org.mustangproject.Invoice::class)))
+    )
     @Tag(name = "Extract")
-    fun extractInvoiceDataFromXml(invoice: java.nio.file.Path) =
-        service.extractInvoiceDataFromXml(invoice)
+    fun extractInvoiceDataFromXml(invoiceXml: String) =
+        service.extractInvoiceDataFromXml(invoiceXml)
+
 
     @Path("validate")
     @POST
