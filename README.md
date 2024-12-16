@@ -10,7 +10,7 @@ throughout the documentation and code.
 ### Gradle
 
 ```
-implementation("net.codinux.invoicing:e-invoice:0.5.1")
+implementation("net.codinux.invoicing:e-invoice:0.5.2")
 ```
 
 ## Reading
