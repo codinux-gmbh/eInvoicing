@@ -3,6 +3,9 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.test.TestUtils
+import java.nio.file.Files
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import kotlin.test.Test
 
 class PdfBoxPdfAttachmentReaderTest {
@@ -61,6 +64,28 @@ class PdfBoxPdfAttachmentReaderTest {
         assertThat(attachment.isProbablyEN16931InvoiceXml).isTrue()
         assertThat(attachment.xml).isNotNull()
         assertThat(attachment.xml!!).hasLength(6567)
+    }
+
+
+//    @Ignore
+    @Test
+    fun addFileAttachment() {
+        val xmlFilename = "empty.xml"
+        val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
+
+        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), xmlFilename, xmlContent, destination.outputStream())
+
+        val createdFile = underTest.getFileAttachments(destination.inputStream())
+
+        assertThat(createdFile.type).isEqualTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
+        assertThat(createdFile.attachments).hasSize(1)
+
+        val attachment = createdFile.attachments.first()
+        assertThat(attachment.filename).isEqualTo(xmlFilename)
+        assertThat(attachment.isXmlFile).isTrue()
+        assertThat(attachment.xml).isNotNull()
+        assertThat(attachment.xml!!).isEqualTo(xmlContent)
     }
 
 
