@@ -130,7 +130,7 @@ open class MustangMapper(
 
     open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
         // TODO: what to use as fallback if unit cannot be determined?
-        item.product.name, item.quantity, item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ASM, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
+        item.product.name, item.quantity, item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ZZ, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
     )
 
     protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
