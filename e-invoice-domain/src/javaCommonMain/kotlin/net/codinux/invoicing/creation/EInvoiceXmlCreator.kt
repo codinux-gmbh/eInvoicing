@@ -1,5 +1,6 @@
 package net.codinux.invoicing.creation
 
+import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
@@ -34,9 +35,7 @@ open class EInvoiceXmlCreator(
     }
 
 
-    internal open fun getProfileNameForFormat(format: EInvoiceXmlFormat) = when (format) {
-        EInvoiceXmlFormat.FacturX -> "EN16931" // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
-        EInvoiceXmlFormat.XRechnung -> "XRECHNUNG"
-    }
+    protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =
+        Constants.getProfileNameForFormat(format)
 
 }

@@ -5,6 +5,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
+import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.test.TestUtils
 import java.nio.file.Files
 import kotlin.io.path.inputStream
@@ -20,11 +22,11 @@ class PdfBoxPdfAttachmentWriterTest {
 
     @Test
     fun addFileAttachment() {
-        val xmlFilename = "empty.xml"
-        val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        val format = EInvoiceXmlFormat.FacturX
+        val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rsm:CrossIndustryInvoice" // to trick Mustang's simple validation
         val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
 
-        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), xmlFilename, xmlContent, destination.outputStream())
+        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), Constants.getProfileNameForFormat(format), xmlContent, destination.outputStream())
 
         val createdFile = reader.getFileAttachments(destination.inputStream())
 
@@ -32,7 +34,7 @@ class PdfBoxPdfAttachmentWriterTest {
         assertThat(createdFile.attachments).hasSize(1)
 
         val attachment = createdFile.attachments.first()
-        assertThat(attachment.filename).isEqualTo(xmlFilename)
+        assertThat(attachment.filename).isEqualTo(Constants.getFilenameForFormat(format))
         assertThat(attachment.isXmlFile).isTrue()
         assertThat(attachment.xml).isNotNull()
         assertThat(attachment.xml!!).isEqualTo(xmlContent)
