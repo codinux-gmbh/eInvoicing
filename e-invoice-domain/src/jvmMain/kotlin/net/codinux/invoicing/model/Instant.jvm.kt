@@ -1,5 +1,6 @@
 package net.codinux.invoicing.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.ZoneId
 
@@ -8,6 +9,17 @@ actual class Instant(@JsonProperty("value", access = JsonProperty.Access.READ_WR
     actual companion object {
         actual fun now(): Instant = Instant(java.time.Instant.now())
     }
+
+
+    actual constructor(epochSeconds: Long, nanosecondsOfSecond: Int) :
+            this(java.time.Instant.ofEpochSecond(epochSeconds, nanosecondsOfSecond.toLong()))
+
+
+    @JsonIgnore
+    actual val epochSeconds: Long = jvmInstant.epochSecond
+
+    @JsonIgnore
+    actual val nanosecondsOfSecond: Int = jvmInstant.nano
 
 
     actual override fun compareTo(other: Instant): Int =

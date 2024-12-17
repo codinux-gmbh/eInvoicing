@@ -1,14 +1,19 @@
 package net.codinux.invoicing.model
 
-actual class Instant : Comparable<Instant> {
+actual class Instant actual constructor(actual val epochSeconds: Long, actual val nanosecondsOfSecond: Int) : Comparable<Instant> {
 
     actual companion object {
-        actual fun now(): Instant = Instant() // TODO
+        actual fun now(): Instant = Instant(0, 0) // TODO
     }
 
 
     actual override fun compareTo(other: Instant): Int {
-        return 0 // TODO
+        val secondsCompare = epochSeconds.compareTo(other.epochSeconds)
+        if (secondsCompare != 0) {
+            return secondsCompare
+        }
+
+        return nanosecondsOfSecond.compareTo(other.nanosecondsOfSecond)
     }
 
     actual fun toLocalDateAtSystemDefaultZone(): LocalDate = LocalDate(0, 0, 0) // TODO
