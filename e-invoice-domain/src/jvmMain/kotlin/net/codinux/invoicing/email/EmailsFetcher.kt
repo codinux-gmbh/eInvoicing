@@ -8,6 +8,7 @@ import jakarta.mail.internet.MimeUtility
 import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.*
 import net.codinux.invoicing.filesystem.FileUtil
+import net.codinux.invoicing.model.toEInvoicingInstant
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -204,7 +205,7 @@ open class EmailsFetcher(
 
         val email = Email(
             messageId,
-            sender, message.subject ?: "", date,
+            sender, message.subject ?: "", date.toEInvoicingInstant(),
 
             message.getRecipients(Message.RecipientType.TO).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.CC).orEmpty().map { map(it) }, message.getRecipients(Message.RecipientType.BCC).orEmpty().map { map(it) },
             (message.replyTo?.firstOrNull() as? InternetAddress)?.let { if (it.address != sender?.address) map(it) else null }, // only set replyTo if it differs from sender

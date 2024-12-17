@@ -1,7 +1,6 @@
 package net.codinux.invoicing.email.model
 
-import java.time.Instant
-import java.time.ZoneId
+import net.codinux.invoicing.model.Instant
 
 class Email(
     /**
@@ -43,5 +42,5 @@ class Email(
     val hasAttachmentsWithExtractedInvoiceData: Boolean by lazy { attachments.any { it.couldExtractPdfInvoiceData } }
 
 
-    override fun toString() = "${date.atZone(ZoneId.systemDefault()).toLocalDate()} $sender: $subject, ${attachments.size} attachment(s)"
+    override fun toString() = "${date.toLocalDateAtSystemDefaultZone()} $sender: $subject, ${attachments.size} attachment(s)"
 }
