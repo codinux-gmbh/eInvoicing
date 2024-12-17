@@ -12,7 +12,6 @@ import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 
@@ -168,13 +167,13 @@ open class MustangMapper(
         Date.from(mapToInstant(date))
 
     protected open fun mapToInstant(date: LocalDate): Instant =
-        date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+        date.toInstantAtSystemDefaultZone()
 
     @JvmName("mapNullable")
     protected fun map(date: Date?) =
         date?.let { map(it) }
 
     protected open fun map(date: Date): LocalDate =
-        date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toEInvoicingDate()
 
 }

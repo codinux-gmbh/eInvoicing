@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
@@ -18,7 +19,7 @@ kotlin {
     jvm()
 
     js {
-        moduleName = "k-i18n"
+        moduleName = "e-invoice"
         binaries.executable()
 
         browser {
@@ -39,6 +40,7 @@ kotlin {
         }
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
@@ -103,6 +105,20 @@ kotlin {
             implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
             implementation("ch.qos.logback:logback-classic:$logbackVersion")
+        }
+
+
+        val nonJvmMain by creating {
+            dependsOn(commonMain.get())
+        }
+        nativeMain {
+            dependsOn(nonJvmMain)
+        }
+        jsMain {
+            dependsOn(nonJvmMain)
+        }
+        wasmJsMain {
+            dependsOn(nonJvmMain)
         }
     }
 }

@@ -6,14 +6,12 @@ import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 object DataGenerator {
 
     const val InvoiceNumber = "12345"
-    val InvoiceDate = LocalDate.of(2015, 10, 21)
-    val DueDate = LocalDate.of(2016, 6, 15)
+    val InvoiceDate = LocalDate(2015, 10, 21)
+    val DueDate = LocalDate(2016, 6, 15)
 
     const val SupplierName = "Hochwürdiger Leistungserbringer"
     const val SupplierAddress = "Fun Street 1"
@@ -58,7 +56,7 @@ object DataGenerator {
         items: List<InvoiceItem> = listOf(createItem()),
         currency: Currency = Currency.Euro,
         dueDate: LocalDate? = DueDate,
-        paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dueDate)}" },
+        paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${dueDate.dayOfMonth}.${dueDate.month}.${dueDate.year}}" },
     ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, dueDate, paymentDescription), supplier, customer, items).apply {
         this.totals = AmountsCalculator().calculateTotalAmounts(this)
     }

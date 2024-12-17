@@ -1,7 +1,7 @@
 package net.codinux.invoicing.pdf
 
+import net.codinux.invoicing.model.LocalDate
 import java.math.BigDecimal
-import java.time.LocalDate
 
 /**
  * PDFs contain only unstructured data, so it's way harder to get invoice data from PDFs then from structured XML eInvoice files.

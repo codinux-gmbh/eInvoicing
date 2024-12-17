@@ -9,7 +9,6 @@ import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
 import java.math.BigDecimal
-import java.time.LocalDate
 
 class Demonstration {
 
@@ -82,7 +81,7 @@ class Demonstration {
 
 
     private fun createInvoice() = Invoice(
-        details = InvoiceDetails("RE-00001", LocalDate.now()),
+        details = InvoiceDetails("RE-00001", LocalDate(2024, 6, 15)),
         supplier = Party("codinux GmbH & Co. KG", "Fun Street 1", null, "12345", "Glückstadt"),
         customer = Party("Abzock GmbH", "Ausbeutstr.", null, "12345", "Abzockhausen"),
         items = listOf(InvoiceItem("Erbrachte Dienstleistungen", BigDecimal(170), UnitOfMeasure.HUR, BigDecimal(1_000_000), BigDecimal(19))) // HUR = EN code for hour

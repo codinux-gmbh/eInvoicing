@@ -1,9 +1,9 @@
 package net.codinux.invoicing.pdf
 
+import net.codinux.invoicing.model.LocalDate
 import net.dankito.text.extraction.info.invoice.InvoiceDataExtractor
 import net.dankito.text.extraction.info.model.InvoiceData
 import java.io.File
-import java.time.LocalDate
 
 /**
  * PDFs contain only unstructured data, so it's way harder to get invoice data from PDFs then from structured XML eInvoice files.
@@ -45,7 +45,7 @@ open class PdfInvoiceDataExtractor(
 
         result.allAmounts.mapNotNull { mapAmount(it) }, result.percentages.mapNotNull { mapAmount(it) },
 
-        result.dates.map { LocalDate.of(it.year, it.month, it.day) },
+        result.dates.map { LocalDate(it.year, it.month, it.day) },
 
         result.ibans.map { it.hit }, result.bics.map { it.hit },
 

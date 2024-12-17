@@ -2,10 +2,9 @@ package net.codinux.invoicing.email
 
 import net.codinux.invoicing.email.model.Email
 import net.codinux.invoicing.email.model.FetchEmailError
+import net.codinux.invoicing.model.LocalDate
 import java.io.File
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 
 open class FetchEmailsOptions(
     /**
@@ -42,7 +41,7 @@ open class FetchEmailsOptions(
     }
 
 
-    val minMessageDate: Instant? by lazy { downloadOnlyMessagesNewerThan?.atStartOfDay(ZoneId.systemDefault())?.toInstant() }
+    val minMessageDate: Instant? by lazy { downloadOnlyMessagesNewerThan?.toInstantAtSystemDefaultZone() }
 
     fun emailReceived(email: Email) {
         onEmailReceived?.invoke(email)

@@ -1,7 +1,6 @@
 package net.codinux.invoicing.model
 
 import net.codinux.invoicing.model.codes.Currency
-import java.time.LocalDate
 
 class InvoiceDetails(
     val invoiceNumber: String,

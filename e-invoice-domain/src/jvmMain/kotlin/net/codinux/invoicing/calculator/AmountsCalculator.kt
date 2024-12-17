@@ -5,7 +5,6 @@ import net.codinux.invoicing.model.*
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.TransactionCalculator
 import java.math.BigDecimal
-import java.time.LocalDate
 
 open class AmountsCalculator {
 
