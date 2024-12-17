@@ -78,8 +78,9 @@ kotlin {
 
     val mustangVersion: String by project
 
-    val textInfoExtractor: String by project
-    val pdfboxTextExtractor: String by project
+    val textInfoExtractorVersion: String by project
+    val textExtractorVersion: String by project
+    val pdfBoxAndroidVersion: String by project
 
     val angusMailVersion: String by project
 
@@ -109,8 +110,8 @@ kotlin {
                 implementation("org.mustangproject:library:$mustangVersion")
 
                 // pdf invoice data extraction
-                api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
-                api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
+                api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractorVersion")
+                api("net.dankito.text.extraction:pdfbox-text-extractor:$textExtractorVersion")
 
                 implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
             }
@@ -122,6 +123,8 @@ kotlin {
             dependencies {
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
                 implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
+                implementation("org.xmlunit:xmlunit-core:$xunitVersion")
             }
         }
 
@@ -136,8 +139,6 @@ kotlin {
             dependsOn(javaCommonTest)
 
             dependencies {
-                implementation("org.xmlunit:xmlunit-core:$xunitVersion")
-
                 implementation("ch.qos.logback:logback-classic:$logbackVersion")
             }
         }
@@ -146,7 +147,8 @@ kotlin {
             dependsOn(javaCommonMain)
 
             dependencies {
-
+                implementation("com.tom-roush:pdfbox-android:$pdfBoxAndroidVersion")
+                implementation("net.dankito.text.extraction:pdfbox-android-text-extractor:$textExtractorVersion")
             }
         }
         val androidUnitTest by getting {

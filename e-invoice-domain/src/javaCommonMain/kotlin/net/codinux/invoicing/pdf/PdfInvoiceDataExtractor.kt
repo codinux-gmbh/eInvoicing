@@ -2,6 +2,7 @@ package net.codinux.invoicing.pdf
 
 import net.codinux.invoicing.model.LocalDate
 import net.codinux.invoicing.model.toEInvoicingBigDecimal
+import net.codinux.invoicing.platform.JavaPlatform
 import net.dankito.text.extraction.info.invoice.InvoiceDataExtractor
 import net.dankito.text.extraction.info.model.InvoiceData
 import java.io.File
@@ -12,7 +13,7 @@ import java.io.File
  * But for validation purposes or PDFs without attached eInvoice XML we also try to extract unstructured invoice data from PDFs.
  */
 open class PdfInvoiceDataExtractor(
-    protected open val textExtractor: PdfTextExtractor,
+    protected open val textExtractor: PdfTextExtractor = JavaPlatform.pdfTextExtractor,
     protected open val invoiceDataExtractor: InvoiceDataExtractor = InvoiceDataExtractor()
 ) {
 

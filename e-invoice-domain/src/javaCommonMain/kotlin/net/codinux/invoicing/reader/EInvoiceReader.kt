@@ -4,8 +4,8 @@ import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.pdf.PdfAttachmentReader
-import net.codinux.invoicing.pdf.PdfBoxPdfAttachmentReader
 import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResult
+import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
@@ -15,15 +15,9 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
 open class EInvoiceReader(
-    protected open val pdfAttachmentReader: PdfAttachmentReader = PdfBoxPdfAttachmentReader(),
+    protected open val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
-
-    companion object {
-        val KnownEInvoiceXmlAttachmentNames = listOf(
-            "factur-x.xml", "zugferd-invoice.xml", "xrechnung.xml" // also "ZUGFeRD-invoice.xml" is found but we make compare case insensitive anyway
-        )
-    }
 
     private val log by logger()
 
