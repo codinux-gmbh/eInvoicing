@@ -1,7 +1,8 @@
 package net.codinux.invoicing.service
 
 import jakarta.inject.Singleton
-import net.codinux.invoicing.creation.EInvoiceCreator
+import net.codinux.invoicing.creation.EInvoicePdfCreator
+import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
@@ -11,7 +12,9 @@ import java.nio.file.Path
 @Singleton
 class InvoicingService {
 
-    private val creator = EInvoiceCreator()
+    private val xmlCreator = EInvoiceXmlCreator()
+
+    private val pdfCreator = EInvoicePdfCreator()
 
     private val reader = EInvoiceReader()
 
@@ -19,15 +22,15 @@ class InvoicingService {
 
 
     fun createXRechnung(invoice: Invoice): String =
-        creator.createXRechnungXml(invoice)
+        xmlCreator.createXRechnungXml(invoice)
 
     fun createFacturXXml(invoice: Invoice): String =
-        creator.createFacturXXml(invoice)
+        xmlCreator.createFacturXXml(invoice)
 
     fun createFacturXPdf(invoice: Invoice): Path {
         val resultFile = createTempPdfFile()
 
-        creator.createPdfWithAttachedXml(invoice, resultFile.toFile())
+        pdfCreator.createPdfWithAttachedXml(invoice, resultFile.toFile())
 
         return resultFile
     }
@@ -35,7 +38,7 @@ class InvoicingService {
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path): Path {
         val resultFile = createTempPdfFile()
 
-        creator.attachInvoiceXmlToPdf(invoice, pdf.toFile(), resultFile.toFile())
+        pdfCreator.attachInvoiceXmlToPdf(invoice, pdf.toFile(), resultFile.toFile())
 
         return resultFile
     }
