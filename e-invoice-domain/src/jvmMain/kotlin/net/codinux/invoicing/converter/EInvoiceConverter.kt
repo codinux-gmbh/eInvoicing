@@ -1,6 +1,6 @@
 package net.codinux.invoicing.converter
 
-import net.codinux.invoicing.creation.EInvoiceCreator
+import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.model.Invoice
 import org.mustangproject.CII.CIIToUBL
 import org.mustangproject.ZUGFeRD.ZUGFeRDVisualizer
@@ -62,7 +62,7 @@ open class EInvoiceConverter {
     }
 
 
-    protected open fun createXRechnungXml(invoice: Invoice): String = EInvoiceCreator().createXRechnungXml(invoice)
+    protected open fun createXRechnungXml(invoice: Invoice): String = EInvoiceXmlCreator().createXRechnungXml(invoice)
 
     protected open fun copyResource(resourceName: String, outputFile: File, outputFileExtension: String) {
         javaClass.classLoader.getResourceAsStream(resourceName).use { inputStream ->

@@ -13,24 +13,6 @@ class EInvoiceCreatorTest {
 
 
     @Test
-    fun createXRechnung() {
-        val invoice = createInvoice()
-
-        val result = underTest.createXRechnungXml(invoice)
-
-        assertInvoiceXml(result)
-    }
-
-    @Test
-    fun createFacturXXml() {
-        val invoice = createInvoice()
-
-        val result = underTest.createFacturXXml(invoice)
-
-        assertInvoiceXml(result)
-    }
-
-    @Test
     fun createPdfWithAttachedXml_FacturX() {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")

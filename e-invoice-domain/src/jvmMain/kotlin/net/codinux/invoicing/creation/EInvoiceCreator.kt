@@ -1,6 +1,5 @@
 package net.codinux.invoicing.creation
 
-import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import org.mustangproject.ZUGFeRD.*
@@ -9,33 +8,8 @@ import java.io.InputStream
 import java.io.OutputStream
 
 open class EInvoiceCreator(
-    protected open val mapper: MustangMapper = MustangMapper()
+    protected open val xmlCreator: EInvoiceXmlCreator = EInvoiceXmlCreator()
 ) {
-
-    open fun createXRechnungXml(invoice: Invoice) = createXml(invoice, EInvoiceXmlFormat.XRechnung)
-
-    /**
-     * Synonym for [createFacturXXml] (ZUGFeRD 2 is a synonym for Factur-X).
-     */
-    open fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
-
-    open fun createFacturXXml(invoice: Invoice) = createXml(invoice, EInvoiceXmlFormat.FacturX)
-
-    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String {
-        val exporter = ZUGFeRDExporterFromA3()
-            .setProfile(getProfileNameForFormat(format))
-
-        return createXml(exporter.provider, invoice)
-    }
-
-    protected open fun createXml(provider: IXMLProvider, invoice: Invoice): String {
-        val transaction = mapper.mapToTransaction(invoice)
-
-        provider.generateXML(transaction)
-
-        return String(provider.xml, Charsets.UTF_8)
-    }
-
 
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
@@ -101,15 +75,10 @@ open class EInvoiceCreator(
     }
 
 
-    protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) = when (format) {
-        EInvoiceXmlFormat.FacturX -> "EN16931" // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
-        EInvoiceXmlFormat.XRechnung -> "XRECHNUNG"
-    }
+    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
+        xmlCreator.createXml(invoice, format)
 
-    protected open fun getFilenameForFormat(format: EInvoiceXmlFormat) = when (format) {
-        EInvoiceXmlFormat.FacturX -> "factur-x.xml"
-        EInvoiceXmlFormat.XRechnung -> "xrechnung.xml"
-        // other available values: "zugferd-invoice.xml" (ZF v2), "ZUGFeRD-invoice.xml" (ZF v1) ("order-x.xml", "cida.xml")
-    }
+    protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =
+        xmlCreator.getProfileNameForFormat(format)
 
 }
