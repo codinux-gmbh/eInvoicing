@@ -1,5 +1,6 @@
 package net.codinux.invoicing.platform
 
+import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.pdf.*
 
 actual object JavaPlatform {
@@ -9,5 +10,7 @@ actual object JavaPlatform {
     actual val pdfAttachmentReader: PdfAttachmentReader = PdfBoxAndroidPdfAttachmentReader(AndroidContext.applicationContext)
 
     actual val pdfAttachmentWriter: PdfAttachmentWriter = PdfBoxAndroidPdfAttachmentWriter()
+
+    actual val invoicePdfCreator: EInvoicePdfCreator? = null
 
 }

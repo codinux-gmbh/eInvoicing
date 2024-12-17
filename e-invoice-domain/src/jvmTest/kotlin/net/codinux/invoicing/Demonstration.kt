@@ -1,8 +1,8 @@
 package net.codinux.invoicing
 
-import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
+import net.codinux.invoicing.creation.JvmEInvoicePdfCreator
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.EmailsFetcher
 import net.codinux.invoicing.model.*
@@ -54,7 +54,7 @@ class Demonstration {
         val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
 
         // create a PDF that also contains the eInvoice as XML attachment
-        val pdfCreator = EInvoicePdfCreator()
+        val pdfCreator = JvmEInvoicePdfCreator()
         pdfCreator.createPdfWithAttachedXml(invoice, pdfResultFile)
 
         val xmlCreator = EInvoiceXmlCreator()

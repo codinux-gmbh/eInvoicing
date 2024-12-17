@@ -7,9 +7,9 @@ import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import kotlin.test.Test
 
-class EInvoicePdfCreatorTest {
+class JvmEInvoicePdfCreatorTest {
 
-    private val underTest = EInvoicePdfCreator()
+    private val underTest = JvmEInvoicePdfCreator()
 
 
     @Test

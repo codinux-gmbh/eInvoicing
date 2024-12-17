@@ -6,28 +6,22 @@ import org.mustangproject.ZUGFeRD.*
 import java.io.File
 import java.io.OutputStream
 
-open class EInvoicePdfCreator(
+// TODO: when all platforms have an EInvoicePdfCreator implementation, rename back to EInvoicePdfCreator
+open class JvmEInvoicePdfCreator(
     protected open val attacher: EInvoiceXmlToPdfAttacher = EInvoiceXmlToPdfAttacher(),
     protected open val xmlCreator: EInvoiceXmlCreator = EInvoiceXmlCreator()
-) {
+) : EInvoicePdfCreator {
 
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    @JvmOverloads
-    open fun createPdfWithAttachedXml(invoice: Invoice, outputFile: File, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX) {
+    override fun createPdfWithAttachedXml(invoice: Invoice, outputFile: File, format: EInvoiceXmlFormat) {
         val xml = createXml(invoice, format)
 
         createPdfWithAttachedXml(xml, format, outputFile)
     }
 
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) {
-        outputFile.outputStream().use { outputStream ->
-            createPdfWithAttachedXml(invoiceXml, format, outputStream)
-        }
-    }
-
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream) {
+    override fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream) {
         val xmlFile = File.createTempFile("${format.name}-invoice", ".xml")
             .also { it.writeText(invoiceXml) }
         val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")

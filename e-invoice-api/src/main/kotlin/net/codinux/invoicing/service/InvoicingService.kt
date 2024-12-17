@@ -1,9 +1,9 @@
 package net.codinux.invoicing.service
 
 import jakarta.inject.Singleton
-import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
+import net.codinux.invoicing.creation.JvmEInvoicePdfCreator
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
@@ -15,7 +15,7 @@ class InvoicingService {
 
     private val xmlCreator = EInvoiceXmlCreator()
 
-    private val pdfCreator = EInvoicePdfCreator()
+    private val pdfCreator = JvmEInvoicePdfCreator()
 
     private val attacher = EInvoiceXmlToPdfAttacher()
 
