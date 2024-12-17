@@ -91,12 +91,12 @@ val invoice: Invoice = createInvoice()
 val existingPdf = File("Invoice.pdf")
 val output = File("Zugferd.pdf")
 
-val pdfCreator = EInvoicePdfCreator()
-pdfCreator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
+val attacher = EInvoiceXmlToPdfAttacher()
+attacher.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
 // or if you already have the invoice XML:
 val xmlCreator = EInvoiceXmlCreator()
 val invoiceXml = xmlCreator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
 
-pdfCreator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
 ```
