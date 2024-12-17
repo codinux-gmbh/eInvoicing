@@ -75,6 +75,7 @@ kotlin {
 
     val assertKVersion: String by project
     val xunitVersion: String by project
+    val jacksonVersion: String by project
     val logbackVersion: String by project
 
     sourceSets {
@@ -100,6 +101,9 @@ kotlin {
             implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
         }
         jvmTest.dependencies {
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
             implementation("org.xmlunit:xmlunit-core:$xunitVersion")
 
             implementation("ch.qos.logback:logback-classic:$logbackVersion")

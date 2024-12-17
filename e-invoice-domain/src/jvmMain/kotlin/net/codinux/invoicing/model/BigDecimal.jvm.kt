@@ -1,8 +1,9 @@
 package net.codinux.invoicing.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.RoundingMode
 
-actual class BigDecimal(private val value: java.math.BigDecimal) : Comparable<BigDecimal> {
+actual class BigDecimal(@JsonProperty(access = JsonProperty.Access.READ_WRITE) private val value: java.math.BigDecimal) : Comparable<BigDecimal> {
 
     actual companion object {
         actual val Zero = BigDecimal(java.math.BigDecimal.ZERO)
