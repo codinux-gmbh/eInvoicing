@@ -30,7 +30,8 @@ dependencies {
     implementation("io.quarkus:quarkus-micrometer")
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
-    implementation(project(":e-invoice-domain"))
+//    implementation(project(":e-invoice-domain")) // after making e-invoice-domain a multiplatform project, Quarkus does not seem to be able to reference it via project()
+    implementation("net.codinux.invoicing:e-invoice:0.6.0-SNAPSHOT")
 
     compileOnly("org.mustangproject:library:$mustangVersion") // only required for documenting REST API
 
