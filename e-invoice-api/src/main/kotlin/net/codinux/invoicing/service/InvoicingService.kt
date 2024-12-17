@@ -4,6 +4,7 @@ import jakarta.inject.Singleton
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
 import net.codinux.invoicing.creation.JvmEInvoicePdfCreator
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
@@ -23,6 +24,9 @@ class InvoicingService {
 
     private val validator = EInvoiceValidator()
 
+
+    fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
+        xmlCreator.createInvoiceXml(invoice, format)
 
     fun createXRechnung(invoice: Invoice): String =
         xmlCreator.createXRechnungXml(invoice)

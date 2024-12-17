@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.api.dto.DtoMapper
 import net.codinux.invoicing.api.dto.ExtractInvoiceDataFromXmlDto
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -30,6 +31,13 @@ class InvoicingResource(
 
     private val mapper: DtoMapper = DtoMapper()
 
+
+    @Path("create")
+    @POST
+    @Operation(summary = "Create an e-invoice XML in format determined by format parameter")
+    @Tag(name = "Create")
+    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat) =
+        service.createInvoiceXml(invoice, format)
 
     @Path("create/xrechnung")
     @POST
