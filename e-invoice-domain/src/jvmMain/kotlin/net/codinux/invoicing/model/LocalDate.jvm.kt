@@ -1,13 +1,12 @@
 package net.codinux.invoicing.model
 
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 
-actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int) {
+actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int): Comparable<LocalDate> {
 
     actual companion object {
-        actual fun now() = LocalDate.now().toEInvoicingDate()
+        actual fun now() = java.time.LocalDate.now().toEInvoicingDate()
     }
 
 
@@ -15,10 +14,13 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
 
     fun toInstantAtSystemDefaultZone(): Instant = toJvmDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
 
+    actual override fun compareTo(other: LocalDate): Int =
+        toJvmDate().compareTo(other.toJvmDate())
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is net.codinux.invoicing.model.LocalDate) return false
+        if (other !is LocalDate) return false
 
         if (year != other.year) return false
         if (month != other.month) return false

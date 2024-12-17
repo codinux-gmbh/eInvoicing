@@ -1,6 +1,6 @@
 package net.codinux.invoicing.model
 
-expect class BigDecimal(value: String) {
+expect class BigDecimal(value: String) : Comparable<BigDecimal> {
 
     companion object {
         val Zero: BigDecimal
@@ -11,5 +11,7 @@ expect class BigDecimal(value: String) {
 
 
     fun toPlainString(): String
+
+    override fun compareTo(other: BigDecimal): Int
 
 }

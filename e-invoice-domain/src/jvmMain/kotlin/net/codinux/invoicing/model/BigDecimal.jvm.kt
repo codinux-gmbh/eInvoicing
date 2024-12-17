@@ -2,7 +2,7 @@ package net.codinux.invoicing.model
 
 import java.math.RoundingMode
 
-actual class BigDecimal(private val value: java.math.BigDecimal) {
+actual class BigDecimal(private val value: java.math.BigDecimal) : Comparable<BigDecimal> {
 
     actual companion object {
         actual val Zero = BigDecimal(java.math.BigDecimal.ZERO)
@@ -15,6 +15,8 @@ actual class BigDecimal(private val value: java.math.BigDecimal) {
 
 
     actual fun toPlainString(): String = value.toPlainString()
+
+    actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)
 
     fun setScale(newScale: Int, roundingMode: RoundingMode = RoundingMode.UNNECESSARY) =
         BigDecimal(value.setScale(newScale, roundingMode))
