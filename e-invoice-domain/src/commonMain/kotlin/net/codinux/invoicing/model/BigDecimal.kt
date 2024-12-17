@@ -14,6 +14,8 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
     constructor(value: Int)
 
 
+    fun setScale(newScale: Int): BigDecimal
+
     fun toPlainString(): String
 
     override fun compareTo(other: BigDecimal): Int

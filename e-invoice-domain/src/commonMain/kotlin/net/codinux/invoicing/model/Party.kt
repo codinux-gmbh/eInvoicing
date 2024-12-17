@@ -1,7 +1,9 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.codes.Country
 
+@Serializable
 class Party(
     val name: String,
 

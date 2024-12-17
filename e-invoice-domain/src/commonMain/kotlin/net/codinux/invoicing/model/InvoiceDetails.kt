@@ -1,7 +1,9 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.codes.Currency
 
+@Serializable
 class InvoiceDetails(
     val invoiceNumber: String,
     val invoiceDate: LocalDate,

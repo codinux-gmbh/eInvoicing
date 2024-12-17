@@ -1,7 +1,7 @@
 package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.test.DataGenerator
-import net.codinux.invoicing.test.InvoiceAsserter
+import net.codinux.invoicing.test.InvoiceXmlAsserter
 import kotlin.test.Test
 
 class EInvoiceXmlCreatorTest {
@@ -31,7 +31,7 @@ class EInvoiceXmlCreatorTest {
     private fun createInvoice() = DataGenerator.createInvoice()
 
     private fun assertInvoiceXml(xml: String) {
-        InvoiceAsserter.assertInvoiceXml(xml)
+        InvoiceXmlAsserter.assertInvoiceXml(xml)
     }
 
 }

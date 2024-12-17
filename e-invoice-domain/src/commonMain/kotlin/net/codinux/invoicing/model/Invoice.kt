@@ -1,5 +1,8 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class Invoice(
     val details: InvoiceDetails,
     val supplier: Party,

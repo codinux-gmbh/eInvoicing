@@ -1,6 +1,6 @@
 package net.codinux.invoicing.test
 
-import net.codinux.invoicing.calculator.AmountsCalculator
+//import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
@@ -57,7 +57,7 @@ object DataGenerator {
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${dueDate.dayOfMonth}.${dueDate.month}.${dueDate.year}}" },
     ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, dueDate, paymentDescription), supplier, customer, items).apply {
-        this.totals = AmountsCalculator().calculateTotalAmounts(this)
+//        this.totals = AmountsCalculator().calculateTotalAmounts(this)
     }
 
     fun createParty(

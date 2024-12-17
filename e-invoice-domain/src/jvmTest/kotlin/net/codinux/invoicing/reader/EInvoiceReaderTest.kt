@@ -6,6 +6,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResult
 import net.codinux.invoicing.test.InvoiceAsserter
+import net.codinux.invoicing.test.InvoiceXmlAsserter
 import net.codinux.invoicing.test.TestUtils
 import kotlin.test.Test
 
@@ -51,7 +52,7 @@ class EInvoiceReaderTest {
     fun extractXmlFromPdf() {
         val result = underTest.extractXmlFromPdf(getTestFile("ZUGFeRD.pdf"))
 
-        InvoiceAsserter.assertInvoiceXml(result.invoiceXml)
+        InvoiceXmlAsserter.assertInvoiceXml(result.invoiceXml)
     }
 
 
@@ -74,7 +75,7 @@ class EInvoiceReaderTest {
         val attachment = result.attachmentExtractionResult.attachments.first()
         assertThat(attachment.isXmlFile).isTrue()
         assertThat(attachment.isProbablyEN16931InvoiceXml).isTrue()
-        InvoiceAsserter.assertInvoiceXml(attachment.xml)
+        InvoiceXmlAsserter.assertInvoiceXml(attachment.xml)
 
         assertThat(result.readEInvoiceXmlResult).isNotNull()
         assertThat(result.readEInvoiceXmlResult!!.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)

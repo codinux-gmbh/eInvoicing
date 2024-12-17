@@ -1,5 +1,8 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class TotalAmounts(
     /**
      * Gesamtbetrag einer einzelnen Rechnungsposition.

@@ -2,7 +2,7 @@ package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.test.DataGenerator
-import net.codinux.invoicing.test.InvoiceAsserter
+import net.codinux.invoicing.test.InvoiceXmlAsserter
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import kotlin.test.Test
@@ -42,7 +42,7 @@ class JvmEInvoicePdfCreatorTest {
     private fun createInvoice() = DataGenerator.createInvoice()
 
     private fun assertInvoiceXml(xml: String) {
-        InvoiceAsserter.assertInvoiceXml(xml)
+        InvoiceXmlAsserter.assertInvoiceXml(xml)
     }
 
 }

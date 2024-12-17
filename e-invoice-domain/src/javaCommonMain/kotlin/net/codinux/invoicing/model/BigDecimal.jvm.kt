@@ -21,6 +21,8 @@ actual class BigDecimal(
     actual constructor(value: Int) : this(java.math.BigDecimal(value))
 
 
+    actual fun setScale(newScale: Int) = BigDecimal(value.setScale(newScale))
+
     actual fun toPlainString(): String = value.toPlainString()
 
     actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)

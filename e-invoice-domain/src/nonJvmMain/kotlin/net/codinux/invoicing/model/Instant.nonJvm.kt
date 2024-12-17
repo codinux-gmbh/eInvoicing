@@ -22,4 +22,21 @@ actual class Instant actual constructor(actual val epochSeconds: Long, actual va
 
     actual fun toLocalDateAtSystemDefaultZone(): LocalDate = LocalDate(0, 0, 0) // TODO
 
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Instant) return false
+
+        if (epochSeconds != other.epochSeconds) return false
+        if (nanosecondsOfSecond != other.nanosecondsOfSecond) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = epochSeconds.hashCode()
+        result = 31 * result + nanosecondsOfSecond
+        return result
+    }
+
 }
