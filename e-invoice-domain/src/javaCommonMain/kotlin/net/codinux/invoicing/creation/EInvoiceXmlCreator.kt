@@ -10,16 +10,16 @@ open class EInvoiceXmlCreator(
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
-    open fun createXRechnungXml(invoice: Invoice) = createXml(invoice, EInvoiceXmlFormat.XRechnung)
+    open fun createXRechnungXml(invoice: Invoice) = createInvoiceXml(invoice, EInvoiceXmlFormat.XRechnung)
 
     /**
      * Synonym for [createFacturXXml] (ZUGFeRD 2 is a synonym for Factur-X).
      */
     open fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
 
-    open fun createFacturXXml(invoice: Invoice) = createXml(invoice, EInvoiceXmlFormat.FacturX)
+    open fun createFacturXXml(invoice: Invoice) = createInvoiceXml(invoice, EInvoiceXmlFormat.FacturX)
 
-    open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String {
+    open fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String {
         val exporter = ZUGFeRDExporterFromA3()
             .setProfile(getProfileNameForFormat(format))
 

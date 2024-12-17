@@ -39,6 +39,6 @@ open class JvmEInvoicePdfCreator(
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
-        xmlCreator.createXml(invoice, format)
+        xmlCreator.createInvoiceXml(invoice, format)
 
 }
