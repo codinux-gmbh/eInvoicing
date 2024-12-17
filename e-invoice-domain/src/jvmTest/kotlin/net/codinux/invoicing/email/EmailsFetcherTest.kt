@@ -5,8 +5,8 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNull
 import net.codinux.invoicing.email.model.EmailAccount
-import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
+import kotlin.test.Test
 
 @Ignore // not an automatic test, set your email account settings below
 class EmailsFetcherTest {
