@@ -1,5 +1,9 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.serialization.InstantSerializer
+
+@Serializable(with = InstantSerializer::class)
 expect class Instant(epochSeconds: Long, nanosecondsOfSecond: Int) : Comparable<Instant> {
 
     companion object {

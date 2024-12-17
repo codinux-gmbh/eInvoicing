@@ -2,9 +2,15 @@ package net.codinux.invoicing.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import net.codinux.invoicing.serialization.InstantSerializer
 import java.time.ZoneId
 
-actual class Instant(@JsonProperty("value", access = JsonProperty.Access.READ_WRITE) private val jvmInstant: java.time.Instant) : Comparable<Instant> {
+@Serializable(with = InstantSerializer::class)
+actual class Instant(
+    @JsonProperty("value", access = JsonProperty.Access.READ_WRITE) @Transient private val jvmInstant: java.time.Instant = java.time.Instant.now()
+) : Comparable<Instant> {
 
     actual companion object {
         actual fun now(): Instant = Instant(java.time.Instant.now())

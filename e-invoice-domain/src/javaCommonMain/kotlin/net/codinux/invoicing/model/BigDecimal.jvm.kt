@@ -1,9 +1,15 @@
 package net.codinux.invoicing.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import net.codinux.invoicing.serialization.BigDecimalSerializer
 import java.math.RoundingMode
 
-actual class BigDecimal(@JsonProperty(access = JsonProperty.Access.READ_WRITE) private val value: java.math.BigDecimal) : Comparable<BigDecimal> {
+@Serializable(with = BigDecimalSerializer::class)
+actual class BigDecimal(
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE) @Transient private val value: java.math.BigDecimal = java.math.BigDecimal.ZERO
+) : Comparable<BigDecimal> {
 
     actual companion object {
         actual val Zero = BigDecimal(java.math.BigDecimal.ZERO)

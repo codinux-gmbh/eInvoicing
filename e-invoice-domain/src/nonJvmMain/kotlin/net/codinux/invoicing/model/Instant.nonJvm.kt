@@ -1,5 +1,9 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.serialization.InstantSerializer
+
+@Serializable(with = InstantSerializer::class)
 actual class Instant actual constructor(actual val epochSeconds: Long, actual val nanosecondsOfSecond: Int) : Comparable<Instant> {
 
     actual companion object {

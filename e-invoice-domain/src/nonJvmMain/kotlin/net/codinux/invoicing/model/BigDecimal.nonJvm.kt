@@ -1,5 +1,9 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.serialization.BigDecimalSerializer
+
+@Serializable(with = BigDecimalSerializer::class)
 actual class BigDecimal actual constructor(private val value: String) : Comparable<BigDecimal> {
 
     actual companion object {

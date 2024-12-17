@@ -1,9 +1,13 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.serialization.LocalDateSerializer
+
 /**
  * I didn't want to use kotlinx-datetime as it has incompatibilities between 0.5 and 0.6 which leads to compile errors
  * when both are on the class path, and doesn't compile with GraalVM.
  */
+@Serializable(with = LocalDateSerializer::class)
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int): Comparable<LocalDate> {
 
     actual companion object {

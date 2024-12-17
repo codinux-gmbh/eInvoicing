@@ -1,8 +1,11 @@
 package net.codinux.invoicing.model
 
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.serialization.LocalDateSerializer
 import java.time.Instant
 import java.time.ZoneId
 
+@Serializable(with = LocalDateSerializer::class)
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int): Comparable<LocalDate> {
 
     actual companion object {
