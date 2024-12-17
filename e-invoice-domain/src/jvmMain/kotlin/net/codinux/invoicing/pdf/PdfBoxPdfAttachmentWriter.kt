@@ -1,5 +1,7 @@
 package net.codinux.invoicing.pdf
 
+import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.ZUGFeRDExporterFromA3
 import java.io.OutputStream
@@ -47,10 +49,10 @@ class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
 //    }
 
 
-    override fun addFileAttachment(pdfFile: ByteArray, attachmentName: String, xml: String, output: OutputStream) {
+    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
         val exporter = ZUGFeRDExporterFromA3()
             .setZUGFeRDVersion(2)
-            .setProfile(attachmentName)
+            .setProfile(Constants.getProfileNameForFormat(format))
             .setProducer("codinux GmbH & Co. KG")
             .setCreator(System.getProperty("user.name"))
             .setCreatorTool("eInvoicing von codinux GmbH & Co. KG")

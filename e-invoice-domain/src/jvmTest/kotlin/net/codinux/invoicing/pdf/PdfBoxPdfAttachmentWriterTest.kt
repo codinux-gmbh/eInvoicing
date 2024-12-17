@@ -26,7 +26,7 @@ class PdfBoxPdfAttachmentWriterTest {
         val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rsm:CrossIndustryInvoice" // to trick Mustang's simple validation
         val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
 
-        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), Constants.getProfileNameForFormat(format), xmlContent, destination.outputStream())
+        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), format, xmlContent, destination.outputStream())
 
         val createdFile = reader.getFileAttachments(destination.inputStream())
 

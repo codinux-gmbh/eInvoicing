@@ -64,7 +64,7 @@ fun create() {
     val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
 
     // create a PDF that also contains the eInvoice as XML attachment
-    val pdfCreator = EInvoicePdfCreator()
+    val pdfCreator = JvmEInvoicePdfCreator()
     pdfCreator.createPdfWithAttachedXml(invoice, pdfResultFile)
 
     val xmlCreator = EInvoiceXmlCreator()

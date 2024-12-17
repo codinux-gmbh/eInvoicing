@@ -6,6 +6,8 @@ import com.tom_roush.pdfbox.pdmodel.PDDocumentNameDictionary
 import com.tom_roush.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode
 import com.tom_roush.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification
 import com.tom_roush.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile
+import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.log.logger
 import java.io.OutputStream
 
@@ -14,7 +16,7 @@ class PdfBoxAndroidPdfAttachmentWriter : PdfAttachmentWriter {
     private val log by logger()
 
 
-    override fun addFileAttachment(pdfFile: ByteArray, attachmentName: String, xml: String, output: OutputStream) {
+    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
         try {
             PDDocument.load(pdfFile).use { document ->
                 val names = PDDocumentNameDictionary(document.documentCatalog)
@@ -32,7 +34,7 @@ class PdfBoxAndroidPdfAttachmentWriter : PdfAttachmentWriter {
                 cosStream.setString(COSName.SUBTYPE, "application/xml")
 
                 val fileSpec = PDComplexFileSpecification()
-                fileSpec.file = attachmentName
+                fileSpec.file = Constants.getFilenameForFormat(format)
                 fileSpec.embeddedFile = PDEmbeddedFile(cosStream)
 
                 fileMap.put(fileSpec.file, fileSpec)

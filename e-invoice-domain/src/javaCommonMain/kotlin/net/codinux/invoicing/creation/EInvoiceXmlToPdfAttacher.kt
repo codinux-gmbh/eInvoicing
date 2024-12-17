@@ -30,7 +30,7 @@ open class EInvoiceXmlToPdfAttacher(
         attachInvoiceXmlToPdf(invoiceXml, format, pdfFile.readAllBytes(), outputFile)
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: ByteArray, outputFile: OutputStream) =
-        attachmentWriter.addFileAttachment(pdfFile, getProfileNameForFormat(format), invoiceXml, outputFile)
+        attachmentWriter.addFileAttachment(pdfFile, format, invoiceXml, outputFile)
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
