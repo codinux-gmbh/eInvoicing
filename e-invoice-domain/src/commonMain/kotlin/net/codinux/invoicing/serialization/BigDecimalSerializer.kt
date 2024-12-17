@@ -9,6 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 import net.codinux.invoicing.model.BigDecimal
 
 object BigDecimalSerializer : KSerializer<BigDecimal> {
+
     @OptIn(ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor = SerialDescriptor("net.codinux.invoicing.model.BigDecimal", BigDecimalSurrogate.serializer().descriptor)
 

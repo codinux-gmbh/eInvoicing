@@ -121,6 +121,7 @@ open class KtorWebClient(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     @OptIn(InternalSerializationApi::class)
     protected open suspend fun <T : Any> decodeResponse(parameters: RequestParameters<T>, clientResponse: HttpResponse): T {
         val responseClass = parameters.responseClass

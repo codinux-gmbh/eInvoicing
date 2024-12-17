@@ -1,5 +1,6 @@
 package net.codinux.invoicing.serialization
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -9,6 +10,7 @@ import net.codinux.invoicing.model.Instant
 
 object InstantSerializer : KSerializer<Instant> {
 
+    @OptIn(ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor = SerialDescriptor("net.codinux.invoicing.model.Instant", InstantSurrogate.serializer().descriptor)
 
     override fun serialize(encoder: Encoder, value: Instant) {
