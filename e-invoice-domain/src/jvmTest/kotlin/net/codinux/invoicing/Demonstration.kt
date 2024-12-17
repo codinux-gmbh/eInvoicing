@@ -1,6 +1,6 @@
 package net.codinux.invoicing
 
-import net.codinux.invoicing.creation.EInvoiceCreator
+import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.EmailsFetcher
@@ -52,10 +52,9 @@ class Demonstration {
         val invoice = createInvoice()
         val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
 
-        val creator = EInvoiceCreator()
-
         // create a PDF that also contains the eInvoice as XML attachment
-        creator.createPdfWithAttachedXml(invoice, pdfResultFile)
+        val pdfCreator = EInvoicePdfCreator()
+        pdfCreator.createPdfWithAttachedXml(invoice, pdfResultFile)
 
         val xmlCreator = EInvoiceXmlCreator()
 
@@ -71,15 +70,14 @@ class Demonstration {
         val existingPdf = File("Invoice.pdf")
         val output = File("Zugferd.pdf")
 
-        val creator = EInvoiceCreator()
-
-        creator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
+        val pdfCreator = EInvoicePdfCreator()
+        pdfCreator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
         // or if you already have the invoice XML:
         val xmlCreator = EInvoiceXmlCreator()
         val invoiceXml = xmlCreator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
 
-        creator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+        pdfCreator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
     }
 
 

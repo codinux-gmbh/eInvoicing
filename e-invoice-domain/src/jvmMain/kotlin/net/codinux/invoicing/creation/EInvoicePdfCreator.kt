@@ -7,7 +7,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
-open class EInvoiceCreator(
+open class EInvoicePdfCreator(
     protected open val xmlCreator: EInvoiceXmlCreator = EInvoiceXmlCreator()
 ) {
 
