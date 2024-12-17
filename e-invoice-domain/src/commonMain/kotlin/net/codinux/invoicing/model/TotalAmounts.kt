@@ -1,19 +1,17 @@
 package net.codinux.invoicing.model
 
-import java.math.BigDecimal
-
 class TotalAmounts(
     /**
      * Gesamtbetrag einer einzelnen Rechnungsposition.
      */
     val lineTotalAmount: BigDecimal,
 
-    val chargeTotalAmount: BigDecimal = BigDecimal.ZERO,
+    val chargeTotalAmount: BigDecimal = BigDecimal.Zero,
 
     /**
      * Gesamtbetrag aller gewährten Rabatte, Abzüge oder Nachlässe.
      */
-    val allowanceTotalAmount: BigDecimal = BigDecimal.ZERO,
+    val allowanceTotalAmount: BigDecimal = BigDecimal.Zero,
 
     /**
      * Der Gesamtbetrag, der als Grundlage für die Steuerberechnung dient, nach Abzug von Rabatten (Allowance) und vor

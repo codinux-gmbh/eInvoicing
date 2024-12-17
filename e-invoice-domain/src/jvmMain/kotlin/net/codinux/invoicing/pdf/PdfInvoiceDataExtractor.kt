@@ -1,6 +1,7 @@
 package net.codinux.invoicing.pdf
 
 import net.codinux.invoicing.model.LocalDate
+import net.codinux.invoicing.model.toEInvoicingBigDecimal
 import net.dankito.text.extraction.info.invoice.InvoiceDataExtractor
 import net.dankito.text.extraction.info.model.InvoiceData
 import java.io.File
@@ -39,7 +40,7 @@ open class PdfInvoiceDataExtractor(
 
     protected open fun mapInvoiceData(result: InvoiceData, pdfText: String) = PdfInvoiceData(
         mapAmount(result.potentialTotalAmount)!!, mapAmount(result.potentialNetAmount),
-        mapAmount(result.potentialValueAddedTax), result.potentialValueAddedTaxRate?.amount,
+        mapAmount(result.potentialValueAddedTax), result.potentialValueAddedTaxRate?.amount?.toEInvoicingBigDecimal(),
 
         result.potentialIban, result.potentialBic,
 
@@ -53,6 +54,6 @@ open class PdfInvoiceDataExtractor(
     )
 
     protected open fun mapAmount(amount: net.dankito.text.extraction.info.model.AmountOfMoney?) =
-        amount?.let { AmountOfMoney(it.amount, it.currency, it.amountWithCurrency) }
+        amount?.let { AmountOfMoney(it.amount.toEInvoicingBigDecimal(), it.currency, it.amountWithCurrency) }
 
 }

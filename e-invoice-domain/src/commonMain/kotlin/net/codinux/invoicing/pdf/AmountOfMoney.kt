@@ -1,6 +1,6 @@
 package net.codinux.invoicing.pdf
 
-import java.math.BigDecimal
+import net.codinux.invoicing.model.BigDecimal
 
 class AmountOfMoney(
     val amount: BigDecimal,

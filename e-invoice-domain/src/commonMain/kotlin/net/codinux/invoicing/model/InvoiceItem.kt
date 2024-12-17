@@ -1,7 +1,6 @@
 package net.codinux.invoicing.model
 
 import net.codinux.invoicing.model.codes.UnitOfMeasure
-import java.math.BigDecimal
 
 class InvoiceItem(
     val name: String,

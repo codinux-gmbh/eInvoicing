@@ -2,13 +2,9 @@ package net.codinux.invoicing.test
 
 import assertk.assertThat
 import assertk.assertions.*
-import net.codinux.invoicing.model.BankDetails
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.InvoiceItem
-import net.codinux.invoicing.model.Party
+import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.UnitOfMeasure
-import java.math.BigDecimal
 
 object InvoiceAsserter {
 

@@ -8,7 +8,6 @@ import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import java.io.File
-import java.math.BigDecimal
 
 class Demonstration {
 

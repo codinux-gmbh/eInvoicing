@@ -44,7 +44,7 @@ open class MustangMapper(
         this.referenceNumber = invoice.customerReferenceNumber
 
         invoice.amountAdjustments?.let { adjustments ->
-            this.totalPrepaidAmount = adjustments.prepaidAmounts
+            this.totalPrepaidAmount = adjustments.prepaidAmounts.toJvmBigDecimal()
             adjustments.charges.forEach { this.addCharge(mapCharge(it)) }
             adjustments.allowances.forEach { this.addAllowance(mapAllowance(it)) }
         }
@@ -77,31 +77,31 @@ open class MustangMapper(
 
     open fun mapLineItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
-        Product(item.name, item.description ?: "", item.unit.code, item.vatRate).apply {
+        Product(item.name, item.description ?: "", item.unit.code, item.vatRate.toJvmBigDecimal()).apply {
             this.sellerAssignedID = item.articleNumber // TODO: what is the articleNumber? sellerAssignedId, globalId, ...?
         },
-        item.unitPrice, item.quantity
+        item.unitPrice.toJvmBigDecimal(), item.quantity.toJvmBigDecimal()
     ).apply {
 
     }
 
-    protected open fun mapCharge(charge: ChargeOrAllowance) = Charge(charge.actualAmount).apply {
-        this.percent = charge.calculationPercent
+    protected open fun mapCharge(charge: ChargeOrAllowance) = Charge(charge.actualAmount.toJvmBigDecimal()).apply {
+        this.percent = charge.calculationPercent?.toJvmBigDecimal()
 
         this.reason = charge.reason
         this.reasonCode = charge.reasonCode
 
-        this.taxPercent = charge.taxRateApplicablePercent
+        this.taxPercent = charge.taxRateApplicablePercent?.toJvmBigDecimal()
         this.categoryCode = charge.taxCategoryCode
     }
 
-    protected open fun mapAllowance(allowance: ChargeOrAllowance) = Allowance(allowance.actualAmount).apply {
-        this.percent = allowance.calculationPercent
+    protected open fun mapAllowance(allowance: ChargeOrAllowance) = Allowance(allowance.actualAmount.toJvmBigDecimal()).apply {
+        this.percent = allowance.calculationPercent?.toJvmBigDecimal()
 
         this.reason = allowance.reason
         this.reasonCode = allowance.reasonCode
 
-        this.taxPercent = allowance.taxRateApplicablePercent
+        this.taxPercent = allowance.taxRateApplicablePercent?.toJvmBigDecimal()
         this.categoryCode = allowance.taxCategoryCode
     }
 
@@ -130,7 +130,8 @@ open class MustangMapper(
 
     open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
         // TODO: what to use as fallback if unit cannot be determined?
-        item.product.name, item.quantity, item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ZZ, item.price, item.product.vatPercent, item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
+        item.product.name, item.quantity.toEInvoicingBigDecimal(), item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ZZ,
+        item.price.toEInvoicingBigDecimal(), item.product.vatPercent.toEInvoicingBigDecimal(), item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
     )
 
     protected open fun mapAmountAdjustments(invoice: Invoice): AmountAdjustments? {
@@ -140,14 +141,15 @@ open class MustangMapper(
         }
 
         return AmountAdjustments(
-            invoice.totalPrepaidAmount,
+            invoice.totalPrepaidAmount.toEInvoicingBigDecimal(),
             invoice.zfCharges.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Charge) },
             invoice.zfAllowances.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Allowance ?: it as? Charge) }
         )
     }
 
     private fun mapChargeOrAllowance(chargeOrAllowance: Charge?) = chargeOrAllowance?.let {
-        ChargeOrAllowance(it.totalAmount, null, null, it.percent, it.reason, it.reasonCode, it.taxPercent, it.categoryCode)
+        ChargeOrAllowance(it.totalAmount.toEInvoicingBigDecimal(), null, null, it.percent.toEInvoicingBigDecimal(),
+            it.reason, it.reasonCode, it.taxPercent.toEInvoicingBigDecimal(), it.categoryCode)
     }
 
 

@@ -5,7 +5,6 @@ import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure
-import java.math.BigDecimal
 
 object DataGenerator {
 

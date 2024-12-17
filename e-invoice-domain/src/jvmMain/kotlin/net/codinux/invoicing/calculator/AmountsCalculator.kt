@@ -25,14 +25,14 @@ open class AmountsCalculator {
         val calculator = MustangTransactionCalculator(invoice)
 
         return TotalAmounts(
-            lineTotalAmount = calculator.lineTotalAmount,
-            chargeTotalAmount = calculator.chargeTotal,
-            allowanceTotalAmount = calculator.allowanceTotal,
-            taxBasisTotalAmount = calculator.taxBasisTotalAmount,
-            taxTotalAmount = calculator.taxTotalAmount,
-            grandTotalAmount = calculator.grandTotal,
-            totalPrepaidAmount = calculator.totalPrepaidAmount,
-            duePayableAmount = calculator.duePayableAmount
+            lineTotalAmount = calculator.lineTotalAmount.toEInvoicingBigDecimal(),
+            chargeTotalAmount = calculator.chargeTotal.toEInvoicingBigDecimal(),
+            allowanceTotalAmount = calculator.allowanceTotal.toEInvoicingBigDecimal(),
+            taxBasisTotalAmount = calculator.taxBasisTotalAmount.toEInvoicingBigDecimal(),
+            taxTotalAmount = calculator.taxTotalAmount.toEInvoicingBigDecimal(),
+            grandTotalAmount = calculator.grandTotal.toEInvoicingBigDecimal(),
+            totalPrepaidAmount = calculator.totalPrepaidAmount.toEInvoicingBigDecimal(),
+            duePayableAmount = calculator.duePayableAmount.toEInvoicingBigDecimal()
         )
     }
 

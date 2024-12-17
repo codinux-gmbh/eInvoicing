@@ -1,12 +1,10 @@
 package net.codinux.invoicing.model
 
-import java.math.BigDecimal
-
 class AmountAdjustments(
     /**
      * Vorauszahlungen.
      */
-    val prepaidAmounts: BigDecimal = BigDecimal.ZERO,
+    val prepaidAmounts: BigDecimal = BigDecimal.Zero,
 
     /**
      * Zusätzliche Gebühren.

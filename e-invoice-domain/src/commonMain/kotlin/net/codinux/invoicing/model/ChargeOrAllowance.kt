@@ -1,7 +1,5 @@
 package net.codinux.invoicing.model
 
-import java.math.BigDecimal
-
 class ChargeOrAllowance(
     /**
      * Gesamtbetrag der Gebühr oder des Nachlasses.
