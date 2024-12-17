@@ -95,6 +95,8 @@ kotlin {
 
     val angusMailVersion: String by project
 
+    val ktorVersion: String by project
+
     val klfVersion: String by project
 
     val assertKVersion: String by project
@@ -104,12 +106,17 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
 
             implementation("net.codinux.log:klf:$klfVersion")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutinesVersion")
 
             implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
         }
@@ -125,6 +132,8 @@ kotlin {
                 api("net.dankito.text.extraction:pdfbox-text-extractor:$textExtractorVersion")
 
                 implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
+
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
             }
         }
 
@@ -176,12 +185,24 @@ kotlin {
         }
         nativeMain {
             dependsOn(nonJvmMain)
+
+            dependencies {
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+            }
         }
         jsMain {
             dependsOn(nonJvmMain)
+
+            dependencies {
+                implementation("io.ktor:ktor-client-js:$ktorVersion")
+            }
         }
         wasmJsMain {
             dependsOn(nonJvmMain)
+
+            dependencies {
+                implementation("io.ktor:ktor-client-js:$ktorVersion")
+            }
         }
     }
 }
