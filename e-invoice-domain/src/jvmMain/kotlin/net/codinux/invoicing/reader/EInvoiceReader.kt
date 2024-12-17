@@ -11,6 +11,7 @@ import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import java.io.InputStream
 import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
 open class EInvoiceReader(
@@ -85,21 +86,24 @@ open class EInvoiceReader(
 
     open fun extractFromFile(inputStream: InputStream, filename: String, directory: String? = null, mediaType: String? = null): FileEInvoiceExtractionResult = try {
         val extension = Path(filename).extension.lowercase()
+        val path = if (directory != null) Path(directory).resolve(filename).absolutePathString() else filename
 
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, extractFromPdf(inputStream), null)
+                FileEInvoiceExtractionResult(filename, directory, path, extractFromPdf(inputStream), null)
             }
         } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, null, extractFromXml(inputStream))
+                FileEInvoiceExtractionResult(filename, directory, path, null, extractFromXml(inputStream))
             }
         } else {
-            FileEInvoiceExtractionResult(filename, directory, null, null)
+            FileEInvoiceExtractionResult(filename, directory, path, null, null)
         }
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${directory?.let { "$it/" } ?: ""}$filename" }
-        FileEInvoiceExtractionResult(filename, directory, null, null)
+
+        val path = if (directory != null) Path(directory).resolve(filename).absolutePathString() else filename // duplicate code
+        FileEInvoiceExtractionResult(filename, directory, path, null, null)
     }
 
 
