@@ -67,28 +67,6 @@ class PdfBoxPdfAttachmentReaderTest {
     }
 
 
-//    @Ignore
-    @Test
-    fun addFileAttachment() {
-        val xmlFilename = "empty.xml"
-        val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
-
-        underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), xmlFilename, xmlContent, destination.outputStream())
-
-        val createdFile = underTest.getFileAttachments(destination.inputStream())
-
-        assertThat(createdFile.type).isEqualTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
-        assertThat(createdFile.attachments).hasSize(1)
-
-        val attachment = createdFile.attachments.first()
-        assertThat(attachment.filename).isEqualTo(xmlFilename)
-        assertThat(attachment.isXmlFile).isTrue()
-        assertThat(attachment.xml).isNotNull()
-        assertThat(attachment.xml!!).isEqualTo(xmlContent)
-    }
-
-
     private fun getTestFile(filename: String) = TestUtils.getInvalidInvoiceFileAsStream(filename)
 
     private fun getValidTestFile(filename: String) = TestUtils.getTestFileAsStream(filename)

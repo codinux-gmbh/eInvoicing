@@ -75,43 +75,4 @@ class PdfBoxAndroidPdfAttachmentReader(
         }
     }
 
-
-    fun addFileAttachment(pdfFileInputStream: InputStream, attachmentName: String, xml: String, output: OutputStream) =
-        addFileAttachment(pdfFileInputStream.readBytes(), attachmentName, xml, output)
-
-    fun addFileAttachment(pdfFile: ByteArray, attachmentName: String, xml: String, output: OutputStream) {
-        try {
-            PDDocument.load(pdfFile).use { document ->
-                val names = PDDocumentNameDictionary(document.documentCatalog)
-                val embeddedFiles = names.embeddedFiles ?: PDEmbeddedFilesNameTreeNode()
-
-                val fileMap = (embeddedFiles.names?.toMutableMap() ?: mutableMapOf())
-
-                val cosStream = document.document.createCOSStream()
-                cosStream.createOutputStream().use {
-                    it.bufferedWriter().use { writer ->
-                        writer.write(xml)
-                    }
-                }
-                cosStream.setItem(COSName.TYPE, COSName.EMBEDDED_FILES)
-                cosStream.setString(COSName.SUBTYPE, "application/xml")
-
-                val fileSpec = PDComplexFileSpecification()
-                fileSpec.file = attachmentName
-                fileSpec.embeddedFile = PDEmbeddedFile(cosStream)
-
-                fileMap.put(fileSpec.file, fileSpec)
-
-                embeddedFiles.names = fileMap
-
-                names.embeddedFiles = embeddedFiles
-                document.documentCatalog.names = names
-
-                document.save(output)
-            }
-        } catch (e: Throwable) {
-            log.error(e) { "Could not add XML file attachments to PDF" }
-        }
-    }
-
 }
