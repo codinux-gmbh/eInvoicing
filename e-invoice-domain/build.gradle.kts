@@ -17,6 +17,11 @@ kotlin {
     compilerOptions {
         // suppresses compiler warning: [EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING] 'expect'/'actual' classes (including interfaces, objects, annotations, enums, and 'actual' typealiases) are in Beta.
         freeCompilerArgs.add("-Xexpect-actual-classes")
+
+        // avoid "variable has been optimised out" in debugging mode
+        if (System.getProperty("idea.debugger.dispatch.addr") != null) {
+            freeCompilerArgs.add("-Xdebug")
+        }
     }
 
 
