@@ -53,7 +53,7 @@ val invoiceFile = File("ZUGFeRD.pdf") // or XRechnung,xml, ...
 val result = validator.validate(invoiceFile)
 
 println("Is valid? ${result.isValid}")
-println(result.report)
+println(result.reportAsXml)
 ```
 
 ## Create eInvoice
@@ -63,16 +63,17 @@ fun create() {
     val invoice = createInvoice()
     val pdfResultFile = File.createTempFile("Zugferd", ".pdf")
 
-    val creator = EInvoiceCreator()
-
     // create a PDF that also contains the eInvoice as XML attachment
-    creator.createPdfWithAttachedXml(invoice, pdfResultFile)
+    val pdfCreator = EInvoicePdfCreator()
+    pdfCreator.createPdfWithAttachedXml(invoice, pdfResultFile)
+
+    val xmlCreator = EInvoiceXmlCreator()
 
     // create only the XML file
-    val xml = creator.createFacturXXml(invoice)
+    val xml = xmlCreator.createFacturXXml(invoice)
 
     // create a XRechnung
-    val xRechnung = creator.createXRechnungXml(invoice)
+    val xRechnung = xmlCreator.createXRechnungXml(invoice)
 }
 
 private fun createInvoice() = Invoice(
@@ -90,12 +91,12 @@ val invoice: Invoice = createInvoice()
 val existingPdf = File("Invoice.pdf")
 val output = File("Zugferd.pdf")
 
-val creator = EInvoiceCreator()
-
-creator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
+val pdfCreator = EInvoicePdfCreator()
+pdfCreator.attachInvoiceXmlToPdf(invoice, existingPdf, output)
 
 // or if you already have the invoice XML:
-val invoiceXml = creator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
+val xmlCreator = EInvoiceXmlCreator()
+val invoiceXml = xmlCreator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
 
-creator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+pdfCreator.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
 ```
