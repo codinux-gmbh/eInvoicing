@@ -9,6 +9,7 @@ import kotlinx.coroutines.*
 import net.codinux.invoicing.email.model.*
 import net.codinux.invoicing.filesystem.FileUtil
 import net.codinux.invoicing.model.toEInvoicingInstant
+import net.codinux.invoicing.pdf.PdfBoxPdfTextExtractor
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
@@ -28,7 +29,7 @@ import kotlin.math.max
 
 open class EmailsFetcher(
     protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader(),
-    protected open val pdfInvoiceDataExtractor: PdfInvoiceDataExtractor = PdfInvoiceDataExtractor(),
+    protected open val pdfInvoiceDataExtractor: PdfInvoiceDataExtractor = PdfInvoiceDataExtractor(PdfBoxPdfTextExtractor()),
     protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher(),
     protected open val exceptionHelper: ExceptionHelper = ExceptionHelper()
 ) {

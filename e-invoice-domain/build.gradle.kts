@@ -1,8 +1,12 @@
+@file:Suppress("UnstableApiUsage")
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.library")
 }
 
 
@@ -17,6 +21,14 @@ kotlin {
     jvmToolchain(11)
 
     jvm()
+
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+
 
     js {
         moduleName = "e-invoice"
@@ -90,25 +102,59 @@ kotlin {
             implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
         }
 
-        jvmMain.dependencies {
-            implementation("org.mustangproject:library:$mustangVersion")
-            implementation("org.mustangproject:validator:$mustangVersion")
+        val javaCommonMain by creating {
+            dependsOn(commonMain.get())
 
-            // pdf invoice data extraction
-            api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
-            api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
+            dependencies {
+                implementation("org.mustangproject:library:$mustangVersion")
 
-            implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
+                // pdf invoice data extraction
+                api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractor")
+                api("net.dankito.text.extraction:pdfbox-text-extractor:$pdfboxTextExtractor")
+
+                implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
+            }
         }
-        jvmTest.dependencies {
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-            implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-            implementation("org.xmlunit:xmlunit-core:$xunitVersion")
+        val javaCommonTest by creating {
+            dependsOn(commonTest.get())
 
-            implementation("ch.qos.logback:logback-classic:$logbackVersion")
+            dependencies {
+                implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+                implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+            }
+        }
 
-            implementation("ch.qos.logback:logback-classic:$logbackVersion")
+        val jvmMain by getting {
+            dependsOn(javaCommonMain)
+
+            dependencies {
+                implementation("org.mustangproject:validator:$mustangVersion")
+            }
+        }
+        val jvmTest by getting {
+            dependsOn(javaCommonTest)
+
+            dependencies {
+                implementation("org.xmlunit:xmlunit-core:$xunitVersion")
+
+                implementation("ch.qos.logback:logback-classic:$logbackVersion")
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(javaCommonMain)
+
+            dependencies {
+
+            }
+        }
+        val androidUnitTest by getting {
+            dependsOn(javaCommonTest)
+
+            dependencies {
+
+            }
         }
 
 
@@ -126,6 +172,33 @@ kotlin {
         }
     }
 }
+
+
+android {
+    namespace = "net.codinux.invoicing.einvoice.domain"
+
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+
+    lint {
+        this.abortOnError = false
+        this.checkReleaseBuilds = false
+    }
+}
+
 
 
 
