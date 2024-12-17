@@ -19,3 +19,10 @@ expect class LocalDate(year: Int, month: Int, dayOfMonth: Int) : Comparable<Loca
     override fun compareTo(other: LocalDate): Int
 
 }
+
+
+fun LocalDate.toIsoDate() =
+    "$year-${month.toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}"
+
+fun LocalDate.toDotSeparatedIsoDate() =
+    "$year.${month.toString().padStart(2, '0')}.${dayOfMonth.toString().padStart(2, '0')}"

@@ -36,7 +36,7 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
         return result
     }
 
-    override fun toString() = "$year-${month.toString().padStart(2, '0')}-${dayOfMonth.toString().padStart(2, '0')}"
+    override fun toString() = this.toIsoDate()
 
 }
 
