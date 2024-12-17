@@ -169,7 +169,7 @@ open class MustangMapper(
         Date.from(mapToInstant(date))
 
     protected open fun mapToInstant(date: LocalDate): Instant =
-        date.toInstantAtSystemDefaultZone()
+        date.toJvmInstantAtSystemDefaultZone()
 
     @JvmName("mapNullable")
     protected fun map(date: Date?) =

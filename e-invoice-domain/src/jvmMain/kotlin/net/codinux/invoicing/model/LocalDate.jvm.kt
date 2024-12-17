@@ -12,7 +12,7 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
 
     fun toJvmDate() = java.time.LocalDate.of(year, month, dayOfMonth)
 
-    fun toInstantAtSystemDefaultZone(): Instant = toJvmDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
+    fun toJvmInstantAtSystemDefaultZone(): Instant = toJvmDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
 
     actual override fun compareTo(other: LocalDate): Int =
         toJvmDate().compareTo(other.toJvmDate())

@@ -10,7 +10,7 @@ import kotlin.test.Test
 class InstantSerializationTestJvm {
 
     companion object {
-        private val ExpectedInstant = LocalDate(2015, 10, 22).toInstantAtSystemDefaultZone().toEInvoicingInstant()
+        private val ExpectedInstant = LocalDate(2015, 10, 22).toJvmInstantAtSystemDefaultZone().toEInvoicingInstant()
 
         private val ExpectedSerializedJson = """{"value":1445464800.000000000}"""
     }

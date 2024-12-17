@@ -41,7 +41,7 @@ open class FetchEmailsOptions(
     }
 
 
-    val minMessageDate: Instant? by lazy { downloadOnlyMessagesNewerThan?.toInstantAtSystemDefaultZone() }
+    val minMessageDate: Instant? by lazy { downloadOnlyMessagesNewerThan?.toJvmInstantAtSystemDefaultZone() }
 
     fun emailReceived(email: Email) {
         onEmailReceived?.invoke(email)
