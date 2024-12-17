@@ -6,7 +6,9 @@ package net.codinux.invoicing.model
  */
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int) {
 
-    actual companion object { }
+    actual companion object {
+        actual fun now() = LocalDate(0, 0, 0) // TODO
+    }
 
 
     override fun equals(other: Any?): Boolean {

@@ -7,9 +7,7 @@ import java.time.ZoneId
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int) {
 
     actual companion object {
-        fun now() = fromJvmDate(LocalDate.now())
-
-        fun fromJvmDate(date: java.time.LocalDate) = LocalDate(date.year, date.monthValue, date.dayOfMonth)
+        actual fun now() = LocalDate.now().toEInvoicingDate()
     }
 
 

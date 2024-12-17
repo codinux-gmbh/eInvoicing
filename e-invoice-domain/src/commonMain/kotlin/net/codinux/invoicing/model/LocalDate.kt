@@ -6,7 +6,9 @@ package net.codinux.invoicing.model
  */
 expect class LocalDate(year: Int, month: Int, dayOfMonth: Int) {
 
-    companion object // to be able to add static extension methods
+    companion object {
+        fun now(): LocalDate
+    }
 
 
     val dayOfMonth: Int
