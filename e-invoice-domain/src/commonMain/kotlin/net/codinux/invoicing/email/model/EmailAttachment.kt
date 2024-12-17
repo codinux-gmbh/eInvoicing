@@ -2,7 +2,6 @@ package net.codinux.invoicing.email.model
 
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfInvoiceData
-import java.io.File
 
 class EmailAttachment(
     val filename: String,
@@ -18,7 +17,7 @@ class EmailAttachment(
     val contentType: String?,
     val invoice: Invoice? = null,
     val pdfInvoiceData: PdfInvoiceData? = null,
-    val file: File? = null
+    val downloadedFilePath: String? = null
 ) {
     val isPdfFile: Boolean by lazy { extension == "pdf" || mediaType == "application/pdf" }
 
