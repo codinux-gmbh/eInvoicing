@@ -44,6 +44,8 @@ object DataGenerator {
     val ItemArticleNumber: String? = null
     val ItemDescription: String? = null
 
+    val SerializedInvoiceJson = """{"details":{"invoiceNumber":"12345","invoiceDate":{"year":2015,"month":10,"dayOfMonth":21},"dueDate":{"year":2016,"month":6,"dayOfMonth":15},"paymentDescription":"Zahlbar ohne Abzug bis 15.6.2016}"},"supplier":{"name":"Hochwürdiger Leistungserbringer","address":"Fun Street 1","postalCode":"12345","city":"Glückstadt","vatId":"DE123456789","email":"working-class-hero@rock.me","phone":"+4917012345678","bankDetails":{"accountNumber":"DE00123456780987654321","bankCode":"ABZODEFFXXX","accountHolderName":"Manuela Musterfrau","financialInstitutionName":"Abzock-Bank"}},"customer":{"name":"Untertänigster Leistungsempfänger","address":"Party Street 1","postalCode":"12345","city":"Glückstadt","vatId":"DE987654321","email":"exploiter@your.boss","phone":"+491234567890"},"items":[{"name":"Erbrachte Dienstleistungen","quantity":{"value":"1"},"unit":"HUR","unitPrice":{"value":"99"},"vatRate":{"value":"19"}}]}"""
+
 
     fun createInvoice(
         invoiceNumber: String = InvoiceNumber,
