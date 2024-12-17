@@ -58,7 +58,14 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    useFirefoxHeadless()
+                }
+            }
+        }
     }
 
 
