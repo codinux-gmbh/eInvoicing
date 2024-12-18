@@ -2,10 +2,9 @@ package net.codinux.invoicing.serialization
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.codinux.invoicing.model.BigDecimal
+import net.codinux.invoicing.test.TestInstances
 import kotlin.test.Test
 
 class BigDecimalSerializationTestJvm {
@@ -17,11 +16,7 @@ class BigDecimalSerializationTestJvm {
     }
 
 
-    private val objectMapper = ObjectMapper().apply {
-        findAndRegisterModules()
-
-        disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    }
+    private val objectMapper = TestInstances.objectMapper
 
 
     @Test
