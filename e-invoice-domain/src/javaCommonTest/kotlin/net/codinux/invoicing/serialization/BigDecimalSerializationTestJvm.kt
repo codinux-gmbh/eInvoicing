@@ -1,10 +1,11 @@
-package net.codinux.invoicing.model
+package net.codinux.invoicing.serialization
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import net.codinux.invoicing.model.BigDecimal
 import kotlin.test.Test
 
 class BigDecimalSerializationTestJvm {
