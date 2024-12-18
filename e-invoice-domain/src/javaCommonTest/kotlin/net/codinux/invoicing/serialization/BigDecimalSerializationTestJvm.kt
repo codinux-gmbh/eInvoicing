@@ -12,7 +12,7 @@ class BigDecimalSerializationTestJvm {
     companion object {
         private val ExpectedBigDecimal = BigDecimal(123)
 
-        private val ExpectedSerializedJson = """{"value":123}"""
+        private val ExpectedSerializedJson = """{"value":"123"}"""
     }
 
 

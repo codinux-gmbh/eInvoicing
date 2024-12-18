@@ -1,5 +1,6 @@
 package net.codinux.invoicing.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -8,7 +9,10 @@ import java.math.RoundingMode
 
 @Serializable(with = BigDecimalSerializer::class)
 actual class BigDecimal(
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE) @Transient private val value: java.math.BigDecimal = java.math.BigDecimal.ZERO
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE) // use the value: BigDecimal private field for Jackson serialization and deserialization
+    @JsonFormat(shape = JsonFormat.Shape.STRING) // for compatibility with kotlinx-serialization, so that it's enable to deserialize BigDecimals serialized by Jackson, write BigDecimals as string
+    @Transient // for kotlinx-serialization we have an extra serializer, so ignore kotlinx-serialization's default which encodes all constructor properties
+    private val value: java.math.BigDecimal = java.math.BigDecimal.ZERO
 ) : Comparable<BigDecimal> {
 
     actual companion object {
