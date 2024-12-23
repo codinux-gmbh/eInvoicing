@@ -25,6 +25,10 @@ actual class BigDecimal(
     actual constructor(value: Int) : this(java.math.BigDecimal(value))
 
 
+    actual fun toInt(): Int = value.toInt()
+
+    actual fun toDouble(): Double = value.toDouble()
+
     actual fun setScale(newScale: Int) = BigDecimal(value.setScale(newScale))
 
     actual fun toPlainString(): String = value.toPlainString()

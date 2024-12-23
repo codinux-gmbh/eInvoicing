@@ -14,6 +14,10 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
     constructor(value: Int)
 
 
+    fun toInt(): Int
+
+    fun toDouble(): Double
+
     fun setScale(newScale: Int): BigDecimal
 
     fun toPlainString(): String

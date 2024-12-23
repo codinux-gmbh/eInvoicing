@@ -14,6 +14,10 @@ actual class BigDecimal actual constructor(private val value: String) : Comparab
     actual constructor(value: Int) : this(value.toString())
 
 
+    actual fun toInt(): Int = value.split(".").first().toInt()
+
+    actual fun toDouble(): Double = value.toDouble()
+
     actual fun setScale(newScale: Int) = this // TODO
 
     actual fun toPlainString(): String = value
