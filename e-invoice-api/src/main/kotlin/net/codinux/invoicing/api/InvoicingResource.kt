@@ -16,6 +16,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
+import kotlin.io.path.readBytes
 
 @Path("")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -62,6 +63,17 @@ class InvoicingResource(
         val pdfFile = service.createFacturXPdf(invoice)
 
         return createPdfFileResponse(pdfFile, invoice)
+    }
+
+    @Path("create/facturx/pdf")
+    @POST
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
+    @Tag(name = "Create")
+    fun createFacturXPdfByteResponse(invoice: Invoice): ByteArray {
+        val pdfFile = service.createFacturXPdf(invoice)
+
+        return pdfFile.readBytes()
     }
 
     @Path("attach")
