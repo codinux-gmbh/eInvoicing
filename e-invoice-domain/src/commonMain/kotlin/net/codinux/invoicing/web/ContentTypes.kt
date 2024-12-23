@@ -7,5 +7,6 @@ object ContentTypes {
     const val FORM_URL_ENCODED = "application/x-www-form-urlencoded; charset=UTF-8"
     const val MULTIPART = "multipart/form-data; charset=UTF-8"
     const val PLAIN_TEXT = "text/plain; charset=UTF-8"
+    const val OCTET_STREAM = "application/octet-stream"
 
 }

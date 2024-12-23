@@ -4,7 +4,7 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.api.dto.DtoMapper
-import net.codinux.invoicing.api.dto.ExtractInvoiceDataFromXmlDto
+import net.codinux.invoicing.model.dto.ExtractInvoiceDataFromXmlDto
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
