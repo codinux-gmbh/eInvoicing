@@ -58,8 +58,8 @@ class InvoicingService {
         reader.extractFromXml(invoiceXml)
 
 
-    fun validateInvoice(invoiceFile: Path) =
-        validator.validate(invoiceFile.toFile())
+    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false) =
+        validator.validate(invoiceFile.toFile(), disableNotices)
 
 
     private fun createTempPdfFile(): Path =
