@@ -99,8 +99,8 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
-    fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path) =
-        mapper.mapPdfExtractionResult(service.extractInvoiceDataFromPdf(invoice))
+    fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path, @QueryParam("ignoreCalculationErrors") ignoreCalculationErrors: Boolean = false) =
+        mapper.mapPdfExtractionResult(service.extractInvoiceDataFromPdf(invoice, ignoreCalculationErrors))
 
     @Path("extract")
     @POST
@@ -112,8 +112,8 @@ class InvoicingResource(
         content = arrayOf(Content(mediaType = MediaType.APPLICATION_XML, schema = Schema(implementation = org.mustangproject.Invoice::class)))
     )
     @Tag(name = "Extract")
-    fun extractInvoiceDataFromXml(invoiceXml: String) =
-        service.extractInvoiceDataFromXml(invoiceXml).let {
+    fun extractInvoiceDataFromXml(invoiceXml: String, @QueryParam("ignoreCalculationErrors") ignoreCalculationErrors: Boolean = false) =
+        service.extractInvoiceDataFromXml(invoiceXml, ignoreCalculationErrors).let {
             ExtractInvoiceDataFromXmlDto(it.type, it.invoice)
         }
 

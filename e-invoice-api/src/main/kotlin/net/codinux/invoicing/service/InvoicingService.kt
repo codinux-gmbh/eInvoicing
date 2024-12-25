@@ -54,11 +54,11 @@ class InvoicingService {
     }
 
 
-    fun extractInvoiceDataFromPdf(invoiceFile: Path) =
-        reader.extractFromPdf(invoiceFile.toFile())
+    fun extractInvoiceDataFromPdf(invoiceFile: Path, ignoreCalculationErrors: Boolean = false) =
+        reader.extractFromPdf(invoiceFile.toFile(), ignoreCalculationErrors)
 
-    fun extractInvoiceDataFromXml(invoiceXml: String) =
-        reader.extractFromXml(invoiceXml)
+    fun extractInvoiceDataFromXml(invoiceXml: String, ignoreCalculationErrors: Boolean = false) =
+        reader.extractFromXml(invoiceXml, ignoreCalculationErrors)
 
 
     fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): InvoiceValidationResult {

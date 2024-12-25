@@ -22,19 +22,27 @@ open class EInvoiceReader(
     private val log by logger()
 
 
-    open fun extractFromXmlOrNull(xmlFile: File) = orNull { extractFromXml(xmlFile) }
+    open fun extractFromXmlOrNull(xmlFile: File, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXml(xmlFile) }
 
-    open fun extractFromXml(xmlFile: File) = xmlFile.inputStream().use { extractFromXml(it) }
+    open fun extractFromXml(xmlFile: File, ignoreCalculationErrors: Boolean = false) = xmlFile.inputStream().use { extractFromXml(it) }
 
-    open fun extractFromXmlOrNull(stream: InputStream) = orNull { extractFromXml(stream) }
+    open fun extractFromXmlOrNull(stream: InputStream, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXml(stream) }
 
-    open fun extractFromXml(stream: InputStream) = extractFromXml(stream.reader().readText())
+    open fun extractFromXml(stream: InputStream, ignoreCalculationErrors: Boolean = false) = extractFromXml(stream.reader().readText())
 
-    open fun extractFromXmlOrNull(xml: String) = orNull { extractFromXml(xml) }
+    open fun extractFromXmlOrNull(xml: String, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXml(xml) }
 
-    open fun extractFromXml(xml: String): ReadEInvoiceXmlResult {
+    /**
+     * Currently data extraction fails if calculated total amount is wrong. Is can be omitted by setting
+     * [ignoreCalculationErrors] to true.
+     */
+    open fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult {
         return try {
             val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
+            if (ignoreCalculationErrors) {
+                importer.doIgnoreCalculationErrors()
+            }
+
             try {
                 importer.fromXML(xml)
             } catch (e: Throwable) {
@@ -50,20 +58,24 @@ open class EInvoiceReader(
     }
 
 
-    open fun extractFromPdfOrNull(pdfFile: File) = orNull { extractFromPdf(pdfFile) }
+    open fun extractFromPdfOrNull(pdfFile: File, ignoreCalculationErrors: Boolean = false) = orNull { extractFromPdf(pdfFile) }
 
-    open fun extractFromPdf(pdfFile: File) = pdfFile.inputStream().use { extractFromPdf(it) }
+    open fun extractFromPdf(pdfFile: File, ignoreCalculationErrors: Boolean = false) = pdfFile.inputStream().use { extractFromPdf(it) }
 
-    open fun extractFromPdfOrNull(stream: InputStream) = orNull { extractFromPdf(stream) }
+    open fun extractFromPdfOrNull(stream: InputStream, ignoreCalculationErrors: Boolean = false) = orNull { extractFromPdf(stream) }
 
-    open fun extractFromPdf(stream: InputStream): PdfEInvoiceExtractionResult {
+    /**
+     * Currently data extraction fails if calculated total amount is wrong. Is can be omitted by setting
+     * [ignoreCalculationErrors] to true.
+     */
+    open fun extractFromPdf(stream: InputStream, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResult {
         val attachmentsResult = extractXmlFromPdf(stream)
         val invoiceXml = attachmentsResult.invoiceXml
         if (invoiceXml == null) {
             return PdfEInvoiceExtractionResult(null, attachmentsResult)
         }
 
-        return PdfEInvoiceExtractionResult(extractFromXml(invoiceXml), attachmentsResult)
+        return PdfEInvoiceExtractionResult(extractFromXml(invoiceXml, ignoreCalculationErrors), attachmentsResult)
     }
 
 

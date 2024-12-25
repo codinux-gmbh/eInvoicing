@@ -11,8 +11,8 @@ open class WebServiceEInvoiceReader(
     protected open val webClient: WebClient = Constants.DefaultWebClient
 ) {
 
-    open suspend fun extractFromXml(xml: String): ExtractInvoiceDataFromXmlDto? {
-        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromXmlDto::class, xml, ContentTypes.XML, ContentTypes.JSON))
+    open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult? {
+        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromXmlDto::class, xml, ContentTypes.XML, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
 
         if (response.successful) {
             return response.body
@@ -21,14 +21,18 @@ open class WebServiceEInvoiceReader(
         return null
     }
 
-    open suspend fun extractFromPdf(pdfData: ByteArray): ExtractInvoiceDataFromPdfResponseDto? {
-        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromPdfResponseDto::class, pdfData, ContentTypes.OCTET_STREAM, ContentTypes.JSON))
+    open suspend fun extractFromPdf(pdfData: ByteArray, ignoreCalculationErrors: Boolean = false): ExtractInvoiceDataFromPdfResponseDto? {
+        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromPdfResponseDto::class, pdfData, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
 
         if (response.successful) {
             return response.body
         }
 
         return null
+    }
+
+    private fun createQueryParameter(ignoreCalculationErrors: Boolean): Map<String, Any> = buildMap {
+        put("ignoreCalculationErrors", ignoreCalculationErrors)
     }
 
 }
