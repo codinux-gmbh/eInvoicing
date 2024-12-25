@@ -1,11 +1,12 @@
 package net.codinux.invoicing.validation
 
+import kotlinx.coroutines.runBlocking
 import net.codinux.log.logger
 import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
 import java.lang.reflect.Field
 
-open class EInvoiceValidator {
+actual open class EInvoiceValidator {
 
     companion object {
         private val SectionField = getPrivateField("section")
@@ -25,7 +26,10 @@ open class EInvoiceValidator {
     }
 
 
-    open fun validate(fileToValidate: File, disableNotices: Boolean = false): InvoiceValidationResult {
+    actual open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean, invoiceFilename: String?) =
+        validateEInvoiceFile(xml.toByteArray(), disableNotices, invoiceFilename)
+
+    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean, invoiceFilename: String?): InvoiceValidationResult? {
         val validator = object : ZUGFeRDValidator() {
             fun getContext() = this.context
         }
@@ -34,7 +38,7 @@ open class EInvoiceValidator {
             validator.disableNotices()
         }
 
-        val report = validator.validate(fileToValidate.absolutePath)
+        val report = validator.validate(fileContent, invoiceFilename ?: "validation.xml")
 
         val context = validator.getContext()
         val isXmlValid = context.isValid
@@ -44,6 +48,10 @@ open class EInvoiceValidator {
         //  is used and then in a private method before XML validation context.clear() gets called removing all PDF validation results
 
         return InvoiceValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report)
+    }
+
+    open fun validate(fileToValidate: File, disableNotices: Boolean = false) = runBlocking {
+        validateEInvoiceFile(fileToValidate.readBytes(), disableNotices, fileToValidate.name)!!
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
