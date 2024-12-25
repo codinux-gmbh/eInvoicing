@@ -15,7 +15,7 @@ actual open class EInvoiceReader(
     actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean) =
         reader.extractFromPdf(pdfFile, ignoreCalculationErrors)
 
-//    actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult {
-//    }
+    actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray) =
+        reader.extractXmlFromPdf(pdfFile)
 
 }

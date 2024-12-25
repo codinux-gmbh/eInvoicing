@@ -110,6 +110,19 @@ class InvoicingResource(
     fun extractInvoiceDataFromXml(invoiceXml: String, @QueryParam("ignoreCalculationErrors") ignoreCalculationErrors: Boolean = false) =
         service.extractInvoiceDataFromXml(invoiceXml, ignoreCalculationErrors)
 
+    @Path("extractXml")
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "extractXmlFromPdf", summary = "Extract invoice XML from a Factur-X / ZUGFeRD PDF")
+    @RequestBody(
+        description = "The Factur-X/ZUGFeRD or XRechnung XML",
+        content = arrayOf(Content(mediaType = MediaType.APPLICATION_XML, schema = Schema(implementation = org.mustangproject.Invoice::class)))
+    )
+    @Tag(name = "Extract")
+    fun extractInvoiceXmlFromPdf(pdfFile: java.nio.file.Path) =
+        service.extractXmlFromPdf(pdfFile)
+
 
     @Path("validate")
     @POST

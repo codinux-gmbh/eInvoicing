@@ -1,10 +1,10 @@
 package net.codinux.invoicing.reader
 
 import assertk.assertThat
-import assertk.assertions.isEqualByComparingTo
-import assertk.assertions.isNotNull
+import assertk.assertions.*
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestData
 import kotlin.test.Test
@@ -37,6 +37,26 @@ class WebServiceEInvoiceReaderTest {
         assertThat(result!!.type).isEqualByComparingTo(PdfExtractionResultType.Success)
 
         assertInvoice(result.invoice)
+    }
+
+
+    @Test
+    fun extractXmlFromPdf() = runTest {
+        val result = underTest.extractXmlFromPdf(TestData.FacturXPdf)
+
+        assertThat(result).isNotNull()
+        assertThat(result!!.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
+
+        assertThat(result.attachments).hasSize(1)
+
+        val attachment = result.attachments.first()
+        assertThat(attachment.isXmlFile).isTrue()
+        assertThat(attachment.isProbablyEN16931InvoiceXml).isTrue()
+        assertThat(attachment.xml).isEqualTo(result.invoiceXml)
+        assertThat(attachment.filename).isEqualTo("factur-x.xml")
+
+        assertThat(result.invoiceXml).isNotNull()
+        assertThat(result.invoiceXml!!).hasLength(6567)
     }
 
 

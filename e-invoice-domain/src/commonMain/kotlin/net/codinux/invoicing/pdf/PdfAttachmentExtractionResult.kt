@@ -1,5 +1,8 @@
 package net.codinux.invoicing.pdf
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PdfAttachmentExtractionResult(
     val type: PdfAttachmentExtractionResultType,
     val attachments: List<PdfAttachment>

@@ -1,5 +1,8 @@
 package net.codinux.invoicing.pdf
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PdfAttachment(
     val filename: String,
     val isXmlFile: Boolean,

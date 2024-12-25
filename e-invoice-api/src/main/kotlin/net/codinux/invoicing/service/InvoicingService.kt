@@ -61,6 +61,9 @@ class InvoicingService {
     fun extractInvoiceDataFromXml(invoiceXml: String, ignoreCalculationErrors: Boolean = false) =
         reader.extractFromXmlJvm(invoiceXml, ignoreCalculationErrors)
 
+    fun extractXmlFromPdf(pdfFile: Path) =
+        reader.extractXmlFromPdf(pdfFile.toFile())
+
 
     fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): InvoiceValidationResult {
         var file = invoiceFile

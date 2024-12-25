@@ -82,7 +82,7 @@ actual open class EInvoiceReader(
         mapPdfEInvoiceExtractionResult(extractFromPdfInternal(pdfFile, ignoreCalculationErrors))
 
     protected open fun extractFromPdfInternal(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResultJvm {
-        val attachmentsResult = extractXmlFromPdf(pdfFile)
+        val attachmentsResult = extractXmlFromPdfJvm(pdfFile)
         val invoiceXml = attachmentsResult.invoiceXml
         if (attachmentsResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || invoiceXml.isNullOrBlank()) {
             return PdfEInvoiceExtractionResultJvm(null, attachmentsResult)
@@ -112,9 +112,13 @@ actual open class EInvoiceReader(
         return pdfAttachmentReader.getFileAttachments(stream)
     }
 
-    open fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult {
+    // TODO: find a better name
+    open fun extractXmlFromPdfJvm(pdfFile: ByteArray): PdfAttachmentExtractionResult {
         return pdfAttachmentReader.getFileAttachments(pdfFile)
     }
+
+    actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult? =
+        extractXmlFromPdfJvm(pdfFile)
 
 
     open fun extractFromFile(inputStream: InputStream, filename: String, directory: String? = null, mediaType: String? = null): FileEInvoiceExtractionResult = try {
