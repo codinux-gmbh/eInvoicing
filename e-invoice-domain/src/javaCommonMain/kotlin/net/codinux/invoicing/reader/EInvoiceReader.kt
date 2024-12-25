@@ -21,6 +21,9 @@ actual open class EInvoiceReader(
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
+    actual constructor() : this(JavaPlatform.pdfAttachmentReader, MustangMapper())
+
+
     private val log by logger()
 
 

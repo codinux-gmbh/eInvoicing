@@ -3,6 +3,8 @@ package net.codinux.invoicing.api
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
+import net.codinux.invoicing.creation.AttachInvoiceXmlToPdfRequest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
@@ -71,6 +73,7 @@ class InvoicingResource(
         return pdfFile.readBytes()
     }
 
+
     @Path("attach")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -79,12 +82,37 @@ class InvoicingResource(
     @Tag(name = "Create - Attach")
     fun attachInvoiceXmlToPdf(
         @RestForm @PartType(MediaType.APPLICATION_JSON) invoice: Invoice,
-        @RestForm("pdf") @PartType(MediaTypePdf) pdf: FileUpload
+        @RestForm("pdf") @PartType(MediaTypePdf) pdf: FileUpload,
+        @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX
     ): Response {
-        val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile())
+        val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile(), format)
 
         return createPdfFileResponse(pdfFile, invoice)
     }
+
+    @Path("attach")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaTypePdf)
+    @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
+    @Tag(name = "Create - Attach")
+    fun attachInvoiceToPdf(body: AttachInvoiceToPdfRequest): Response {
+        val pdfFile = service.attachInvoiceXmlToPdf(body.invoice, body.pdfFile, body.format)
+
+        return createPdfFileResponse(pdfFile, body.invoice)
+    }
+
+//    @Path("attach/xml")
+//    @POST
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @Produces(MediaTypePdf)
+//    @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
+//    @Tag(name = "Create - Attach")
+//    fun attachInvoiceXmlToPdf(body: AttachInvoiceXmlToPdfRequest): Response {
+//        val pdfFile = service.attachInvoiceXmlToPdf(body.invoiceXml, body.pdfFile, body.format)
+//
+//        return createPdfFileResponse(pdfFile, body.invoiceXml)
+//    }
 
 
 
@@ -140,8 +168,11 @@ class InvoicingResource(
 
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
+        createPdfFileResponse(pdfFile, "${invoice.details.invoiceDate.toString().replace('-', '.')} ${invoice.customer.name} ${invoice.details.invoiceNumber}.pdf")
+
+    private fun createPdfFileResponse(pdfFile: java.nio.file.Path, filename: String): Response =
         Response.ok(pdfFile)
-            .header("Content-Disposition", "attachment;filename=\"${invoice.details.invoiceDate.toString().replace('-', '.')} ${invoice.customer.name} ${invoice.details.invoiceNumber}.pdf\"")
+            .header("Content-Disposition", "attachment;filename=\"$filename\"")
             .build()
 
 }

@@ -46,10 +46,21 @@ class InvoicingService {
         return resultFile
     }
 
-    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path): Path {
+    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Path {
         val resultFile = createTempPdfFile()
 
-        attacher.attachInvoiceXmlToPdf(invoice, pdf.toFile(), resultFile.toFile())
+        attacher.attachInvoiceXmlToPdf(invoice, pdf.toFile(), resultFile.toFile(), format)
+
+        return resultFile
+    }
+
+    fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat) =
+        attachInvoiceXmlToPdf(createInvoiceXml(invoice, format), pdfFile, format)
+
+    fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: ByteArray, format: EInvoiceXmlFormat): Path {
+        val resultFile = createTempPdfFile()
+
+        attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdfFile, resultFile.outputStream())
 
         return resultFile
     }

@@ -1,10 +1,13 @@
 package net.codinux.invoicing.reader
 
+import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.web.WebClient
 
 actual open class EInvoiceReader(
     protected open val reader: WebServiceEInvoiceReader
 ) {
+
+    actual constructor() : this(Constants.DefaultWebClient)
 
     constructor(webClient: WebClient) : this(WebServiceEInvoiceReader(webClient))
 

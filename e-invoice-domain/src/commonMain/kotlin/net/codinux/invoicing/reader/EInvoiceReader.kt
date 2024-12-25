@@ -2,7 +2,7 @@ package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 
-expect open class EInvoiceReader {
+expect open class EInvoiceReader constructor() {
 
     open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult?
 

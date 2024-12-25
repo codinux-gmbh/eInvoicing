@@ -8,5 +8,6 @@ object ContentTypes {
     const val MULTIPART = "multipart/form-data; charset=UTF-8"
     const val PLAIN_TEXT = "text/plain; charset=UTF-8"
     const val OCTET_STREAM = "application/octet-stream"
+    const val PDF = "application/pdf"
 
 }
