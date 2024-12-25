@@ -8,8 +8,11 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
+import net.codinux.invoicing.validation.InvoiceValidationResult
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.*
 
 @Singleton
 class InvoicingService {
@@ -58,8 +61,24 @@ class InvoicingService {
         reader.extractFromXml(invoiceXml)
 
 
-    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false) =
-        validator.validate(invoiceFile.toFile(), disableNotices)
+    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): InvoiceValidationResult {
+        var file = invoiceFile
+
+        // Mustang writes the filename to validation report, so set a nice filename for the report
+        if (invoiceFilename != null) {
+            val destination = invoiceFile.parent.resolve(invoiceFile.name + "_folder").resolve(invoiceFilename)
+            Files.createDirectories(destination.parent)
+            file = invoiceFile.moveTo(destination, true)
+        }
+
+        return validator.validate(file.toFile(), disableNotices).also {
+            // clean moved file
+            file.deleteExisting()
+            if (invoiceFilename != null) { // delete created folder
+                file.parent.deleteExisting()
+            }
+        }
+    }
 
 
     private fun createTempPdfFile(): Path =
