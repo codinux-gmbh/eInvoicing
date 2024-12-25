@@ -121,10 +121,11 @@ class InvoicingResource(
     @Path("validate")
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Validate")
     fun validateInvoiceXml(invoice: java.nio.file.Path, @QueryParam("disableNotices") disableNotices: Boolean = false) =
-        service.validateInvoice(invoice, disableNotices).reportAsXml
+        service.validateInvoice(invoice, disableNotices)
 
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =

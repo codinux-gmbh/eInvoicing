@@ -2,6 +2,7 @@ package net.codinux.invoicing.validation
 
 import assertk.assertThat
 import assertk.assertions.isGreaterThan
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.test.TestData
@@ -34,10 +35,12 @@ class WebServiceEInvoiceValidatorTest {
     }
 
 
-    private fun assertValidationResult(result: String?) {
+    private fun assertValidationResult(result: InvoiceValidationResult?) {
         assertThat(result).isNotNull()
+        assertThat(result!!.xmlValidationResults).isNotEmpty()
 
-        assertThat(result!!.length).isGreaterThan(2_400)
+        val report = result.reportAsXml
+        assertThat(report.length).isGreaterThan(2_400)
     }
 
 }

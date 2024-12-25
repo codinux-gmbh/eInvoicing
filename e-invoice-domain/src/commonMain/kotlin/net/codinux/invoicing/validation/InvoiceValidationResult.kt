@@ -1,5 +1,8 @@
 package net.codinux.invoicing.validation
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class InvoiceValidationResult(
     /**
      * If XML and, if supplied, PDF is valid.
@@ -22,7 +25,7 @@ class InvoiceValidationResult(
 
     val countXmlErrors: Int by lazy { xmlValidationResults.count { it.severity == ValidationResultSeverity.Error } }
 
-    val countXmlFatalOrExcepton: Int by lazy { xmlValidationResults.count { it.severity == ValidationResultSeverity.Fatal || it.severity == ValidationResultSeverity.Exception } }
+    val countXmlFatalOrException: Int by lazy { xmlValidationResults.count { it.severity == ValidationResultSeverity.Fatal || it.severity == ValidationResultSeverity.Exception } }
 
     override fun toString() = when (isValid) {
         true -> "Valid: $reportAsXml"

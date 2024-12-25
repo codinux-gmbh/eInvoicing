@@ -12,8 +12,8 @@ open class WebServiceEInvoiceValidator(
     open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean = false) =
         validateEInvoiceFile(xml.encodeToByteArray(), disableNotices)
 
-    open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean = false): String? {
-        val response = webClient.postAsync(RequestParameters("validate", String::class, fileContent, ContentTypes.OCTET_STREAM, ContentTypes.XML))
+    open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean = false): InvoiceValidationResult? {
+        val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, fileContent, ContentTypes.OCTET_STREAM, ContentTypes.JSON))
 
         if (response.successful) {
             return response.body

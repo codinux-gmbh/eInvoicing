@@ -21,7 +21,7 @@ class EInvoiceValidatorTest {
         assertThat(result.xmlValidationResults).hasSize(3)
         assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(2)
-        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
+        assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
 
     @Test
@@ -36,7 +36,7 @@ class EInvoiceValidatorTest {
         assertThat(result.xmlValidationResults).hasSize(5)
         assertThat(result.countXmlNotices).isEqualTo(5)
         assertThat(result.countXmlErrors).isEqualTo(0)
-        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
+        assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
 
     @Test
@@ -50,7 +50,7 @@ class EInvoiceValidatorTest {
         assertThat(result.xmlValidationResults).hasSize(5)
         assertThat(result.countXmlNotices).isEqualTo(5)
         assertThat(result.countXmlErrors).isEqualTo(0)
-        assertThat(result.countXmlFatalOrExcepton).isEqualTo(0)
+        assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
 
 
