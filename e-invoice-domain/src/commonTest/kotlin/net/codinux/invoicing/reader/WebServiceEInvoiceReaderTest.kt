@@ -5,8 +5,6 @@ import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.dto.ExtractInvoiceDataFromXmlDto
-import net.codinux.invoicing.model.dto.PdfExtractionResultType
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestData
 import kotlin.test.Test
@@ -42,7 +40,7 @@ class WebServiceEInvoiceReaderTest {
     }
 
 
-    private fun assertInvoice(result: ExtractInvoiceDataFromXmlDto?) {
+    private fun assertInvoice(result: ReadEInvoiceXmlResult?) {
         assertThat(result).isNotNull()
         assertThat(result!!.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
 

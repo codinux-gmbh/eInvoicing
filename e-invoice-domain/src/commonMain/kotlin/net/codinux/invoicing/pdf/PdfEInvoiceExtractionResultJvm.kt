@@ -1,10 +1,10 @@
 package net.codinux.invoicing.pdf
 
 import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.reader.ReadEInvoiceXmlResult
+import net.codinux.invoicing.reader.ReadEInvoiceXmlResultJvm
 
-data class PdfEInvoiceExtractionResult(
-    val readEInvoiceXmlResult: ReadEInvoiceXmlResult?,
+data class PdfEInvoiceExtractionResultJvm(
+    val readEInvoiceXmlResult: ReadEInvoiceXmlResultJvm?,
     val attachmentExtractionResult: PdfAttachmentExtractionResult
 ) {
     val invoice: Invoice? = readEInvoiceXmlResult?.invoice

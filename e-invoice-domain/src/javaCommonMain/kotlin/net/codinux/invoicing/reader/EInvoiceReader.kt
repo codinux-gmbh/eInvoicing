@@ -3,8 +3,9 @@ package net.codinux.invoicing.reader
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
+import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.pdf.PdfAttachmentReader
-import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResult
+import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResultJvm
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
@@ -14,7 +15,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
-open class EInvoiceReader(
+actual open class EInvoiceReader(
     protected open val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
@@ -28,15 +29,16 @@ open class EInvoiceReader(
 
     open fun extractFromXmlOrNull(stream: InputStream, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXml(stream) }
 
-    open fun extractFromXml(stream: InputStream, ignoreCalculationErrors: Boolean = false) = extractFromXml(stream.reader().readText())
+    open fun extractFromXml(stream: InputStream, ignoreCalculationErrors: Boolean = false) = extractFromXmlJvm(stream.reader().readText())
 
-    open fun extractFromXmlOrNull(xml: String, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXml(xml) }
+    open fun extractFromXmlOrNull(xml: String, ignoreCalculationErrors: Boolean = false) = orNull { extractFromXmlJvm(xml) }
 
     /**
      * Currently data extraction fails if calculated total amount is wrong. Is can be omitted by setting
      * [ignoreCalculationErrors] to true.
      */
-    open fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult {
+    // TODO: find a better name
+    open fun extractFromXmlJvm(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResultJvm {
         return try {
             val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
             if (ignoreCalculationErrors) {
@@ -47,15 +49,20 @@ open class EInvoiceReader(
                 importer.fromXML(xml)
             } catch (e: Throwable) {
                 log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
-                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, null, e)
+                return ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.InvalidXml, null, e)
             }
 
-            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
+            ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
         } catch (e: Throwable) {
             log.error(e) { "Could not extract invoice from XML:\n$xml" }
-            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
+            return ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
         }
     }
+
+    actual open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean): ReadEInvoiceXmlResult? =
+        extractFromXmlJvm(xml, ignoreCalculationErrors).let {
+            ReadEInvoiceXmlResult(it.type, it.invoice)
+        }
 
 
     open fun extractFromPdfOrNull(pdfFile: File, ignoreCalculationErrors: Boolean = false) = orNull { extractFromPdf(pdfFile) }
@@ -68,15 +75,31 @@ open class EInvoiceReader(
      * Currently data extraction fails if calculated total amount is wrong. Is can be omitted by setting
      * [ignoreCalculationErrors] to true.
      */
-    open fun extractFromPdf(stream: InputStream, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResult {
-        val attachmentsResult = extractXmlFromPdf(stream)
+    open fun extractFromPdf(stream: InputStream, ignoreCalculationErrors: Boolean = false) =
+        extractFromPdfInternal(stream.readAllBytes(), ignoreCalculationErrors)
+
+    actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean): PdfEInvoiceExtractionResult? =
+        mapPdfEInvoiceExtractionResult(extractFromPdfInternal(pdfFile, ignoreCalculationErrors))
+
+    protected open fun extractFromPdfInternal(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResultJvm {
+        val attachmentsResult = extractXmlFromPdf(pdfFile)
         val invoiceXml = attachmentsResult.invoiceXml
-        if (invoiceXml == null) {
-            return PdfEInvoiceExtractionResult(null, attachmentsResult)
+        if (attachmentsResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || invoiceXml.isNullOrBlank()) {
+            return PdfEInvoiceExtractionResultJvm(null, attachmentsResult)
         }
 
-        return PdfEInvoiceExtractionResult(extractFromXml(invoiceXml, ignoreCalculationErrors), attachmentsResult)
+        return PdfEInvoiceExtractionResultJvm(extractFromXmlJvm(invoiceXml, ignoreCalculationErrors), attachmentsResult)
     }
+
+    open fun mapPdfEInvoiceExtractionResult(result: PdfEInvoiceExtractionResultJvm) =
+        PdfEInvoiceExtractionResult(mapPdfExtractionResultType(result), result.invoice)
+
+    protected open fun mapPdfExtractionResultType(result: PdfEInvoiceExtractionResultJvm): PdfExtractionResultType =
+        if (result.attachmentExtractionResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || result.readEInvoiceXmlResult == null) {
+            PdfExtractionResultType.valueOf(result.attachmentExtractionResult.type.name)
+        } else {
+            PdfExtractionResultType.valueOf(result.readEInvoiceXmlResult.type.name)
+        }
 
 
     open fun extractXmlFromPdfOrNull(pdfFile: File) = orNull { extractXmlFromPdf(pdfFile) }
@@ -87,6 +110,10 @@ open class EInvoiceReader(
 
     open fun extractXmlFromPdf(stream: InputStream): PdfAttachmentExtractionResult {
         return pdfAttachmentReader.getFileAttachments(stream)
+    }
+
+    open fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult {
+        return pdfAttachmentReader.getFileAttachments(pdfFile)
     }
 
 

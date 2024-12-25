@@ -19,9 +19,9 @@ class PdfBoxPdfAttachmentReader : PdfAttachmentReader {
     private val log by logger()
 
 
-    override fun getFileAttachments(pdfInputStream: InputStream): PdfAttachmentExtractionResult {
+    override fun getFileAttachments(pdfFile: ByteArray): PdfAttachmentExtractionResult {
         try {
-            Loader.loadPDF(pdfInputStream.readAllBytes()).use { document ->
+            Loader.loadPDF(pdfFile).use { document ->
                 val names = PDDocumentNameDictionary(document.documentCatalog) // documentCatalog is never null
                 val embeddedFiles = names.embeddedFiles
                 if (embeddedFiles == null) {

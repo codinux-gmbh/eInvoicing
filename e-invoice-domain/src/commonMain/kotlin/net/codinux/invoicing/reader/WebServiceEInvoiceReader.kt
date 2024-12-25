@@ -1,8 +1,6 @@
 package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.config.Constants
-import net.codinux.invoicing.model.dto.ExtractInvoiceDataFromPdfResponseDto
-import net.codinux.invoicing.model.dto.ExtractInvoiceDataFromXmlDto
 import net.codinux.invoicing.web.ContentTypes
 import net.codinux.invoicing.web.RequestParameters
 import net.codinux.invoicing.web.WebClient
@@ -12,7 +10,7 @@ open class WebServiceEInvoiceReader(
 ) {
 
     open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult? {
-        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromXmlDto::class, xml, ContentTypes.XML, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
+        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoiceXmlResult::class, xml, ContentTypes.XML, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
 
         if (response.successful) {
             return response.body
@@ -21,8 +19,8 @@ open class WebServiceEInvoiceReader(
         return null
     }
 
-    open suspend fun extractFromPdf(pdfData: ByteArray, ignoreCalculationErrors: Boolean = false): ExtractInvoiceDataFromPdfResponseDto? {
-        val response = webClient.postAsync(RequestParameters("extract", ExtractInvoiceDataFromPdfResponseDto::class, pdfData, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
+    open suspend fun extractFromPdf(pdfData: ByteArray, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResult? {
+        val response = webClient.postAsync(RequestParameters("extract", PdfEInvoiceExtractionResult::class, pdfData, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
 
         if (response.successful) {
             return response.body

@@ -6,6 +6,7 @@ import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
 import net.codinux.invoicing.creation.JvmEInvoicePdfCreator
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.reader.PdfEInvoiceExtractionResult
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import net.codinux.invoicing.validation.InvoiceValidationResult
@@ -54,11 +55,11 @@ class InvoicingService {
     }
 
 
-    fun extractInvoiceDataFromPdf(invoiceFile: Path, ignoreCalculationErrors: Boolean = false) =
-        reader.extractFromPdf(invoiceFile.toFile(), ignoreCalculationErrors)
+    fun extractInvoiceDataFromPdf(invoiceFile: Path, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResult? =
+        reader.mapPdfEInvoiceExtractionResult(reader.extractFromPdf(invoiceFile.toFile(), ignoreCalculationErrors))
 
     fun extractInvoiceDataFromXml(invoiceXml: String, ignoreCalculationErrors: Boolean = false) =
-        reader.extractFromXml(invoiceXml, ignoreCalculationErrors)
+        reader.extractFromXmlJvm(invoiceXml, ignoreCalculationErrors)
 
 
     fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): InvoiceValidationResult {

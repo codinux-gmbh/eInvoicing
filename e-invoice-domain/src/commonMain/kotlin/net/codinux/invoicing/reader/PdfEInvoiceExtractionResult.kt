@@ -1,10 +1,10 @@
-package net.codinux.invoicing.model.dto
+package net.codinux.invoicing.reader
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
 
 @Serializable
-data class ExtractInvoiceDataFromPdfResponseDto(
+data class PdfEInvoiceExtractionResult(
     val type: PdfExtractionResultType,
     val invoice: Invoice?,
 )

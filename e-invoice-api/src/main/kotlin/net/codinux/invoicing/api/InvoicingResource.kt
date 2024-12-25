@@ -3,8 +3,6 @@ package net.codinux.invoicing.api
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import net.codinux.invoicing.api.dto.DtoMapper
-import net.codinux.invoicing.model.dto.ExtractInvoiceDataFromXmlDto
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
@@ -28,9 +26,6 @@ class InvoicingResource(
     companion object {
         private const val MediaTypePdf = "application/pdf"
     }
-
-
-    private val mapper: DtoMapper = DtoMapper()
 
 
     @Path("create")
@@ -100,7 +95,7 @@ class InvoicingResource(
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
     fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path, @QueryParam("ignoreCalculationErrors") ignoreCalculationErrors: Boolean = false) =
-        mapper.mapPdfExtractionResult(service.extractInvoiceDataFromPdf(invoice, ignoreCalculationErrors))
+        service.extractInvoiceDataFromPdf(invoice, ignoreCalculationErrors)
 
     @Path("extract")
     @POST
@@ -113,9 +108,7 @@ class InvoicingResource(
     )
     @Tag(name = "Extract")
     fun extractInvoiceDataFromXml(invoiceXml: String, @QueryParam("ignoreCalculationErrors") ignoreCalculationErrors: Boolean = false) =
-        service.extractInvoiceDataFromXml(invoiceXml, ignoreCalculationErrors).let {
-            ExtractInvoiceDataFromXmlDto(it.type, it.invoice)
-        }
+        service.extractInvoiceDataFromXml(invoiceXml, ignoreCalculationErrors)
 
 
     @Path("validate")
