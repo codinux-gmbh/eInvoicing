@@ -1,6 +1,7 @@
 package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentWriter
@@ -27,7 +28,7 @@ open class EInvoiceXmlToPdfAttacher(
     }
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: InputStream, outputFile: OutputStream) =
-        attachInvoiceXmlToPdf(invoiceXml, format, pdfFile.readAllBytes(), outputFile)
+        attachInvoiceXmlToPdf(invoiceXml, format, pdfFile.readAllBytesAndClose(), outputFile)
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: ByteArray, outputFile: OutputStream) =
         attachmentWriter.addFileAttachment(pdfFile, format, invoiceXml, outputFile)

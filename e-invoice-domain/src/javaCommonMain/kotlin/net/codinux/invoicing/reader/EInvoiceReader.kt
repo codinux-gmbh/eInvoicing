@@ -1,5 +1,6 @@
 package net.codinux.invoicing.reader
 
+import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
@@ -76,7 +77,7 @@ actual open class EInvoiceReader(
      * [ignoreCalculationErrors] to true.
      */
     open fun extractFromPdf(stream: InputStream, ignoreCalculationErrors: Boolean = false) =
-        extractFromPdfInternal(stream.readAllBytes(), ignoreCalculationErrors)
+        extractFromPdfInternal(stream.readAllBytesAndClose(), ignoreCalculationErrors)
 
     actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean): PdfEInvoiceExtractionResult? =
         mapPdfEInvoiceExtractionResult(extractFromPdfInternal(pdfFile, ignoreCalculationErrors))
