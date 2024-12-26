@@ -13,6 +13,8 @@ kotlin {
 
 val quarkusVersion: String by project
 
+val eInvoicingDomainVersion: String = version.toString()
+
 val mustangVersion: String by project
 
 val klfVersion: String by project
@@ -31,7 +33,9 @@ dependencies {
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
 //    implementation(project(":e-invoice-domain")) // after making e-invoice-domain a multiplatform project, Quarkus does not seem to be able to reference it via project()
-    implementation("net.codinux.invoicing:e-invoice:0.6.0-SNAPSHOT")
+    implementation("net.codinux.invoicing:e-invoice:$eInvoicingDomainVersion") {
+        exclude("io.ktor") // remove Ktor 3.x (which we don't use as we don't contact the backend - we are the backend!) as in conflicts with LokiLogger's Ktor 2.x
+    }
 
     compileOnly("org.mustangproject:library:$mustangVersion") // only required for documenting REST API
 
