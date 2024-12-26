@@ -4,10 +4,11 @@ import jakarta.mail.BodyPart
 import jakarta.mail.Message
 import jakarta.mail.Part
 import jakarta.mail.Store
+import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.email.model.EmailAccount
 import net.codinux.invoicing.email.model.FetchEmailError
 import net.codinux.invoicing.email.model.FetchEmailErrorType
-import net.codinux.invoicing.filesystem.FileUtil
+import net.codinux.invoicing.filesystem.FilesystemService
 import org.eclipse.angus.mail.imap.IMAPFolder
 import java.io.File
 
@@ -16,11 +17,12 @@ data class FetchEmailsStatus(
     val store: Store,
     val folder: IMAPFolder,
     val options: FetchEmailsOptions,
-    val messageSpecificErrors: MutableList<FetchEmailError> = mutableListOf()
+    val messageSpecificErrors: MutableList<FetchEmailError> = mutableListOf(),
+    val filesystem: FilesystemService = DIJava.Filesystem
 ) {
 
     val userAttachmentsDownloadDirectory: File by lazy {
-        val userDirName = FileUtil.removeIllegalFileCharacters(account.username)
+        val userDirName = filesystem.removeIllegalFileCharacters(account.username)
 
         File(options.attachmentsDownloadDirectory, userDirName).also { it.mkdirs() }
     }

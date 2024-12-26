@@ -6,8 +6,10 @@ import jakarta.mail.event.MessageCountEvent
 import jakarta.mail.internet.InternetAddress
 import jakarta.mail.internet.MimeUtility
 import kotlinx.coroutines.*
+import net.codinux.invoicing.config.DI
+import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.email.model.*
-import net.codinux.invoicing.filesystem.FileUtil
+import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.model.toEInvoicingInstant
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
@@ -30,7 +32,8 @@ open class EmailsFetcher(
     protected open val eInvoiceReader: EInvoiceReader = EInvoiceReader(),
     protected open val pdfInvoiceDataExtractor: PdfInvoiceDataExtractor = PdfInvoiceDataExtractor(),
     protected open val coroutineDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(max(24, Runtime.getRuntime().availableProcessors() * 4)).asCoroutineDispatcher(),
-    protected open val exceptionHelper: ExceptionHelper = ExceptionHelper()
+    protected open val filesystem: FilesystemService = DIJava.Filesystem,
+    protected open val exceptionHelper: ExceptionHelper = DI.ExceptionHelper
 ) {
 
     protected data class MessagePart(
@@ -276,7 +279,7 @@ open class EmailsFetcher(
         }
 
     private fun downloadAttachment(part: Part, status: FetchEmailsStatus) =
-        File(status.userAttachmentsDownloadDirectory, FileUtil.removeIllegalFileCharacters(part.fileName)).also { file ->
+        File(status.userAttachmentsDownloadDirectory, filesystem.removeIllegalFileCharacters(part.fileName)).also { file ->
             part.inputStream.use { inputStream ->
                 file.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
