@@ -1,6 +1,6 @@
 package net.codinux.invoicing.creation
 
-import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.config.DI
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.web.WebClient
@@ -9,7 +9,7 @@ actual open class EInvoicePdfCreator(protected open val pdfCreator: WebServiceEI
 
     constructor(webClient: WebClient) : this(WebServiceEInvoicePdfCreator(webClient))
 
-    actual constructor() : this(Constants.DefaultWebClient)
+    actual constructor() : this(DI.DefaultWebClient)
 
 
     /**

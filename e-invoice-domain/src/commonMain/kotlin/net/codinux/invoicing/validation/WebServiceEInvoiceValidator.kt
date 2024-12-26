@@ -1,12 +1,12 @@
 package net.codinux.invoicing.validation
 
-import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.config.DI
 import net.codinux.invoicing.web.ContentTypes
 import net.codinux.invoicing.web.RequestParameters
 import net.codinux.invoicing.web.WebClient
 
 open class WebServiceEInvoiceValidator(
-    protected open val webClient: WebClient = Constants.DefaultWebClient,
+    protected open val webClient: WebClient = DI.DefaultWebClient,
 ) {
 
     open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean = false, invoiceFilename: String? = null) =

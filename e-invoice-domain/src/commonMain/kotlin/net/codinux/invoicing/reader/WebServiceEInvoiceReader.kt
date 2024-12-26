@@ -1,13 +1,13 @@
 package net.codinux.invoicing.reader
 
-import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.config.DI
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.web.ContentTypes
 import net.codinux.invoicing.web.RequestParameters
 import net.codinux.invoicing.web.WebClient
 
 open class WebServiceEInvoiceReader(
-    protected open val webClient: WebClient = Constants.DefaultWebClient
+    protected open val webClient: WebClient = DI.DefaultWebClient
 ) {
 
     open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult? {
