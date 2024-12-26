@@ -7,9 +7,9 @@ import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import kotlin.test.Test
 
-class JvmEInvoicePdfCreatorTest {
+class EInvoicePdfCreatorTest {
 
-    private val underTest = JvmEInvoicePdfCreator()
+    private val underTest = EInvoicePdfCreator()
 
 
     @Test
@@ -17,7 +17,7 @@ class JvmEInvoicePdfCreatorTest {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.FacturX)
+        underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX, testFile)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
         val xml = importer.utF8
@@ -30,7 +30,7 @@ class JvmEInvoicePdfCreatorTest {
         val invoice = createInvoice()
         val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createPdfWithAttachedXml(invoice, testFile, EInvoiceXmlFormat.XRechnung)
+        underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.XRechnung, testFile)
 
         val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
         val xml = importer.utF8
