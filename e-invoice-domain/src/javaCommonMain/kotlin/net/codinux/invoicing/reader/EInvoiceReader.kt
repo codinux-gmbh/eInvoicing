@@ -13,7 +13,6 @@ import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import java.io.InputStream
 import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
 actual open class EInvoiceReader(
@@ -127,24 +126,23 @@ actual open class EInvoiceReader(
 
     open fun extractFromFile(inputStream: InputStream, filename: String, directory: String? = null, mediaType: String? = null): FileEInvoiceExtractionResult = try {
         val extension = Path(filename).extension.lowercase()
-        val path = if (directory != null) Path(directory).resolve(filename).absolutePathString() else filename
 
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, path, extractFromPdf(inputStream), null)
+                val result = extractFromPdf(inputStream)
+                FileEInvoiceExtractionResult(filename, directory, PdfEInvoiceExtractionResult(mapPdfExtractionResultType(result), result.invoice), result.readEInvoiceXmlResult)
             }
         } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, path, null, extractFromXml(inputStream))
+                FileEInvoiceExtractionResult(filename, directory, null, extractFromXml(inputStream))
             }
         } else {
-            FileEInvoiceExtractionResult(filename, directory, path, null, null)
+            FileEInvoiceExtractionResult(filename, directory, null, null)
         }
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${directory?.let { "$it/" } ?: ""}$filename" }
 
-        val path = if (directory != null) Path(directory).resolve(filename).absolutePathString() else filename // duplicate code
-        FileEInvoiceExtractionResult(filename, directory, path, null, null)
+        FileEInvoiceExtractionResult(filename, directory, null, null)
     }
 
 
