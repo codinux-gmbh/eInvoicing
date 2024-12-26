@@ -63,9 +63,7 @@ actual open class EInvoiceReader(
     }
 
     actual open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean): ReadEInvoiceXmlResult? =
-        extractFromXmlJvm(xml, ignoreCalculationErrors).let {
-            ReadEInvoiceXmlResult(it.type, it.invoice)
-        }
+        extractFromXmlJvm(xml, ignoreCalculationErrors)
 
 
     open fun extractFromPdfOrNull(pdfFile: File, ignoreCalculationErrors: Boolean = false) = orNull { extractFromPdf(pdfFile) }
