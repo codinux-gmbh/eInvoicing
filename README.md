@@ -13,6 +13,28 @@ throughout the documentation and code.
 implementation("net.codinux.invoicing:e-invoice:0.5.2")
 ```
 
+### Android
+
+On Android for working with PDFs the Android application context is required. Call this line before creating and PDF relevant classes (like EInvoiceReader or EInvoiceCreator):
+
+```kotlin
+AndroidContext.applicationContext = this.applicationContext
+```
+
+E.g. in MainActivity:
+
+```kotlin
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        net.codinux.invoicing.platform.AndroidContext.applicationContext = this.applicationContext
+        // ...
+    }
+}
+```
+
 ## Reading
 
 ### Extract eInvoice from a PDF or XML file:
