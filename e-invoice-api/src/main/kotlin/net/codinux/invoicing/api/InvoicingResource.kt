@@ -72,6 +72,18 @@ class InvoicingResource(
         return pdfFile.readBytes()
     }
 
+    @Path("create/facturx/pdf")
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Operation(summary = "Create a Factur-X / ZUGFeRD from supplied invoice XML and attaches supplied XML to it")
+    @Tag(name = "Create")
+    fun createFacturXPdfByteResponse(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): ByteArray {
+        val pdfFile = service.createFacturXPdf(invoiceXml, format)
+
+        return pdfFile.readBytes()
+    }
+
 
     @Path("attach")
     @POST
