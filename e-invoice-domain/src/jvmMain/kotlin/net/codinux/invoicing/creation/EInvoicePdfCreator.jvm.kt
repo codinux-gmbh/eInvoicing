@@ -102,6 +102,6 @@ actual open class EInvoicePdfCreator(
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
-        xmlCreator.createInvoiceXml(invoice, format)
+        xmlCreator.createInvoiceXmlJvm(invoice, format)
 
 }

@@ -60,10 +60,10 @@ class Demonstration {
         val xmlCreator = EInvoiceXmlCreator()
 
         // create only the XML file
-        val xml = xmlCreator.createFacturXXml(invoice)
+        val xml = xmlCreator.createFacturXXmlJvm(invoice)
 
         // create a XRechnung
-        val xRechnung = xmlCreator.createXRechnungXml(invoice)
+        val xRechnung = xmlCreator.createXRechnungXmlJvm(invoice)
     }
 
     fun attachInvoiceXmlToPdf() {
@@ -76,7 +76,7 @@ class Demonstration {
 
         // or if you already have the invoice XML:
         val xmlCreator = EInvoiceXmlCreator()
-        val invoiceXml = xmlCreator.createXRechnungXml(invoice) // or creator.createZugferdXml(invoice), ...
+        val invoiceXml = xmlCreator.createXRechnungXmlJvm(invoice) // or creator.createZugferdXml(invoice), ...
 
         attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
     }

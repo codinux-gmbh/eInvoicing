@@ -13,7 +13,7 @@ class EInvoiceXmlCreatorTest {
     fun createXRechnung() {
         val invoice = createInvoice()
 
-        val result = underTest.createXRechnungXml(invoice)
+        val result = underTest.createXRechnungXmlJvm(invoice)
 
         assertInvoiceXml(result)
     }
@@ -22,7 +22,7 @@ class EInvoiceXmlCreatorTest {
     fun createFacturXXml() {
         val invoice = createInvoice()
 
-        val result = underTest.createFacturXXml(invoice)
+        val result = underTest.createFacturXXmlJvm(invoice)
 
         assertInvoiceXml(result)
     }

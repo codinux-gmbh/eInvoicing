@@ -35,7 +35,7 @@ open class EInvoiceXmlToPdfAttacher(
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
-        xmlCreator.createInvoiceXml(invoice, format)
+        xmlCreator.createInvoiceXmlJvm(invoice, format)
 
     protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =
         Constants.getProfileNameForFormat(format)

@@ -6,20 +6,40 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import org.mustangproject.ZUGFeRD.*
 
-open class EInvoiceXmlCreator(
+actual open class EInvoiceXmlCreator(
     protected open val mapper: MustangMapper = MustangMapper()
 ) {
 
-    open fun createXRechnungXml(invoice: Invoice) = createInvoiceXml(invoice, EInvoiceXmlFormat.XRechnung)
+    actual constructor() : this(MustangMapper())
+
+
+    actual open suspend fun createXRechnungXml(invoice: Invoice): String? =
+        createXRechnungXmlJvm(invoice)
+
+    actual open suspend fun createZugferdXml(invoice: Invoice): String? =
+        createZugferdXmlJvm(invoice)
+
+    actual open suspend fun createFacturXXml(invoice: Invoice): String? =
+        createFacturXXmlJvm(invoice)
+
+    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String? =
+        createInvoiceXmlJvm(invoice, format)
+
+
+    // TODO: find a better name
+    open fun createXRechnungXmlJvm(invoice: Invoice) = createInvoiceXmlJvm(invoice, EInvoiceXmlFormat.XRechnung)
 
     /**
-     * Synonym for [createFacturXXml] (ZUGFeRD 2 is a synonym for Factur-X).
+     * Synonym for [createFacturXXmlJvm] (ZUGFeRD 2 is a synonym for Factur-X).
      */
-    open fun createZugferdXml(invoice: Invoice) = createFacturXXml(invoice)
+    // TODO: find a better name
+    open fun createZugferdXmlJvm(invoice: Invoice) = createFacturXXmlJvm(invoice)
 
-    open fun createFacturXXml(invoice: Invoice) = createInvoiceXml(invoice, EInvoiceXmlFormat.FacturX)
+    // TODO: find a better name
+    open fun createFacturXXmlJvm(invoice: Invoice) = createInvoiceXmlJvm(invoice, EInvoiceXmlFormat.FacturX)
 
-    open fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String {
+    // TODO: find a better name
+    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): String {
         val exporter = ZUGFeRDExporterFromA3()
             .setProfile(getProfileNameForFormat(format))
 
