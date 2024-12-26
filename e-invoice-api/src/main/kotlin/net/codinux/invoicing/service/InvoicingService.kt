@@ -38,10 +38,10 @@ class InvoicingService {
     fun createFacturXXml(invoice: Invoice): String =
         xmlCreator.createFacturXXml(invoice)
 
-    fun createFacturXPdf(invoice: Invoice): Path {
+    fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Path {
         val resultFile = createTempPdfFile()
 
-        pdfCreator.createPdfWithAttachedXml(invoice, resultFile.toFile())
+        pdfCreator.createPdfWithAttachedXml(invoice, resultFile.toFile(), format)
 
         return resultFile
     }

@@ -4,7 +4,6 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
-import net.codinux.invoicing.creation.AttachInvoiceXmlToPdfRequest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.service.InvoicingService
@@ -56,8 +55,8 @@ class InvoicingResource(
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdf(invoice: Invoice): Response {
-        val pdfFile = service.createFacturXPdf(invoice)
+    fun createFacturXPdf(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+        val pdfFile = service.createFacturXPdf(invoice, format)
 
         return createPdfFileResponse(pdfFile, invoice)
     }
@@ -67,8 +66,8 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdfByteResponse(invoice: Invoice): ByteArray {
-        val pdfFile = service.createFacturXPdf(invoice)
+    fun createFacturXPdfByteResponse(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): ByteArray {
+        val pdfFile = service.createFacturXPdf(invoice, format)
 
         return pdfFile.readBytes()
     }
