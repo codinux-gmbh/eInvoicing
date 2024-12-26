@@ -7,7 +7,7 @@ import net.codinux.invoicing.web.ContentTypes
 import net.codinux.invoicing.web.RequestParameters
 import net.codinux.invoicing.web.WebClient
 
-class WebServiceEInvoiceXmlToPdfAttacher(
+open class WebServiceEInvoiceXmlToPdfAttacher(
     protected open val webClient: WebClient = Constants.DefaultWebClient,
 ) {
 
