@@ -1,16 +1,16 @@
 package net.codinux.invoicing.service
 
 import jakarta.inject.Singleton
+import net.codinux.invoicing.config.DIJava
+import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
-import net.codinux.invoicing.creation.JvmEInvoicePdfCreator
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.reader.PdfEInvoiceExtractionResult
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import net.codinux.invoicing.validation.InvoiceValidationResult
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -20,7 +20,7 @@ class InvoicingService {
 
     private val xmlCreator = EInvoiceXmlCreator()
 
-    private val pdfCreator = JvmEInvoicePdfCreator()
+    private val pdfCreator = EInvoicePdfCreator()
 
     private val attacher = EInvoiceXmlToPdfAttacher()
 
@@ -28,20 +28,22 @@ class InvoicingService {
 
     private val validator = EInvoiceValidator()
 
+    private val filesystem = DIJava.Filesystem
+
 
     fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
-        xmlCreator.createInvoiceXml(invoice, format)
+        xmlCreator.createInvoiceXmlJvm(invoice, format)
 
     fun createXRechnung(invoice: Invoice): String =
-        xmlCreator.createXRechnungXml(invoice)
+        xmlCreator.createXRechnungXmlJvm(invoice)
 
     fun createFacturXXml(invoice: Invoice): String =
-        xmlCreator.createFacturXXml(invoice)
+        xmlCreator.createFacturXXmlJvm(invoice)
 
     fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Path {
         val resultFile = createTempPdfFile()
 
-        pdfCreator.createPdfWithAttachedXml(invoice, resultFile.toFile(), format)
+        pdfCreator.createPdfWithAttachedXml(invoice, format, resultFile)
 
         return resultFile
     }
@@ -106,8 +108,6 @@ class InvoicingService {
 
 
     private fun createTempPdfFile(): Path =
-        File.createTempFile("factur-x", ".pdf")
-            .also { it.deleteOnExit() }
-            .toPath()
+        filesystem.createTempPdfFile().toPath()
 
 }
