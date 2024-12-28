@@ -190,11 +190,17 @@ kotlin {
         }
         nativeMain {
             dependsOn(nonJvmMain)
-
-            dependencies {
-                implementation("io.ktor:ktor-client-cio:$ktorVersion")
-            }
         }
+        appleMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+        }
+        linuxMain.dependencies {
+            implementation("io.ktor:ktor-client-curl:$ktorVersion")
+        }
+        mingwMain.dependencies {
+            implementation("io.ktor:ktor-client-winhttp:$ktorVersion")
+        }
+
         jsMain {
             dependsOn(nonJvmMain)
 
