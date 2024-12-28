@@ -2,10 +2,8 @@ package net.codinux.invoicing.web
 
 import io.ktor.client.*
 import io.ktor.client.call.body
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.timeout
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -14,6 +12,7 @@ import io.ktor.util.*
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import net.codinux.log.logger
 
 open class KtorWebClient(
     protected open val baseUrl: String? = null
@@ -22,6 +21,8 @@ open class KtorWebClient(
     protected open val json = Json {
         ignoreUnknownKeys = true
     }
+
+    protected val log by logger()
 
     protected open val client = HttpClient { configureClient(this) }
 
@@ -64,6 +65,7 @@ open class KtorWebClient(
 
             mapHttResponse(method, parameters, httpResponse)
         } catch (e: Throwable) {
+            log.error(e) { "Error during request to ${method.value} ${parameters.url}" }
             WebClientResponse(false, error = e)
         }
     }
@@ -113,7 +115,12 @@ open class KtorWebClient(
         val headers = httpResponse.headers.toMap()
 
         return if (httpResponse.status.isSuccess()) {
-            WebClientResponse(true, statusCode, headers, body = decodeResponse(parameters, httpResponse))
+            try {
+                WebClientResponse(true, statusCode, headers, body = decodeResponse(parameters, httpResponse))
+            } catch (e: Throwable) {
+                log.error(e) { "Error while mapping response of: ${method.value} ${httpResponse.request.url}, ${httpResponse.headers.toMap()}" }
+                WebClientResponse(true, statusCode, headers, WebClientException(statusCode, e.message ?: ""))
+            }
         } else {
             val responseBody = httpResponse.bodyAsText()
 
