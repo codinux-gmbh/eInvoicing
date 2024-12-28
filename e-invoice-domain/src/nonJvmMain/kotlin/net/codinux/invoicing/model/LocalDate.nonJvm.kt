@@ -11,7 +11,7 @@ import net.codinux.invoicing.serialization.LocalDateSerializer
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int): Comparable<LocalDate> {
 
     actual companion object {
-        actual fun now() = LocalDate(0, 0, 0) // TODO
+        actual fun now() = LocalDate(2025, 1, 1) // TODO
     }
 
 
