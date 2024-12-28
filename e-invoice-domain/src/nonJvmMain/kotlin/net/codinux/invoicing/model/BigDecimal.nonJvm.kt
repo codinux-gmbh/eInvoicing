@@ -28,11 +28,12 @@ actual class BigDecimal actual constructor(private val value: String) : Comparab
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is BigDecimal) return false
-        return true
+
+        return value.equals(other.value)
     }
 
     override fun hashCode(): Int {
-        return this::class.hashCode()
+        return value.hashCode()
     }
 
     override fun toString() = value
