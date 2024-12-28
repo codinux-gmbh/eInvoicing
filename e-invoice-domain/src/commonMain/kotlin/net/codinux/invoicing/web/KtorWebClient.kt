@@ -28,7 +28,7 @@ open class KtorWebClient(
 
     private fun configureClient(config: HttpClientConfig<*>) {
         config.apply {
-            install(HttpTimeout)
+            install(HttpTimeout) // JS doesn't support connectTimeout and socketTimeout
             install(ContentNegotiation) {
                 json()
             }
