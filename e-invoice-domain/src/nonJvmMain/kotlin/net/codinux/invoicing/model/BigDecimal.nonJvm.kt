@@ -18,7 +18,29 @@ actual class BigDecimal actual constructor(private val value: String) : Comparab
 
     actual fun toDouble(): Double = value.toDouble()
 
-    actual fun setScale(newScale: Int) = this // TODO
+    actual fun setScale(newScale: Int): BigDecimal {
+        val indexOfDot = value.lastIndexOf('.')
+        if (indexOfDot != -1) {
+            val countFractionDigits = value.length - indexOfDot - 1
+            if (countFractionDigits != newScale) {
+                val diff = newScale - countFractionDigits
+
+                val newValue = if (newScale == 0) {
+                    value.substring(0, indexOfDot)
+                } else if (diff < 0) {
+                    value.substring(0, indexOfDot + newScale + 1)
+                } else {
+                    value.padEnd(indexOfDot + newScale + 1, '0')
+                }
+
+                return BigDecimal(newValue)
+            }
+        } else if (newScale != 0) {
+            return BigDecimal(value + "." + "".padEnd(newScale, '0'))
+        }
+
+        return this
+    }
 
     actual fun toPlainString(): String = value
 
