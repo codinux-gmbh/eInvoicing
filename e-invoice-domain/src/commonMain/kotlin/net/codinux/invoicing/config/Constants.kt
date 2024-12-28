@@ -5,11 +5,6 @@ import net.codinux.invoicing.web.KtorWebClient
 
 object Constants {
 
-    val BackendBaseUrl = "http://0.0.0.0:8091/invoicing"
-
-    val DefaultWebClient = KtorWebClient(BackendBaseUrl)
-
-
     const val FacturXProfileName = "EN16931" // available values: MINIMUM, BASICWL, BASIC, CIUS, EN16931, EXTENDED, XRECHNUNG
 
     const val XRechnungProfileName = "XRECHNUNG"
