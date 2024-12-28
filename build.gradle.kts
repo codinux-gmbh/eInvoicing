@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
     group = "net.codinux.invoicing"
-    version = "0.6.0-SNAPSHOT"
+    version = "0.6.0"
 
     ext["sourceCodeRepositoryBaseUrl"] = "git.dankito.net/codinux/eInvoicing"
 
