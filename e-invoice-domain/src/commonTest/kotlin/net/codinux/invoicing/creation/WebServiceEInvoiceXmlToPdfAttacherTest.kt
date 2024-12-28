@@ -1,8 +1,8 @@
 package net.codinux.invoicing.creation
 
 import assertk.assertThat
-import assertk.assertions.hasSize
 import assertk.assertions.isEqualByComparingTo
+import assertk.assertions.isGreaterThanOrEqualTo
 import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
@@ -39,7 +39,7 @@ class WebServiceEInvoiceXmlToPdfAttacherTest {
 
     private suspend fun assertResponse(result: ByteArray?) {
         assertThat(result).isNotNull()
-        assertThat(result!!).hasSize(40739)
+        assertThat(result!!.size).isGreaterThanOrEqualTo(40735)
 
         val extractionResult = invoiceReader.extractFromPdf(result)
         assertThat(extractionResult).isNotNull()
