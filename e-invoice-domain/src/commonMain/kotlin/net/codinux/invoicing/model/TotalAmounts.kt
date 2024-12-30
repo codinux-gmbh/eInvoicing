@@ -46,5 +46,9 @@ class TotalAmounts(
      */
     val duePayableAmount: BigDecimal
 ) {
+    companion object {
+        val Zero = TotalAmounts(BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero, BigDecimal.Zero)
+    }
+
     override fun toString() = "${duePayableAmount.toPlainString()} (net: ${taxBasisTotalAmount.toPlainString()}, tax: ${taxTotalAmount.toPlainString()})"
 }
