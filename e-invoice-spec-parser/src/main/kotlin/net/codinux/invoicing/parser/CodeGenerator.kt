@@ -175,6 +175,7 @@ class CodeGenerator {
         val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it.values[0] }
 
         val rows = cefByIsoCode.map { (code, cefRow) ->
+            val enumName = if (code.toString().equals("NIL", true)) "${code}_" else code.toString() // cannot use "NIL" as an enum name as it's a keyword on apple system
             val row = zugferdByIsoCode[code]!!.first()
             val values = row.values
             val i18nUnit = i18nUnitsByCode[code] ?: run {
@@ -184,7 +185,7 @@ class CodeGenerator {
                 else null
             }
 
-            Row(listOf(code, values[1], i18nUnit?.symbol, row.isFrequentlyUsedValue), row.isFrequentlyUsedValue)
+            Row(listOf(code, values[1], i18nUnit?.symbol, row.isFrequentlyUsedValue), row.isFrequentlyUsedValue, enumName)
         }
 
         return columns to rows.sortedBy { it.values[0].toString() } // sort by code
