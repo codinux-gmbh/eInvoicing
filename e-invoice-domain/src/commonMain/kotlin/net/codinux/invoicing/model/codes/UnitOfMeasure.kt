@@ -1509,7 +1509,6 @@ enum class UnitOfMeasure(val code: String, val englishName: String, val symbol: 
 	NCL("NCL", "number of cells", null, false),
 	NEW("NEW", "newton", "N", false),
 	NF("NF", "message", null, false),
-	NIL_("NIL", "nil", "()", false),
 	NIU("NIU", "number of international units", null, false),
 	NL("NL", "load", null, false),
 	NM3("NM3", "Normalised cubic metre", null, false),

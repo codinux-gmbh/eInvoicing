@@ -174,7 +174,11 @@ class CodeGenerator {
         val cefByIsoCode = cefCodeList.rows.associateBy { it.values[0] }
         val zugferdByIsoCode = zugferdCodeList.rows.groupBy { it.values[0] }
 
-        val rows = cefByIsoCode.map { (code, cefRow) ->
+        val rows = cefByIsoCode.mapNotNull { (code, cefRow) ->
+            if (code.toString().equals("NIL", true)) {
+                return@mapNotNull null // cannot use "NIL" as an enum name as it's a keyword on apple system
+            }
+
             val enumName = if (code.toString().equals("NIL", true)) "${code}_" else code.toString() // cannot use "NIL" as an enum name as it's a keyword on apple system
             val row = zugferdByIsoCode[code]!!.first()
             val values = row.values
