@@ -20,7 +20,7 @@ class CodeListsGeneratorApp {
 
         var outputDirectoryBasePath = zipFile.parentFile.parentFile.absolutePath.replace("e-invoice-spec-parser", "e-invoice-domain")
         if (outputDirectoryBasePath.contains("/build/resources/main")) {
-            outputDirectoryBasePath = outputDirectoryBasePath.replace("/build/resources/main", "/src/main")
+            outputDirectoryBasePath = outputDirectoryBasePath.replace("/build/resources/main", "/src/commonMain")
         }
         val outputDirectory = File(outputDirectoryBasePath, "kotlin/net/codinux/invoicing/model/codes").also { it.mkdirs() }
 
