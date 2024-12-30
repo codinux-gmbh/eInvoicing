@@ -2,11 +2,12 @@ package net.codinux.invoicing.calculator
 
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.*
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import org.mustangproject.ZUGFeRD.IExportableTransaction
 import org.mustangproject.ZUGFeRD.TransactionCalculator
 import java.math.BigDecimal
 
-open class AmountsCalculator {
+actual open class AmountsCalculator {
 
     protected open val mapper by lazy { MustangMapper() } // lazy to avoid circular dependency creation with MustangMapper
 
@@ -14,6 +15,13 @@ open class AmountsCalculator {
 
     private val party by lazy { Party("", "", null, null, "") }
 
+
+    actual open suspend fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>): TotalAmounts? =
+        calculateTotalAmountsJvm(itemPrices)
+
+    // TODO: find a better name
+    open fun calculateTotalAmountsJvm(itemPrices: Collection<InvoiceItemPrice>): TotalAmounts =
+        calculateTotalAmounts(itemPrices.map { InvoiceItem("", it.quantity, UnitOfMeasure.ZZ, it.unitPrice, it.vatRate) })
 
     open fun calculateTotalAmounts(items: List<InvoiceItem>) =
         calculateTotalAmounts(Invoice(invoiceDetails, party, party, items))

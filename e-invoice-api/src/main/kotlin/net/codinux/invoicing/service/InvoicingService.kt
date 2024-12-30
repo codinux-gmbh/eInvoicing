@@ -1,6 +1,8 @@
 package net.codinux.invoicing.service
 
 import jakarta.inject.Singleton
+import net.codinux.invoicing.calculator.AmountsCalculator
+import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
@@ -27,6 +29,8 @@ class InvoicingService {
     private val reader = EInvoiceReader()
 
     private val validator = EInvoiceValidator()
+
+    private val amountsCalculator = AmountsCalculator()
 
     private val filesystem = DIJava.Filesystem
 
@@ -105,6 +109,10 @@ class InvoicingService {
             }
         }
     }
+
+
+    fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =
+        amountsCalculator.calculateTotalAmountsJvm(itemPrices)
 
 
     private fun createTempPdfFile(): Path =

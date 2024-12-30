@@ -3,6 +3,7 @@ package net.codinux.invoicing.api
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
@@ -176,6 +177,18 @@ class InvoicingResource(
         @QueryParam("invoiceFilename") invoiceFilename: String? = null
     ) =
         service.validateInvoice(invoice, disableNotices, invoiceFilename)
+
+
+    @Path("calculateTotalAmounts")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Calculates invoice total amounts from invoice item prices")
+    @Tag(name = "Tools - Calculate")
+    fun calculateTotalAmounts(
+        itemPrices: List<InvoiceItemPrice>
+    ) =
+        service.calculateTotalAmounts(itemPrices)
 
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =

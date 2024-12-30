@@ -1,11 +1,8 @@
 package net.codinux.invoicing.calculator
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
 import net.codinux.invoicing.model.BigDecimal
 import net.codinux.invoicing.model.InvoiceItem
 import net.codinux.invoicing.model.codes.UnitOfMeasure
-import java.math.RoundingMode
 import kotlin.test.Test
 
 class AmountsCalculatorTest {
@@ -22,17 +19,14 @@ class AmountsCalculatorTest {
 
         val result = underTest.calculateTotalAmounts(items)
 
-        val expectedNetAmount = BigDecimal(7 * 5 + 20 * 5).setScale(2)
-        val expectedVatAmount = BigDecimal((7 * 5 * 0.19 + 20 * 5 * 0.07).toString()).setScale(2, RoundingMode.DOWN)
-        val expectedTotalAmount = expectedNetAmount + expectedVatAmount
+        WebServiceAmountsCalculatorTest.assertTotalAmounts(result)
+    }
 
-        assertThat(result.lineTotalAmount).isEqualTo(expectedNetAmount)
-        assertThat(result.taxBasisTotalAmount).isEqualTo(expectedNetAmount)
+    @Test
+    fun calculateTotalAmountsFromInvoiceItemPrices() {
+        val result = underTest.calculateTotalAmountsJvm(WebServiceAmountsCalculatorTest.itemPrices)
 
-        assertThat(result.taxTotalAmount).isEqualTo(expectedVatAmount)
-
-        assertThat(result.grandTotalAmount).isEqualTo(expectedTotalAmount)
-        assertThat(result.duePayableAmount).isEqualTo(expectedTotalAmount)
+        WebServiceAmountsCalculatorTest.assertTotalAmounts(result)
     }
 
 }
