@@ -179,6 +179,6 @@ enum class Currency(val alpha3Code: String, val numericCode: Int?, val currencyS
 	YuanRenminbi("CNY", 156, "CN¥", "Yuan Renminbi", setOf("CHINA"), false),
 	ZambianKwacha("ZMW", 967, "ZMW", "Zambian Kwacha", setOf("ZAMBIA"), false),
 	ZimbabweDollar("ZWL", null, "ZWL", "Zimbabwe Dollar", setOf("ZIMBABWE"), false),
-	ZimbabweGold("ZWG", 924, null, "Zimbabwe Gold", emptySet(), false),
+	ZimbabweGold("ZWG", 924, "ZWG", "Zimbabwe Gold", emptySet(), false),
 	Zloty("PLN", 985, "PLN", "Zloty", setOf("POLAND"), true),
 }
