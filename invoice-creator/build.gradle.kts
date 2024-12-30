@@ -7,10 +7,6 @@ kotlin {
     jvmToolchain(11)
 }
 
-java {
-    withSourcesJar()
-}
-
 
 val openHtmlToPdfVersion: String by project
 
