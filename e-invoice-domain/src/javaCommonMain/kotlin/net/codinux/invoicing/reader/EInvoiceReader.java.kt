@@ -52,13 +52,13 @@ actual open class EInvoiceReader(
                 importer.fromXML(xml)
             } catch (e: Throwable) {
                 log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
-                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, null, e)
+                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
             }
 
-            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
+            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer))
         } catch (e: Throwable) {
             log.error(e) { "Could not extract invoice from XML:\n$xml" }
-            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
+            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, e)
         }
     }
 
