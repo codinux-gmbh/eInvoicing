@@ -20,8 +20,8 @@ open class WebServiceEInvoiceReader(
         return null
     }
 
-    open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResult? {
-        val response = webClient.postAsync(RequestParameters("extract", PdfEInvoiceExtractionResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
+    open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): ReadEInvoicePdfResult? {
+        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoicePdfResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
 
         if (response.successful) {
             return response.body

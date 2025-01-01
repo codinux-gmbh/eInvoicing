@@ -34,7 +34,7 @@ class WebServiceEInvoiceReaderTest {
         val result = underTest.extractFromPdf(TestData.FacturXPdf)
 
         assertThat(result).isNotNull()
-        assertThat(result!!.type).isEqualByComparingTo(PdfExtractionResultType.Success)
+        assertThat(result!!.type).isEqualByComparingTo(ReadEInvoicePdfResultType.Success)
 
         assertInvoice(result.invoice)
     }

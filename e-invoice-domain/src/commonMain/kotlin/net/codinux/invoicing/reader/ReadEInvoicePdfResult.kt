@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
 
 @Serializable
-data class PdfEInvoiceExtractionResult(
-    val type: PdfExtractionResultType,
+data class ReadEInvoicePdfResult(
+    val type: ReadEInvoicePdfResultType,
     val invoice: Invoice?,
 )
 
@@ -13,7 +13,7 @@ data class PdfEInvoiceExtractionResult(
  * A combination of [net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType]
  * and [net.codinux.invoicing.reader.ReadEInvoiceXmlResultType]
  */
-enum class PdfExtractionResultType {
+enum class ReadEInvoicePdfResultType {
     // PdfAttachmentExtractionResultType without HasXmlAttachments
     NotAPdf,
     NoAttachments,

@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
-import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResultJvm
+import net.codinux.invoicing.pdf.ReadEInvoicePdfResultJvm
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.InvoiceXmlAsserter
 import net.codinux.invoicing.test.TestUtils
@@ -68,7 +68,7 @@ class EInvoiceReaderTest {
         assertInvoice(result.invoice)
     }
 
-    private fun assertInvoice(result: PdfEInvoiceExtractionResultJvm) {
+    private fun assertInvoice(result: ReadEInvoicePdfResultJvm) {
         assertThat(result.attachmentExtractionResult.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
         assertThat(result.attachmentExtractionResult.attachments).hasSize(1)
 

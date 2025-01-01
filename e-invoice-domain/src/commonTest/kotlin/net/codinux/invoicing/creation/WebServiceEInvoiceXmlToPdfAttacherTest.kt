@@ -7,7 +7,7 @@ import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.reader.EInvoiceReader
-import net.codinux.invoicing.reader.PdfExtractionResultType
+import net.codinux.invoicing.reader.ReadEInvoicePdfResultType
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestData
@@ -43,7 +43,7 @@ class WebServiceEInvoiceXmlToPdfAttacherTest {
 
         val extractionResult = invoiceReader.extractFromPdf(result)
         assertThat(extractionResult).isNotNull()
-        assertThat(extractionResult!!.type).isEqualByComparingTo(PdfExtractionResultType.Success)
+        assertThat(extractionResult!!.type).isEqualByComparingTo(ReadEInvoicePdfResultType.Success)
         InvoiceAsserter.assertInvoice(extractionResult.invoice)
     }
 

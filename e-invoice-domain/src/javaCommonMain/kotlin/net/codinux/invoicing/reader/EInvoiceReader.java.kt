@@ -6,7 +6,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.pdf.PdfAttachmentReader
-import net.codinux.invoicing.pdf.PdfEInvoiceExtractionResultJvm
+import net.codinux.invoicing.pdf.ReadEInvoicePdfResultJvm
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
@@ -79,27 +79,27 @@ actual open class EInvoiceReader(
     open fun extractFromPdf(stream: InputStream, ignoreCalculationErrors: Boolean = false) =
         extractFromPdfInternal(stream.readAllBytesAndClose(), ignoreCalculationErrors)
 
-    actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean): PdfEInvoiceExtractionResult? =
+    actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean): ReadEInvoicePdfResult? =
         mapPdfEInvoiceExtractionResult(extractFromPdfInternal(pdfFile, ignoreCalculationErrors))
 
-    protected open fun extractFromPdfInternal(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): PdfEInvoiceExtractionResultJvm {
+    protected open fun extractFromPdfInternal(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): ReadEInvoicePdfResultJvm {
         val attachmentsResult = extractXmlFromPdfJvm(pdfFile)
         val invoiceXml = attachmentsResult.invoiceXml
         if (attachmentsResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || invoiceXml.isNullOrBlank()) {
-            return PdfEInvoiceExtractionResultJvm(null, attachmentsResult)
+            return ReadEInvoicePdfResultJvm(null, attachmentsResult)
         }
 
-        return PdfEInvoiceExtractionResultJvm(extractFromXmlJvm(invoiceXml, ignoreCalculationErrors), attachmentsResult)
+        return ReadEInvoicePdfResultJvm(extractFromXmlJvm(invoiceXml, ignoreCalculationErrors), attachmentsResult)
     }
 
-    open fun mapPdfEInvoiceExtractionResult(result: PdfEInvoiceExtractionResultJvm) =
-        PdfEInvoiceExtractionResult(mapPdfExtractionResultType(result), result.invoice)
+    open fun mapPdfEInvoiceExtractionResult(result: ReadEInvoicePdfResultJvm) =
+        ReadEInvoicePdfResult(mapPdfExtractionResultType(result), result.invoice)
 
-    protected open fun mapPdfExtractionResultType(result: PdfEInvoiceExtractionResultJvm): PdfExtractionResultType =
+    protected open fun mapPdfExtractionResultType(result: ReadEInvoicePdfResultJvm): ReadEInvoicePdfResultType =
         if (result.attachmentExtractionResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || result.readEInvoiceXmlResult == null) {
-            PdfExtractionResultType.valueOf(result.attachmentExtractionResult.type.name)
+            ReadEInvoicePdfResultType.valueOf(result.attachmentExtractionResult.type.name)
         } else {
-            PdfExtractionResultType.valueOf(result.readEInvoiceXmlResult.type.name)
+            ReadEInvoicePdfResultType.valueOf(result.readEInvoiceXmlResult.type.name)
         }
 
 
@@ -128,7 +128,7 @@ actual open class EInvoiceReader(
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             inputStream.use {
                 val result = extractFromPdf(inputStream)
-                FileEInvoiceExtractionResult(filename, directory, PdfEInvoiceExtractionResult(mapPdfExtractionResultType(result), result.invoice), result.readEInvoiceXmlResult)
+                FileEInvoiceExtractionResult(filename, directory, ReadEInvoicePdfResult(mapPdfExtractionResultType(result), result.invoice), result.readEInvoiceXmlResult)
             }
         } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             inputStream.use {

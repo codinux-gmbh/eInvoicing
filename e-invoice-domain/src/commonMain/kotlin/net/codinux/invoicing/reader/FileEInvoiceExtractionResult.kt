@@ -5,7 +5,7 @@ import net.codinux.invoicing.model.Invoice
 data class FileEInvoiceExtractionResult(
     val filename: String,
     val directory: String?,
-    val pdf: PdfEInvoiceExtractionResult?,
+    val pdf: ReadEInvoicePdfResult?,
     val xml: ReadEInvoiceXmlResult?
 ) {
     val invoice: Invoice? = pdf?.invoice ?: xml?.invoice
