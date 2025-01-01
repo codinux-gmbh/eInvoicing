@@ -41,7 +41,7 @@ actual open class EInvoiceReader(
      * [ignoreCalculationErrors] to true.
      */
     // TODO: find a better name
-    open fun extractFromXmlJvm(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResultJvm {
+    open fun extractFromXmlJvm(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult {
         return try {
             val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
             if (ignoreCalculationErrors) {
@@ -52,13 +52,13 @@ actual open class EInvoiceReader(
                 importer.fromXML(xml)
             } catch (e: Throwable) {
                 log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
-                return ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.InvalidXml, null, e)
+                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, null, e)
             }
 
-            ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
+            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer), null)
         } catch (e: Throwable) {
             log.error(e) { "Could not extract invoice from XML:\n$xml" }
-            return ReadEInvoiceXmlResultJvm(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
+            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, null, e)
         }
     }
 

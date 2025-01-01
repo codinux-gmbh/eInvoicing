@@ -61,7 +61,7 @@ class EInvoiceReaderTest {
     private fun getInvalidInvoiceFile(filename: String) = TestUtils.getInvalidInvoiceFileAsStream(filename)
 
 
-    private fun assertInvoice(result: ReadEInvoiceXmlResultJvm) {
+    private fun assertInvoice(result: ReadEInvoiceXmlResult) {
         assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
         assertThat(result.readError).isNull()
 
