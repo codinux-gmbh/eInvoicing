@@ -13,6 +13,7 @@ data class PdfAttachmentExtractionResult(
     }
 
 
+    // TODO: fix that Jackson should not serialize invoiceXml
     val invoiceXml: String? by lazy { attachments.firstOrNull { it.isProbablyEN16931InvoiceXml && it.xml != null }?.xml }
 
     override fun toString() = "$type: ${attachments.joinToString()}"

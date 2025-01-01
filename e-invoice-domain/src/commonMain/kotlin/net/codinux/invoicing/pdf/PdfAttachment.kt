@@ -7,7 +7,7 @@ data class PdfAttachment(
     val filename: String,
     val isXmlFile: Boolean,
     val isProbablyEN16931InvoiceXml: Boolean,
-    val xml: String?
+    val xml: String? = null
 ) {
     override fun toString() = "$filename (isInvoiceXml? $isProbablyEN16931InvoiceXml)"
 }

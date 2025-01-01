@@ -2,11 +2,13 @@ package net.codinux.invoicing.reader
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 
 @Serializable
 data class ReadEInvoicePdfResult(
     val type: ReadEInvoicePdfResultType,
-    val invoice: Invoice?,
+    val attachmentExtractionResult: PdfAttachmentExtractionResult,
+    val invoice: Invoice? = null,
 )
 
 /**
