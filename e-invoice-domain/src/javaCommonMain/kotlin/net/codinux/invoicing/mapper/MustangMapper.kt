@@ -36,7 +36,7 @@ open class MustangMapper(
         this.sender = mapParty(invoice.supplier)
         this.recipient = mapParty(invoice.customer)
 
-        this.setZFItems(ArrayList(invoice.items.map { mapLineItem(it) }))
+        this.setZFItems(ArrayList(invoice.items.map { mapInvoiceItem(it) }))
 
         this.dueDate = map(invoice.details.dueDate)
         this.paymentTermDescription = invoice.details.paymentDescription
@@ -75,7 +75,7 @@ open class MustangMapper(
         }
     }
 
-    open fun mapLineItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
+    open fun mapInvoiceItem(item: InvoiceItem): IZUGFeRDExportableItem = Item(
         // description has to be an empty string if not set
         Product(item.name, item.description ?: "", item.unit.code, item.vatRate.toJvmBigDecimal()).apply {
             this.sellerAssignedID = item.articleNumber // TODO: what is the articleNumber? sellerAssignedId, globalId, ...?
@@ -112,7 +112,7 @@ open class MustangMapper(
 
         supplier = mapParty(invoice.sender),
         customer = mapParty(invoice.recipient),
-        items = invoice.zfItems.map { mapLineItem(it) },
+        items = invoice.zfItems.map { mapInvoiceItem(it) },
 
         customerReferenceNumber = invoice.referenceNumber,
 
@@ -128,7 +128,7 @@ open class MustangMapper(
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )
 
-    open fun mapLineItem(item: IZUGFeRDExportableItem) = InvoiceItem(
+    open fun mapInvoiceItem(item: IZUGFeRDExportableItem) = InvoiceItem(
         // TODO: what to use as fallback if unit cannot be determined?
         item.product.name, item.quantity.toEInvoicingBigDecimal(), item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ZZ,
         item.price.toEInvoicingBigDecimal(), item.product.vatPercent.toEInvoicingBigDecimal(), item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
