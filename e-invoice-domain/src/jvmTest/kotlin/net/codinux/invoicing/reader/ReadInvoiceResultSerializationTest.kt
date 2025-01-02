@@ -152,6 +152,33 @@ class ReadInvoiceResultSerializationTest {
     }
 
 
+    @Test
+    fun extractFromFile_Xml() {
+        val fileExtractionResult = reader.extractFromFile(getTestFile("XRechnung.xml"), "XRechnung.xml")
+
+        val json = jacksonObjectMapper.writeValueAsString(fileExtractionResult)
+
+        val decoded = kotlinxJson.decodeFromString<FileEInvoiceExtractionResult>(json)
+
+        assertThat(fileExtractionResult.filename).isEqualTo(decoded.filename)
+        assertThat(decoded.xml).isNotNull()
+        assertEquals(fileExtractionResult.xml!!, decoded.xml!!)
+    }
+
+    @Test
+    fun extractFromFile_Pdf() {
+        val fileExtractionResult = reader.extractFromFile(getTestFile("ZUGFeRD.pdf"), "ZUGFeRD.pdf")
+
+        val json = jacksonObjectMapper.writeValueAsString(fileExtractionResult)
+
+        val decoded = kotlinxJson.decodeFromString<FileEInvoiceExtractionResult>(json)
+
+        assertThat(fileExtractionResult.filename).isEqualTo(decoded.filename)
+        assertThat(decoded.pdf).isNotNull()
+        assertEquals(fileExtractionResult.pdf, decoded.pdf!!)
+    }
+
+
     private fun getTestFile(filename: String) = TestUtils.getTestFileAsStream(filename)
 
     private fun getInvalidInvoiceFile(filename: String) = TestUtils.getInvalidInvoiceFileAsStream(filename)
