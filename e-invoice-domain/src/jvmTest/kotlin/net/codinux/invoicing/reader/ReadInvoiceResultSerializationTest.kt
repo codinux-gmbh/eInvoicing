@@ -164,6 +164,28 @@ class ReadInvoiceResultSerializationTest {
         assertEquals(attachmentExtractionResult, decoded)
     }
 
+    @Test
+    fun extractXmlFromPdf_readError() {
+        val attachmentExtractionResult = reader.extractXmlFromPdf(getInvalidInvoiceFile("NotAValidPdf.pdf"))
+
+        val json = jacksonObjectMapper.writeValueAsString(attachmentExtractionResult)
+
+        val decoded = kotlinxJson.decodeFromString<PdfAttachmentExtractionResult>(json)
+
+        assertEquals(attachmentExtractionResult, decoded)
+    }
+
+    @Test
+    fun extractXmlFromPdf_readError_SerializedJsonEquals() {
+        val attachmentExtractionResult = reader.extractXmlFromPdf(getInvalidInvoiceFile("NotAValidPdf.pdf"))
+
+        val jacksonResult = jacksonObjectMapper.writeValueAsString(attachmentExtractionResult)
+
+        val kotlinxSerializationResult = kotlinxJson.encodeToString(attachmentExtractionResult)
+
+        assertThat(jacksonResult).isEqualTo(kotlinxSerializationResult)
+    }
+
 
     @Test
     fun extractFromFile_Xml() {

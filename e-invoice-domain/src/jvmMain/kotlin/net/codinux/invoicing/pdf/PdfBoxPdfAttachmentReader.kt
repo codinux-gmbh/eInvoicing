@@ -51,7 +51,7 @@ class PdfBoxPdfAttachmentReader : PdfAttachmentReader {
             }
         } catch (e: Throwable) {
             log.info(e) { "Could not list XML file attachments of PDF" }
-            return PdfAttachmentExtractionResult(PdfAttachmentExtractionResultType.NotAPdf, emptyList())
+            return PdfAttachmentExtractionResult(PdfAttachmentExtractionResultType.NotAPdf, e)
         }
     }
 
