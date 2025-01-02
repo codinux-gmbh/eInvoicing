@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
-import net.codinux.invoicing.pdf.ReadEInvoicePdfResultJvm
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.InvoiceXmlAsserter
 import net.codinux.invoicing.test.TestUtils
@@ -37,7 +36,7 @@ class EInvoiceReaderTest {
 
         assertThat(result.invoice).isNull()
         assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.InvalidInvoiceData)
-        assertThat(result.readError).isNotNull().hasClass(IllegalArgumentException::class)
+        assertThat(result.readError?.type).isNotNull().isEqualTo("IllegalArgumentException")
     }
 
 
@@ -68,7 +67,7 @@ class EInvoiceReaderTest {
         assertInvoice(result.invoice)
     }
 
-    private fun assertInvoice(result: ReadEInvoicePdfResultJvm) {
+    private fun assertInvoice(result: ReadEInvoicePdfResult) {
         assertThat(result.attachmentExtractionResult.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
         assertThat(result.attachmentExtractionResult.attachments).hasSize(1)
 
@@ -77,9 +76,9 @@ class EInvoiceReaderTest {
         assertThat(attachment.isProbablyEN16931InvoiceXml).isTrue()
         InvoiceXmlAsserter.assertInvoiceXml(attachment.xml)
 
-        assertThat(result.readEInvoiceXmlResult).isNotNull()
-        assertThat(result.readEInvoiceXmlResult!!.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
-        assertThat(result.readEInvoiceXmlResult!!.readError).isNull()
+        assertThat(result.type).isEqualByComparingTo(ReadEInvoicePdfResultType.Success)
+        assertThat(result.attachmentExtractionResult.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
+        assertThat(result.readError).isNull()
 
         assertInvoice(result.invoice)
     }

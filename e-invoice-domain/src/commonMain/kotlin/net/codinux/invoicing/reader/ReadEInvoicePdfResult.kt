@@ -2,6 +2,7 @@ package net.codinux.invoicing.reader
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 
 @Serializable
@@ -9,7 +10,13 @@ data class ReadEInvoicePdfResult(
     val type: ReadEInvoicePdfResultType,
     val attachmentExtractionResult: PdfAttachmentExtractionResult,
     val invoice: Invoice? = null,
-)
+    val readError: SerializableException? = null
+) {
+    constructor(attachmentsResult: PdfAttachmentExtractionResult, readXmlResult: ReadEInvoiceXmlResult) :
+            this(ReadEInvoicePdfResultType.valueOf(readXmlResult.type.name), attachmentsResult, readXmlResult.invoice, readXmlResult.readError)
+
+    override fun toString() = "$type ${invoice ?: readError ?: attachmentExtractionResult}"
+}
 
 /**
  * A combination of [net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType]
