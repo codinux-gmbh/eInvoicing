@@ -133,7 +133,8 @@ class CodeGenerator {
             val i18nRegion = i18nRegionsByCode[isoCode]
             Row(listOf(isoCode, i18nRegion?.alpha3Code ?: values[2], i18nRegion?.numericCode, i18nRegion?.numericCodeAsString, i18nRegion?.englishName ?: values[0],
                 i18nRegion?.isContainedIn.orEmpty().toSet(), i18nRegion?.contains.orEmpty().toSet()), false, fixCountryName(i18nRegion?.name ?: values[0]))
-        }
+        } + // equivalent to Region.UnknownRegion (used as fallback value if Country ISO code cannot be mapped)
+                Row(listOf("ZZ", "ZZZ", 999, "999", "Unknown Country", emptySet<String>(), emptySet<String>()), false, "UnknownCountry")
 
         return columns to rows.sortedBy { it.enumName!! } // sort by englishName
     }

@@ -1,7 +1,7 @@
 package net.codinux.invoicing.reader
 
 import kotlinx.serialization.Serializable
-import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 
@@ -9,7 +9,7 @@ import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 data class ReadEInvoicePdfResult(
     val type: ReadEInvoicePdfResultType,
     val attachmentExtractionResult: PdfAttachmentExtractionResult,
-    val invoice: Invoice? = null,
+    val invoice: MapInvoiceResult? = null,
     val readError: SerializableException? = null
 ) {
     constructor(attachmentsResult: PdfAttachmentExtractionResult, readXmlResult: ReadEInvoiceXmlResult) :

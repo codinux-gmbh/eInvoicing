@@ -3,7 +3,7 @@ package net.codinux.invoicing.reader
 import assertk.assertThat
 import assertk.assertions.*
 import kotlinx.coroutines.test.runTest
-import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestData
@@ -67,9 +67,7 @@ class WebServiceEInvoiceReaderTest {
         assertInvoice(result.invoice)
     }
 
-    private fun assertInvoice(invoice: Invoice?) {
-        assertThat(invoice).isNotNull()
-
+    private fun assertInvoice(invoice: MapInvoiceResult?) {
         InvoiceAsserter.assertInvoice(invoice)
     }
 

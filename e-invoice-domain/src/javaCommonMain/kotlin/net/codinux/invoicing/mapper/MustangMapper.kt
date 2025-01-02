@@ -5,6 +5,7 @@ import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure
+import net.codinux.log.logger
 import org.mustangproject.*
 import org.mustangproject.BankDetails
 import org.mustangproject.Invoice
@@ -25,7 +26,16 @@ open class MustangMapper(
         val CurrenciesByIsoCode = Currency.entries.associateBy { it.alpha3Code }
 
         val UnitsByCode = UnitOfMeasure.entries.associateBy { it.code }
+
+        val CountryFallbackValue = Country.UnknownCountry
+
+        val CurrencyFallbackValue = Currency.TheCodesAssignedForTransactionsWhereNoCurrencyIsInvolved
+
+        val UnitFallbackValue = UnitOfMeasure.ZZ
     }
+
+
+    private val log by logger()
 
 
     open fun mapToTransaction(invoice: net.codinux.invoicing.model.Invoice): IExportableTransaction = Invoice().apply {
@@ -106,31 +116,36 @@ open class MustangMapper(
     }
 
 
-    open fun mapToInvoice(invoice: Invoice) = net.codinux.invoicing.model.Invoice(
-        // TODO: what to do if currency code is unknown? Currently it throws an exception, but i don't like that mapping fails just due to an unknown currency code
-        details = InvoiceDetails(invoice.number, map(invoice.issueDate), mapCurrency(invoice.currency), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
+    open fun mapToInvoice(invoice: Invoice): MapInvoiceResult {
+        val dataErrors = mutableListOf<InvoiceDataError>()
 
-        supplier = mapParty(invoice.sender),
-        customer = mapParty(invoice.recipient),
-        items = invoice.zfItems.map { mapInvoiceItem(it) },
+        return MapInvoiceResult(
+            net.codinux.invoicing.model.Invoice(
+                details = InvoiceDetails(invoice.number, map(invoice.issueDate), mapCurrency(invoice.currency, dataErrors), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
 
-        customerReferenceNumber = invoice.referenceNumber,
+                supplier = mapParty(invoice.sender, true, dataErrors),
+                customer = mapParty(invoice.recipient, false, dataErrors),
+                items = invoice.zfItems.map { mapInvoiceItem(it, dataErrors) },
 
-        amountAdjustments = mapAmountAdjustments(invoice),
+                customerReferenceNumber = invoice.referenceNumber,
 
-        totals = calculator.calculateTotalAmounts(invoice)
-    )
+                amountAdjustments = mapAmountAdjustments(invoice),
 
-    open fun mapParty(party: TradeParty) = Party(
-        // TODO: what to do if country code is unknown? Currently it throws an exception, but i don't like that mapping fails just due to an unknown country code
-        party.name, party.street, party.additionalAddress, party.zip, party.location, mapCountry(party.country), party.vatID,
-        party.email ?: party.contact?.eMail, party.contact?.phone, party.contact?.fax, party.contact?.name,
+                totals = calculator.calculateTotalAmounts(invoice)
+            ),
+            dataErrors
+        )
+    }
+
+    open fun mapParty(party: TradeParty, isSupplier: Boolean, dataErrors: MutableList<InvoiceDataError>) = Party(
+        party.name, party.street, party.additionalAddress, party.zip, party.location,
+        mapCountry(party.country, if (isSupplier) InvoiceField.SupplierCountry else InvoiceField.CustomerCountry, dataErrors),
+        party.vatID, party.email ?: party.contact?.eMail, party.contact?.phone, party.contact?.fax, party.contact?.name,
         party.bankDetails?.firstOrNull()?.let { net.codinux.invoicing.model.BankDetails(it.iban, it.bic, it.accountName) }
     )
 
-    open fun mapInvoiceItem(item: IZUGFeRDExportableItem) = InvoiceItem(
-        // TODO: what to use as fallback if unit cannot be determined?
-        item.product.name, item.quantity.toEInvoicingBigDecimal(), item.product.unit?.let { UnitsByCode[it] } ?: UnitOfMeasure.ZZ,
+    open fun mapInvoiceItem(item: IZUGFeRDExportableItem, dataErrors: MutableList<InvoiceDataError>) = InvoiceItem(
+        item.product.name, item.quantity.toEInvoicingBigDecimal(), mapUnit(item.product.unit, dataErrors),
         item.price.toEInvoicingBigDecimal(), item.product.vatPercent.toEInvoicingBigDecimal(), item.product.sellerAssignedID, item.product.description.takeUnless { it.isBlank() }
     )
 
@@ -153,13 +168,56 @@ open class MustangMapper(
     }
 
 
-    private fun mapCountry(isoAlpha2CountryCode: String?): Country =
-        CountriesByIsoCode[isoAlpha2CountryCode]
-            ?: throw IllegalArgumentException("Unknown ISO Alpha-2 country code \"$isoAlpha2CountryCode\", therefore cannot map ISO code to Country")
+    private fun mapCountry(isoAlpha2CountryCode: String?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): Country {
+        if (isoAlpha2CountryCode.isNullOrBlank()) {
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeNotSet, isoAlpha2CountryCode))
+            return CountryFallbackValue
+        }
 
-    private fun mapCurrency(isoCurrencyCode: String?): Currency =
-        CurrenciesByIsoCode[isoCurrencyCode]
-            ?: throw IllegalArgumentException("Unknown ISO currency code \"$isoCurrencyCode\", therefore cannot map ISO code to Currency")
+        val country = CountriesByIsoCode[isoAlpha2CountryCode]
+        if (country != null && isoAlpha2CountryCode.any { it.isUpperCase() == false }) {
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeNotUpperCase, isoAlpha2CountryCode))
+        } else if (country == null) {
+            log.warn { "Unknown ISO Alpha-2 country code \"$isoAlpha2CountryCode\", therefore cannot map ISO code to Country" }
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeIsInvalid, isoAlpha2CountryCode))
+        }
+
+        return country ?: CountryFallbackValue
+    }
+
+    private fun mapCurrency(isoCurrencyCode: String?, dataErrors: MutableList<InvoiceDataError>): Currency {
+        if (isoCurrencyCode.isNullOrBlank()) {
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeNotSet, isoCurrencyCode))
+            return CurrencyFallbackValue
+        }
+
+        val currency = CurrenciesByIsoCode[isoCurrencyCode.uppercase()]
+        if (currency != null && isoCurrencyCode.any { it.isUpperCase() == false }) {
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeNotUpperCase, isoCurrencyCode))
+        } else if (currency == null) {
+            log.warn { "Unknown ISO currency code \"$isoCurrencyCode\", therefore cannot map ISO code to Currency" }
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeIsInvalid, isoCurrencyCode))
+        }
+
+        return currency ?: CurrencyFallbackValue
+    }
+
+    private fun mapUnit(unitUnCefactCode: String?, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure {
+        if (unitUnCefactCode.isNullOrBlank()) {
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeNotSet, unitUnCefactCode))
+            return UnitFallbackValue
+        }
+
+        val unit = UnitsByCode[unitUnCefactCode.uppercase()]
+        if (unit != null && unitUnCefactCode != unitUnCefactCode.uppercase()) {
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeNotUpperCase, unitUnCefactCode))
+        } else if (unit == null) {
+            log.warn { "Unknown UN/CEFACT unit of measurement code \"$unitUnCefactCode\", therefore cannot map code to UnitOfMeasurement" }
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeIsInvalid, unitUnCefactCode))
+        }
+
+        return unit ?: UnitFallbackValue
+    }
 
     @JvmName("mapNullable")
     protected fun map(date: LocalDate?) =

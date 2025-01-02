@@ -2,7 +2,10 @@ package net.codinux.invoicing.reader
 
 import assertk.assertThat
 import assertk.assertions.*
-import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.mapper.MustangMapper
+import net.codinux.invoicing.model.InvoiceDataErrorType
+import net.codinux.invoicing.model.InvoiceField
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.InvoiceXmlAsserter
@@ -34,9 +37,17 @@ class EInvoiceReaderTest {
     fun extractFromXml_NoCountryCode() {
         val result = underTest.extractFromXml(getInvalidInvoiceFile("NoCountryCode.xml"))
 
-        assertThat(result.invoice).isNull()
         assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.InvalidInvoiceData)
-        assertThat(result.readError?.type).isNotNull().isEqualTo("IllegalArgumentException")
+        assertThat(result.readError).isNull()
+        assertThat(result.invoice).isNotNull()
+        assertThat(result.invoice!!.invoice.supplier.country).isEqualByComparingTo(MustangMapper.CountryFallbackValue)
+        assertThat(result.invoice!!.invoiceDataErrors).hasSize(2)
+
+        result.invoice!!.invoiceDataErrors.forEach { invoiceDataError ->
+            assertThat(invoiceDataError.field).isIn(InvoiceField.SupplierCountry, InvoiceField.CustomerCountry)
+            assertThat(invoiceDataError.errorType).isEqualTo(InvoiceDataErrorType.CountryIsoCodeNotSet)
+            assertThat(invoiceDataError.erroneousValue).isNullOrEmpty()
+        }
     }
 
 
@@ -83,7 +94,7 @@ class EInvoiceReaderTest {
         assertInvoice(result.invoice)
     }
 
-    private fun assertInvoice(invoice: Invoice?) {
+    private fun assertInvoice(invoice: MapInvoiceResult?) {
         InvoiceAsserter.assertInvoice(invoice)
     }
 

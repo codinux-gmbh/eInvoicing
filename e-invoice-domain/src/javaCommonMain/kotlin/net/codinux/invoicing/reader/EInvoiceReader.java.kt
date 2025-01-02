@@ -2,7 +2,7 @@ package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.mapper.MustangMapper
-import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
@@ -51,7 +51,9 @@ actual open class EInvoiceReader(
             try {
                 importer.fromXML(xml)
 
-                ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.Success, extractInvoice(importer))
+                val mapInvoiceResult = extractInvoice(importer)
+                val resultType = if (mapInvoiceResult.invoiceDataErrors.isNotEmpty()) ReadEInvoiceXmlResultType.InvalidInvoiceData else ReadEInvoiceXmlResultType.Success
+                ReadEInvoiceXmlResult(resultType, mapInvoiceResult)
             } catch (e: Throwable) {
                 log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
                 ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
@@ -133,7 +135,7 @@ actual open class EInvoiceReader(
     }
 
 
-    protected open fun extractInvoice(importer: ZUGFeRDInvoiceImporter): Invoice {
+    protected open fun extractInvoice(importer: ZUGFeRDInvoiceImporter): MapInvoiceResult {
         val invoice = importer.extractInvoice()
 
         // TODO: the values LineTotalAmount, ChargeTotalAmount, AllowanceTotalAmount, TaxBasisTotalAmount, TaxTotalAmount,

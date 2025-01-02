@@ -241,6 +241,7 @@ enum class Country(val alpha2Code: String, val alpha3Code: String, val numericCo
 	UnitedArabEmirates("AE", "ARE", 784, "784", "United Arab Emirates", setOf("145", "UN"), emptySet()),
 	UnitedKingdom("GB", "GBR", 826, "826", "United Kingdom", setOf("154", "UN"), emptySet()),
 	UnitedStates("US", "USA", 840, "840", "United States", setOf("021", "UN"), emptySet()),
+	UnknownCountry("ZZ", "ZZZ", 999, "999", "Unknown Country", emptySet(), emptySet()),
 	Uruguay("UY", "URY", 858, "858", "Uruguay", setOf("005", "UN"), emptySet()),
 	Uzbekistan("UZ", "UZB", 860, "860", "Uzbekistan", setOf("143", "UN"), emptySet()),
 	Vanuatu("VU", "VUT", 548, "548", "Vanuatu", setOf("054", "UN"), emptySet()),

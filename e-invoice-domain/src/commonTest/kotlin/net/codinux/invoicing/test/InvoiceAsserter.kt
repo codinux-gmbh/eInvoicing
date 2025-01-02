@@ -8,6 +8,13 @@ import net.codinux.invoicing.model.codes.UnitOfMeasure
 
 object InvoiceAsserter {
 
+    fun assertInvoice(invoice: MapInvoiceResult?) {
+        assertThat(invoice).isNotNull()
+        assertThat(invoice!!.invoiceDataErrors).isEmpty()
+
+        assertInvoice(invoice.invoice)
+    }
+
     fun assertInvoice(invoice: Invoice?) {
         assertThat(invoice).isNotNull()
 

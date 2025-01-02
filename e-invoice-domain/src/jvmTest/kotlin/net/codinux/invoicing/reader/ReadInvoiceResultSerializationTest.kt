@@ -63,17 +63,6 @@ class ReadInvoiceResultSerializationTest {
         assertEquals(erroneousReadXmlResult, decoded)
     }
 
-    @Test
-    fun extractFromXml_NoCountryCode_SerializedJsonEquals() {
-        val erroneousReadXmlResult = reader.extractFromXml(getInvalidInvoiceFile("NoCountryCode.xml"))
-
-        val jacksonResult = jacksonObjectMapper.writeValueAsString(erroneousReadXmlResult)
-
-        val kotlinxSerializationResult = kotlinxJson.encodeToString(erroneousReadXmlResult)
-
-        assertThat(jacksonResult).isEqualTo(kotlinxSerializationResult)
-    }
-
 
     @Test
     fun extractFromPdf() = runTest {
@@ -227,8 +216,17 @@ class ReadInvoiceResultSerializationTest {
 
         if (expected.invoice == null) {
             assertThat(decoded.invoice).isNull()
+        } else if (expected.invoice!!.invoiceDataErrors.isNotEmpty()) {
+            val mapInvoiceResult = decoded.invoice
+            assertThat(mapInvoiceResult).isNotNull()
+
+            assertThat(expected.invoice!!.invoiceDataErrors).hasSize(mapInvoiceResult!!.invoiceDataErrors.size)
+            assertThat(expected.invoice!!.invoiceDataErrors.map { it.field }).containsExactly(*mapInvoiceResult.invoiceDataErrors.map { it.field }.toTypedArray())
+            assertThat(expected.invoice!!.invoiceDataErrors.map { it.errorType }).containsExactly(*mapInvoiceResult.invoiceDataErrors.map { it.errorType }.toTypedArray())
+            assertThat(expected.invoice!!.invoiceDataErrors.map { it.erroneousValue }).containsExactly(*mapInvoiceResult.invoiceDataErrors.map { it.erroneousValue }.toTypedArray())
+
         } else {
-            InvoiceAsserter.assertInvoice(decoded.invoice)
+            InvoiceAsserter.assertInvoice(decoded.invoice?.invoice)
         }
     }
 

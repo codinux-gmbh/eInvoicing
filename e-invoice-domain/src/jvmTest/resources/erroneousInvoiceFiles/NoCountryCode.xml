@@ -26,11 +26,11 @@
       <ram:SpecifiedLineTradeAgreement>
         <ram:NetPriceProductTradePrice>
           <ram:ChargeAmount>1.0000</ram:ChargeAmount>
-          <ram:BasisQuantity unitCode="">1.0000</ram:BasisQuantity>
+          <ram:BasisQuantity unitCode="HUR">1.0000</ram:BasisQuantity>
         </ram:NetPriceProductTradePrice>
       </ram:SpecifiedLineTradeAgreement>
       <ram:SpecifiedLineTradeDelivery>
-        <ram:BilledQuantity unitCode="">1.0000</ram:BilledQuantity>
+        <ram:BilledQuantity unitCode="HUR">1.0000</ram:BilledQuantity>
       </ram:SpecifiedLineTradeDelivery>
       <ram:SpecifiedLineTradeSettlement>
         <ram:ApplicableTradeTax>

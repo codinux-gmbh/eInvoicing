@@ -12,7 +12,7 @@ data class FileEInvoiceExtractionResult(
     val xml: ReadEInvoiceXmlResult? = null,
     val readError: SerializableException? = null
 ) {
-    val invoice: Invoice? = pdf?.invoice ?: xml?.invoice
+    val invoice: Invoice? = pdf?.invoice?.invoice ?: xml?.invoice?.invoice
 
     override fun toString() = "$filename ${pdf ?: xml ?: readError}"
 }
