@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
+import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestInstances
 import net.codinux.invoicing.test.TestUtils
@@ -153,6 +154,18 @@ class ReadInvoiceResultSerializationTest {
 
 
     @Test
+    fun extractXmlFromPdf() {
+        val attachmentExtractionResult = reader.extractXmlFromPdf(getTestFile("ZUGFeRD.pdf"))
+
+        val json = jacksonObjectMapper.writeValueAsString(attachmentExtractionResult)
+
+        val decoded = kotlinxJson.decodeFromString<PdfAttachmentExtractionResult>(json)
+
+        assertEquals(attachmentExtractionResult, decoded)
+    }
+
+
+    @Test
     fun extractFromFile_Xml() {
         val fileExtractionResult = reader.extractFromFile(getTestFile("XRechnung.xml"), "XRechnung.xml")
 
@@ -202,21 +215,25 @@ class ReadInvoiceResultSerializationTest {
 
         assertThat(decoded.type).isEqualTo(expected!!.type)
 
-        assertThat(decoded.attachmentExtractionResult.type).isEqualTo(expected.attachmentExtractionResult.type)
-        assertThat(decoded.attachmentExtractionResult.attachments).hasSize(expected.attachmentExtractionResult.attachments.size)
-
-        expected.attachmentExtractionResult.attachments.forEachIndexed { index, attachment ->
-            val decodedAttachment = decoded.attachmentExtractionResult.attachments[index]
-            assertThat(decodedAttachment.filename).isEqualTo(attachment.filename)
-            assertThat(decodedAttachment.isXmlFile).isEqualTo(attachment.isXmlFile)
-            assertThat(decodedAttachment.isProbablyEN16931InvoiceXml).isEqualTo(attachment.isProbablyEN16931InvoiceXml)
-            assertThat(decodedAttachment.xml).isEqualTo(attachment.xml)
-        }
+        assertEquals(expected.attachmentExtractionResult, decoded.attachmentExtractionResult)
 
         if (expected.invoice == null) {
             assertThat(decoded.invoice).isNull()
         } else {
             InvoiceAsserter.assertInvoice(decoded.invoice)
+        }
+    }
+
+    private fun assertEquals(expected: PdfAttachmentExtractionResult, decoded: PdfAttachmentExtractionResult) {
+        assertThat(decoded.type).isEqualTo(expected.type)
+        assertThat(decoded.attachments).hasSize(expected.attachments.size)
+
+        expected.attachments.forEachIndexed { index, attachment ->
+            val decodedAttachment = decoded.attachments[index]
+            assertThat(decodedAttachment.filename).isEqualTo(attachment.filename)
+            assertThat(decodedAttachment.isXmlFile).isEqualTo(attachment.isXmlFile)
+            assertThat(decodedAttachment.isProbablyEN16931InvoiceXml).isEqualTo(attachment.isProbablyEN16931InvoiceXml)
+            assertThat(decodedAttachment.xml).isEqualTo(attachment.xml)
         }
     }
 
