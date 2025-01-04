@@ -10,17 +10,9 @@ data class InvoiceDataError(
 )
 
 enum class InvoiceDataErrorType {
-    CurrencyIsoCodeNotSet,
-    CurrencyIsoCodeNotUpperCase,
-    CurrencyIsoCodeIsInvalid,
-
-    CountryIsoCodeNotSet,
-    CountryIsoCodeNotUpperCase,
-    CountryIsoCodeIsInvalid,
-
-    UnitCodeNotSet,
-    UnitCodeNotUpperCase,
-    UnitCodeIsInvalid,
+    ValueNotSet,
+    ValueNotUpperCase,
+    ValueIsInvalid,
 
     CalculatedAmountsAreInvalid
 }

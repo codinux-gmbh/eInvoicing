@@ -45,7 +45,7 @@ class EInvoiceReaderTest {
 
         result.invoice!!.invoiceDataErrors.forEach { invoiceDataError ->
             assertThat(invoiceDataError.field).isIn(InvoiceField.SupplierCountry, InvoiceField.CustomerCountry)
-            assertThat(invoiceDataError.errorType).isEqualTo(InvoiceDataErrorType.CountryIsoCodeNotSet)
+            assertThat(invoiceDataError.errorType).isEqualTo(InvoiceDataErrorType.ValueNotSet)
             assertThat(invoiceDataError.erroneousValue).isNullOrEmpty()
         }
     }

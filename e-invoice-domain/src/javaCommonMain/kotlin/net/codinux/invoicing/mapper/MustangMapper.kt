@@ -170,16 +170,16 @@ open class MustangMapper(
 
     private fun mapCountry(isoAlpha2CountryCode: String?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): Country {
         if (isoAlpha2CountryCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeNotSet, isoAlpha2CountryCode))
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotSet, isoAlpha2CountryCode))
             return CountryFallbackValue
         }
 
         val country = CountriesByIsoCode[isoAlpha2CountryCode]
         if (country != null && isoAlpha2CountryCode.any { it.isUpperCase() == false }) {
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeNotUpperCase, isoAlpha2CountryCode))
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotUpperCase, isoAlpha2CountryCode))
         } else if (country == null) {
             log.warn { "Unknown ISO Alpha-2 country code \"$isoAlpha2CountryCode\", therefore cannot map ISO code to Country" }
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.CountryIsoCodeIsInvalid, isoAlpha2CountryCode))
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueIsInvalid, isoAlpha2CountryCode))
         }
 
         return country ?: CountryFallbackValue
@@ -187,16 +187,16 @@ open class MustangMapper(
 
     private fun mapCurrency(isoCurrencyCode: String?, dataErrors: MutableList<InvoiceDataError>): Currency {
         if (isoCurrencyCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeNotSet, isoCurrencyCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueNotSet, isoCurrencyCode))
             return CurrencyFallbackValue
         }
 
         val currency = CurrenciesByIsoCode[isoCurrencyCode.uppercase()]
         if (currency != null && isoCurrencyCode.any { it.isUpperCase() == false }) {
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeNotUpperCase, isoCurrencyCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueNotUpperCase, isoCurrencyCode))
         } else if (currency == null) {
             log.warn { "Unknown ISO currency code \"$isoCurrencyCode\", therefore cannot map ISO code to Currency" }
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.CurrencyIsoCodeIsInvalid, isoCurrencyCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueIsInvalid, isoCurrencyCode))
         }
 
         return currency ?: CurrencyFallbackValue
@@ -204,16 +204,16 @@ open class MustangMapper(
 
     private fun mapUnit(unitUnCefactCode: String?, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure {
         if (unitUnCefactCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeNotSet, unitUnCefactCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueNotSet, unitUnCefactCode))
             return UnitFallbackValue
         }
 
         val unit = UnitsByCode[unitUnCefactCode.uppercase()]
         if (unit != null && unitUnCefactCode != unitUnCefactCode.uppercase()) {
-            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeNotUpperCase, unitUnCefactCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueNotUpperCase, unitUnCefactCode))
         } else if (unit == null) {
             log.warn { "Unknown UN/CEFACT unit of measurement code \"$unitUnCefactCode\", therefore cannot map code to UnitOfMeasurement" }
-            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.UnitCodeIsInvalid, unitUnCefactCode))
+            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueIsInvalid, unitUnCefactCode))
         }
 
         return unit ?: UnitFallbackValue
