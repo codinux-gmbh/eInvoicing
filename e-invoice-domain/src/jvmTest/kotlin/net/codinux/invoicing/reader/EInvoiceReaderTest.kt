@@ -65,6 +65,41 @@ class EInvoiceReaderTest {
         assertThat(invoiceDataError.erroneousValue).isNull()
     }
 
+    @Test
+    fun extractFromXml_AllInvalidDataErrors() {
+        val result = underTest.extractFromXml(getInvalidInvoiceFile("AllInvalidDataErrors.xml"))
+
+        assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.InvalidInvoiceData)
+        assertThat(result.readError).isNull()
+        assertThat(result.invoice).isNotNull()
+        assertThat(result.invoice!!.invoiceDataErrors).hasSize(5)
+
+        val currencyError = result.invoice!!.invoiceDataErrors.first()
+        assertThat(currencyError.field).isIn(InvoiceField.Currency)
+        assertThat(currencyError.errorType).isEqualTo(InvoiceDataErrorType.ValueIsInvalid)
+        assertThat(currencyError.erroneousValue).isEqualTo("D-MARK")
+
+        val supplierCountryError = result.invoice!!.invoiceDataErrors[1]
+        assertThat(supplierCountryError.field).isIn(InvoiceField.SupplierCountry)
+        assertThat(supplierCountryError.errorType).isEqualTo(InvoiceDataErrorType.ValueNotUpperCase)
+        assertThat(supplierCountryError.erroneousValue).isEqualTo("de")
+
+        val customerCountryError = result.invoice!!.invoiceDataErrors[2]
+        assertThat(customerCountryError.field).isIn(InvoiceField.CustomerCountry)
+        assertThat(customerCountryError.errorType).isEqualTo(InvoiceDataErrorType.ValueNotSet)
+        assertThat(customerCountryError.erroneousValue).isEqualTo("")
+
+        val itemUnitError = result.invoice!!.invoiceDataErrors[3]
+        assertThat(itemUnitError.field).isIn(InvoiceField.ItemUnit)
+        assertThat(itemUnitError.errorType).isEqualTo(InvoiceDataErrorType.ValueIsInvalid)
+        assertThat(itemUnitError.erroneousValue).isEqualTo("invalid")
+
+        val totalAmountError = result.invoice!!.invoiceDataErrors[4]
+        assertThat(totalAmountError.field).isIn(InvoiceField.TotalAmount)
+        assertThat(totalAmountError.errorType).isEqualTo(InvoiceDataErrorType.CalculatedAmountsAreInvalid)
+        assertThat(totalAmountError.erroneousValue).isNull()
+    }
+
 
     @Test
     fun extractFromPdf() {

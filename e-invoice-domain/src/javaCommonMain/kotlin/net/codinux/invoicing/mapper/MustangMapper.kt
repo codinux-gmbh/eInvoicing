@@ -174,7 +174,7 @@ open class MustangMapper(
             return CountryFallbackValue
         }
 
-        val country = CountriesByIsoCode[isoAlpha2CountryCode]
+        val country = CountriesByIsoCode[isoAlpha2CountryCode.uppercase()]
         if (country != null && isoAlpha2CountryCode.any { it.isUpperCase() == false }) {
             dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotUpperCase, isoAlpha2CountryCode))
         } else if (country == null) {

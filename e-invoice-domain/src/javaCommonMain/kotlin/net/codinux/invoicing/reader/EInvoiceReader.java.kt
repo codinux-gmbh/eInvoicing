@@ -155,7 +155,7 @@ actual open class EInvoiceReader(
 
             extractInvoice(importer).invoice == null
         } catch (e: Throwable) {
-            log.warn(e) { "Calculating total amounts failed for:\n$xml" }
+            log.debug(e) { "Calculating total amounts failed for:\n$xml" }
             e is ArithmetricException || e.cause is ArithmetricException // in case of calculation error Mustang throws an ArithmetricException
         }
 
