@@ -1,5 +1,6 @@
 package net.codinux.invoicing.email.model
 
+import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.pdf.PdfInvoiceData
 
@@ -15,15 +16,18 @@ class EmailAttachment(
      */
     val mediaType: String?,
     val contentType: String?,
-    val invoice: MapInvoiceResult? = null,
+    val mapInvoiceResult: MapInvoiceResult? = null,
     val pdfInvoiceData: PdfInvoiceData? = null,
     val downloadedFilePath: String? = null
 ) {
     val isPdfFile: Boolean by lazy { extension == "pdf" || mediaType == "application/pdf" }
 
-    val containsEInvoice: Boolean by lazy { invoice != null }
+    val containsEInvoice: Boolean by lazy { mapInvoiceResult != null }
+
+    val invoice: Invoice?
+        get() = mapInvoiceResult?.invoice
 
     val couldExtractPdfInvoiceData: Boolean by lazy { pdfInvoiceData != null }
 
-    override fun toString() = "$filename: $invoice"
+    override fun toString() = "$filename: $mapInvoiceResult"
 }
