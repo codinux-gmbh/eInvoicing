@@ -5,7 +5,7 @@ import net.codinux.invoicing.web.KtorWebClient
 
 internal object DI {
 
-    val DefaultWebClient by lazy { KtorWebClient(Config.BackendBaseUrl) }
+    val DefaultWebClient by lazy { KtorWebClient(Config.InvoicingApiBaseUrl + Config.InvoicingApiRootPath) }
 
     val ExceptionHelper = ExceptionHelper()
 

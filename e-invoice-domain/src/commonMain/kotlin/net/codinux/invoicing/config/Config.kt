@@ -2,6 +2,8 @@ package net.codinux.invoicing.config
 
 object Config {
 
-    var BackendBaseUrl = "http://0.0.0.0:8091/invoicing"
+    var InvoicingApiBaseUrl = "http://0.0.0.0:8091"
+
+    var InvoicingApiRootPath = "/invoicing"
 
 }
