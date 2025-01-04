@@ -18,7 +18,7 @@ import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
 import kotlin.io.path.readBytes
 
-@Path("")
+@Path("v1")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_XML)
 class InvoicingResource(
