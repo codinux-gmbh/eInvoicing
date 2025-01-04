@@ -8,6 +8,8 @@ object Config {
 
     var InvoicingApiRootPath = "/invoicing/v1"
 
-    var DefaultUserAgent: String? = "${Platform.type} eInvoicing ${Version.ProjectVersion}"
+    var OsInfo = "${Platform.osName} ${Platform.osVersion}${Platform.cpuArchitecture?.let { " ($it)" } ?: ""}"
+
+    var DefaultUserAgent: String? = "eInvoicing ${Version.ProjectVersion} ${Platform.type}, $OsInfo"
 
 }
