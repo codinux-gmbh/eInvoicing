@@ -41,7 +41,7 @@ actual open class EInvoiceReader(
      * [ignoreCalculationErrors] to true.
      */
     // TODO: find a better name
-    open fun extractFromXmlJvm(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult =
+    open fun extractFromXmlJvm(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult {
         try {
             val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
             if (ignoreCalculationErrors) {
@@ -50,18 +50,20 @@ actual open class EInvoiceReader(
 
             try {
                 importer.fromXML(xml)
-
-                val mapInvoiceResult = extractInvoice(importer)
-                val resultType = if (mapInvoiceResult.invoiceDataErrors.isNotEmpty()) ReadEInvoiceXmlResultType.InvalidInvoiceData else ReadEInvoiceXmlResultType.Success
-                ReadEInvoiceXmlResult(resultType, mapInvoiceResult)
             } catch (e: Throwable) {
                 log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
-                ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
+                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
             }
+
+            val mapInvoiceResult = extractInvoice(importer)
+            val resultType = if (mapInvoiceResult.invoiceDataErrors.isNotEmpty()) ReadEInvoiceXmlResultType.InvalidInvoiceData else ReadEInvoiceXmlResultType.Success
+
+            return ReadEInvoiceXmlResult(resultType, mapInvoiceResult)
         } catch (e: Throwable) {
             log.error(e) { "Could not extract invoice from XML:\n$xml" }
-            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, e)
+            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, e)
         }
+    }
 
     actual open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean): ReadEInvoiceXmlResult? =
         extractFromXmlJvm(xml, ignoreCalculationErrors)
