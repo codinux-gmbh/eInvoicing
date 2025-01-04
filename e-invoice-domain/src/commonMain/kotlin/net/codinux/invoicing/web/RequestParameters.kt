@@ -10,7 +10,7 @@ open class RequestParameters<T : Any>(
     open val accept: String? = null,
     open val headers: Map<String, String> = mutableMapOf(),
     open val queryParameters: Map<String, Any> = mapOf(),
-    open val userAgent: String? = DefaultUserAgent
+    open val userAgent: String? = null
 ) {
 
     companion object {

@@ -15,7 +15,8 @@ import kotlinx.serialization.serializer
 import net.codinux.log.logger
 
 open class KtorWebClient(
-    protected open val baseUrl: String? = null
+    protected open val baseUrl: String? = null,
+    protected open val defaultUserAgent: String? = null
 ) : WebClient {
 
     protected open val json = Json {
@@ -35,6 +36,10 @@ open class KtorWebClient(
             defaultRequest {
                 baseUrl?.let {
                     url(baseUrl)
+                }
+
+                defaultUserAgent?.let {
+                    userAgent(it)
                 }
             }
         }
