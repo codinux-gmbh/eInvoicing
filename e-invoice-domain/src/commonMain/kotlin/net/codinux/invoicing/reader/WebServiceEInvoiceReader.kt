@@ -10,8 +10,8 @@ open class WebServiceEInvoiceReader(
     protected open val webClient: WebClient = DI.DefaultWebClient
 ) {
 
-    open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean = false): ReadEInvoiceXmlResult? {
-        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoiceXmlResult::class, xml, ContentTypes.XML, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
+    open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult? {
+        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoiceXmlResult::class, xml, ContentTypes.XML, ContentTypes.JSON))
 
         if (response.successful) {
             return response.body
@@ -20,8 +20,8 @@ open class WebServiceEInvoiceReader(
         return null
     }
 
-    open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean = false): ReadEInvoicePdfResult? {
-        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoicePdfResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = createQueryParameter(ignoreCalculationErrors)))
+    open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult? {
+        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoicePdfResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON))
 
         if (response.successful) {
             return response.body
@@ -38,11 +38,6 @@ open class WebServiceEInvoiceReader(
         }
 
         return null
-    }
-
-
-    private fun createQueryParameter(ignoreCalculationErrors: Boolean): Map<String, Any> = buildMap {
-        put("ignoreCalculationErrors", ignoreCalculationErrors)
     }
 
 }

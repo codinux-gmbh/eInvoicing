@@ -50,6 +50,21 @@ class EInvoiceReaderTest {
         }
     }
 
+    @Test
+    fun extractFromXml_InvalidTotalAmount() {
+        val result = underTest.extractFromXml(getInvalidInvoiceFile("InvalidTotalAmount.xml"))
+
+        assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.InvalidInvoiceData)
+        assertThat(result.readError).isNull()
+        assertThat(result.invoice).isNotNull()
+        assertThat(result.invoice!!.invoiceDataErrors).hasSize(1)
+
+        val invoiceDataError = result.invoice!!.invoiceDataErrors.first()
+        assertThat(invoiceDataError.field).isIn(InvoiceField.TotalAmount)
+        assertThat(invoiceDataError.errorType).isEqualTo(InvoiceDataErrorType.CalculatedAmountsAreInvalid)
+        assertThat(invoiceDataError.erroneousValue).isNull()
+    }
+
 
     @Test
     fun extractFromPdf() {

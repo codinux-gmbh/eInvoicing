@@ -21,4 +21,6 @@ enum class InvoiceDataErrorType {
     UnitCodeNotSet,
     UnitCodeNotUpperCase,
     UnitCodeIsInvalid,
+
+    CalculatedAmountsAreInvalid
 }

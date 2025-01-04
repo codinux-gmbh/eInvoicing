@@ -6,5 +6,7 @@ enum class InvoiceField {
     SupplierCountry,
     CustomerCountry,
 
-    ItemUnit
+    ItemUnit,
+
+    TotalAmount
 }

@@ -12,11 +12,11 @@ actual open class EInvoiceReader(
     constructor(webClient: WebClient) : this(WebServiceEInvoiceReader(webClient))
 
 
-    actual open suspend fun extractFromXml(xml: String, ignoreCalculationErrors: Boolean) =
+    actual open suspend fun extractFromXml(xml: String) =
         reader.extractFromXml(xml)
 
-    actual open suspend fun extractFromPdf(pdfFile: ByteArray, ignoreCalculationErrors: Boolean) =
-        reader.extractFromPdf(pdfFile, ignoreCalculationErrors)
+    actual open suspend fun extractFromPdf(pdfFile: ByteArray) =
+        reader.extractFromPdf(pdfFile)
 
     actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray) =
         reader.extractXmlFromPdf(pdfFile)
