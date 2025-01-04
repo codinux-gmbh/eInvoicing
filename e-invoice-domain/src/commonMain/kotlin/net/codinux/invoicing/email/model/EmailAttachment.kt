@@ -1,6 +1,6 @@
 package net.codinux.invoicing.email.model
 
-import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.pdf.PdfInvoiceData
 
 class EmailAttachment(
@@ -15,7 +15,7 @@ class EmailAttachment(
      */
     val mediaType: String?,
     val contentType: String?,
-    val invoice: Invoice? = null,
+    val invoice: MapInvoiceResult? = null,
     val pdfInvoiceData: PdfInvoiceData? = null,
     val downloadedFilePath: String? = null
 ) {

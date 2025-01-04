@@ -252,7 +252,7 @@ open class EmailsFetcher(
                             if (extension !in status.options.downloadAttachmentsWithExtensions) null
                             else downloadAttachment(part, status)
 
-                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, readInvoiceResult?.invoice, pdfInvoiceData, file?.absolutePath)
+                return EmailAttachment(part.fileName, extension, part.size.takeIf { it > 0 }, mapDisposition(part), messagePart.mediaType, part.contentType, readInvoiceResult?.mapInvoiceResult, pdfInvoiceData, file?.absolutePath)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not check attachment '${messagePart.part.fileName}' (${messagePart.mediaType}) for eInvoice" }

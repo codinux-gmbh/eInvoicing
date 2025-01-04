@@ -2,6 +2,7 @@ package net.codinux.invoicing.reader
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 
 @Serializable
@@ -12,7 +13,9 @@ data class FileEInvoiceExtractionResult(
     val xml: ReadEInvoiceXmlResult? = null,
     val readError: SerializableException? = null
 ) {
-    val invoice: Invoice? = pdf?.invoice?.invoice ?: xml?.invoice?.invoice
+    val mapInvoiceResult: MapInvoiceResult? = pdf?.invoice ?: xml?.invoice
+
+    val invoice: Invoice? = mapInvoiceResult?.invoice
 
     override fun toString() = "$filename ${pdf ?: xml ?: readError}"
 }
