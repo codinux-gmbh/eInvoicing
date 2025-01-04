@@ -102,6 +102,7 @@ kotlin {
 
     val ktorVersion: String by project
 
+    val kmpBaseVersion: String by project
     val klfVersion: String by project
 
     val assertKVersion: String by project
@@ -117,6 +118,7 @@ kotlin {
 
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
 
+            implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
             implementation("net.codinux.log:klf:$klfVersion")
         }
         commonTest.dependencies {
@@ -217,6 +219,33 @@ kotlin {
         }
     }
 }
+
+
+tasks.register("generateVersionFile") {
+    val outputDir = project.projectDir.resolve("src/commonMain/kotlin/net/codinux/invoicing/config")
+
+    doLast {
+        val versionFile = outputDir.resolve("Version.kt")
+        versionFile.parentFile.mkdirs()
+        versionFile.writeText(
+            """
+            // Generated file. Do not modify!
+            package net.codinux.invoicing.config
+
+            object Version {
+            
+                const val ProjectVersion = "${project.version}"
+                
+            }
+            """.trimIndent()
+        )
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn("generateVersionFile")
+}
+
 
 
 android {
