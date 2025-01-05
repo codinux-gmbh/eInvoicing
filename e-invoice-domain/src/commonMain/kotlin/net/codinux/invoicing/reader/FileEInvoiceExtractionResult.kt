@@ -9,13 +9,13 @@ import net.codinux.invoicing.model.dto.SerializableException
 data class FileEInvoiceExtractionResult(
     val filename: String,
     val directory: String? = null,
-    val pdf: ReadEInvoicePdfResult? = null,
-    val xml: ReadEInvoiceXmlResult? = null,
+    val readPdfResult: ReadEInvoicePdfResult? = null,
+    val readXmlResult: ReadEInvoiceXmlResult? = null,
     val readError: SerializableException? = null
 ) {
-    val mapInvoiceResult: MapInvoiceResult? = pdf?.invoice ?: xml?.invoice
+    val mapInvoiceResult: MapInvoiceResult? = readPdfResult?.invoice ?: readXmlResult?.invoice
 
     val invoice: Invoice? = mapInvoiceResult?.invoice
 
-    override fun toString() = "$filename ${pdf ?: xml ?: readError}"
+    override fun toString() = "$filename ${readPdfResult ?: readXmlResult ?: readError}"
 }
