@@ -19,6 +19,7 @@ data class PdfAttachmentExtractionResult(
     constructor(type: PdfAttachmentExtractionResultType, readError: Throwable) : this(type, emptyList(), SerializableException(readError))
 
 
+    @Suppress("RUNTIME_ANNOTATION_NOT_SUPPORTED")
     @get:JsonIgnore // not that obvious, but Jackson affords @get:JsonIgnore instead of @delegate:JsonIgnore on delegates in order to work
     val invoiceXml: String? by lazy { attachments.firstOrNull { it.isProbablyEN16931InvoiceXml && it.xml != null }?.xml }
 

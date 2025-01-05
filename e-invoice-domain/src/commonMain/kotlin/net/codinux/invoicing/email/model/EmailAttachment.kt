@@ -7,6 +7,7 @@ import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
+@Suppress("RUNTIME_ANNOTATION_NOT_SUPPORTED")
 class EmailAttachment(
     val filename: String,
     val extension: String,

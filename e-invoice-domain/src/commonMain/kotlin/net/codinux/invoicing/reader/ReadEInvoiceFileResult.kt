@@ -7,6 +7,7 @@ import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
+@Suppress("RUNTIME_ANNOTATION_NOT_SUPPORTED")
 data class ReadEInvoiceFileResult(
     val filename: String,
     val directory: String? = null,
