@@ -184,7 +184,7 @@ class ReadInvoiceResultSerializationTest {
 
         val decoded = kotlinxJson.decodeFromString<ReadEInvoiceFileResult>(json)
 
-        assertThat(readFileResult.filename).isEqualTo(decoded.filename)
+        assertThat(decoded.filename).isEqualTo(readFileResult.filename)
         assertThat(decoded.readXmlResult).isNotNull()
         assertEquals(readFileResult.readXmlResult!!, decoded.readXmlResult!!)
     }
@@ -197,7 +197,7 @@ class ReadInvoiceResultSerializationTest {
 
         val decoded = kotlinxJson.decodeFromString<ReadEInvoiceFileResult>(json)
 
-        assertThat(readFileResult.filename).isEqualTo(decoded.filename)
+        assertThat(decoded.filename).isEqualTo(readFileResult.filename)
         assertThat(decoded.readPdfResult).isNotNull()
         assertEquals(readFileResult.readPdfResult, decoded.readPdfResult!!)
     }
