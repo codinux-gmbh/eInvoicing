@@ -114,24 +114,24 @@ actual open class EInvoiceReader(
         extractXmlFromPdfJvm(pdfFile)
 
 
-    open fun extractFromFile(inputStream: InputStream, filename: String, directory: String? = null, mediaType: String? = null): FileEInvoiceExtractionResult = try {
+    open fun extractFromFile(inputStream: InputStream, filename: String, directory: String? = null, mediaType: String? = null): ReadEInvoiceFileResult = try {
         val extension = Path(filename).extension.lowercase()
 
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, extractFromPdf(inputStream))
+                ReadEInvoiceFileResult(filename, directory, extractFromPdf(inputStream))
             }
         } else if (extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             inputStream.use {
-                FileEInvoiceExtractionResult(filename, directory, null, extractFromXml(inputStream))
+                ReadEInvoiceFileResult(filename, directory, null, extractFromXml(inputStream))
             }
         } else {
-            FileEInvoiceExtractionResult(filename, directory)
+            ReadEInvoiceFileResult(filename, directory)
         }
     } catch (e: Throwable) {
         log.debug(e) { "Could not extract invoices from ${directory?.let { "$it/" } ?: ""}$filename" }
 
-        FileEInvoiceExtractionResult(filename, directory, readError = SerializableException(e))
+        ReadEInvoiceFileResult(filename, directory, readError = SerializableException(e))
     }
 
 

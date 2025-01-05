@@ -14,7 +14,7 @@ import net.codinux.invoicing.model.toEInvoicingInstant
 import net.codinux.invoicing.pdf.PdfInvoiceData
 import net.codinux.invoicing.pdf.PdfInvoiceDataExtractor
 import net.codinux.invoicing.reader.EInvoiceReader
-import net.codinux.invoicing.reader.FileEInvoiceExtractionResult
+import net.codinux.invoicing.reader.ReadEInvoiceFileResult
 import net.codinux.invoicing.util.ExceptionHelper
 import net.codinux.log.logger
 import org.eclipse.angus.mail.imap.IMAPFolder
@@ -45,7 +45,7 @@ open class EmailsFetcher(
     companion object {
         protected val MessageBodyMediaTypes = listOf("text/plain", "text/html")
 
-        protected val FileNotDownloadedOrErrorOccurred = Pair<FileEInvoiceExtractionResult?, File?>(null, null)
+        protected val FileNotDownloadedOrErrorOccurred = Pair<ReadEInvoiceFileResult?, File?>(null, null)
     }
 
 
@@ -269,7 +269,7 @@ open class EmailsFetcher(
         else -> ContentDisposition.Unknown
     }
 
-    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<FileEInvoiceExtractionResult?, File?> =
+    protected open fun tryToReadEInvoice(part: Part, extension: String, mediaType: String?, status: FetchEmailsStatus): Pair<ReadEInvoiceFileResult?, File?> =
         if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream" ||
             extension == "xml" || mediaType == "application/xml" || mediaType == "text/xml") {
             val file = downloadAttachment(part, status)

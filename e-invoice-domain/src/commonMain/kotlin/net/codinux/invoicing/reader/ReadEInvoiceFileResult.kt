@@ -6,7 +6,7 @@ import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 
 @Serializable
-data class FileEInvoiceExtractionResult(
+data class ReadEInvoiceFileResult(
     val filename: String,
     val directory: String? = null,
     val readPdfResult: ReadEInvoicePdfResult? = null,
