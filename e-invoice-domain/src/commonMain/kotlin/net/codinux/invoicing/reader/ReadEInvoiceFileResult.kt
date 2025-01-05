@@ -13,9 +13,13 @@ data class ReadEInvoiceFileResult(
     val readXmlResult: ReadEInvoiceXmlResult? = null,
     val readError: SerializableException? = null
 ) {
-    val mapInvoiceResult: MapInvoiceResult? = readPdfResult?.invoice ?: readXmlResult?.invoice
 
-    val invoice: Invoice? = mapInvoiceResult?.invoice
+    // TODO: avoid that Jackson serializes these fields
+    val mapInvoiceResult: MapInvoiceResult?
+        get() = readPdfResult?.invoice ?: readXmlResult?.invoice
+
+    val invoice: Invoice?
+        get() = mapInvoiceResult?.invoice
 
     override fun toString() = "$filename ${readPdfResult ?: readXmlResult ?: readError}"
 }
