@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
+import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
 data class ReadEInvoiceFileResult(
@@ -14,10 +15,11 @@ data class ReadEInvoiceFileResult(
     val readError: SerializableException? = null
 ) {
 
-    // TODO: avoid that Jackson serializes these fields
+    @get:JsonIgnore // not that obvious, but Jackson affords @get:JsonIgnore instead of @delegate:JsonIgnore on delegates in order to work
     val mapInvoiceResult: MapInvoiceResult?
         get() = readPdfResult?.invoice ?: readXmlResult?.invoice
 
+    @get:JsonIgnore
     val invoice: Invoice?
         get() = mapInvoiceResult?.invoice
 

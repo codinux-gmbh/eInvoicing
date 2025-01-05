@@ -1,5 +1,6 @@
 package net.codinux.invoicing.pdf
 
+import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.BigDecimal
 import net.codinux.invoicing.model.LocalDate
 
@@ -10,6 +11,7 @@ import net.codinux.invoicing.model.LocalDate
  *
  * Therefor this class' properties all contain 'possible' in their name to reflect this circumstance.
  */
+@Serializable
 class PdfInvoiceData(
     val potentialTotalAmount: AmountOfMoney,
     val potentialNetAmount: AmountOfMoney? = null,

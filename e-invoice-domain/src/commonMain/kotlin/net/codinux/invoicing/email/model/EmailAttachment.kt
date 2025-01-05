@@ -1,9 +1,12 @@
 package net.codinux.invoicing.email.model
 
+import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.pdf.PdfInvoiceData
+import net.codinux.kotlin.annotation.JsonIgnore
 
+@Serializable
 class EmailAttachment(
     val filename: String,
     val extension: String,
@@ -20,13 +23,16 @@ class EmailAttachment(
     val pdfInvoiceData: PdfInvoiceData? = null,
     val downloadedFilePath: String? = null
 ) {
+    @get:JsonIgnore // not that obvious, but Jackson affords @get:JsonIgnore instead of @delegate:JsonIgnore on delegates in order to work
     val isPdfFile: Boolean by lazy { extension == "pdf" || mediaType == "application/pdf" }
 
+    @get:JsonIgnore
     val containsEInvoice: Boolean by lazy { mapInvoiceResult != null }
 
-    val invoice: Invoice?
-        get() = mapInvoiceResult?.invoice
+    @get:JsonIgnore
+    val invoice: Invoice? by lazy { mapInvoiceResult?.invoice }
 
+    @get:JsonIgnore
     val couldExtractPdfInvoiceData: Boolean by lazy { pdfInvoiceData != null }
 
     override fun toString() = "$filename: $mapInvoiceResult"

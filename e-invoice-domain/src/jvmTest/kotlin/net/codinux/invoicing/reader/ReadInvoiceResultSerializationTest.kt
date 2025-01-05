@@ -4,10 +4,13 @@ import assertk.assertThat
 import assertk.assertions.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
+import net.codinux.invoicing.email.model.ContentDisposition
+import net.codinux.invoicing.email.model.EmailAttachment
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.TestInstances
 import net.codinux.invoicing.test.TestUtils
+import net.codinux.kotlin.extensions.countOccurrences
 import kotlin.test.Test
 
 class ReadInvoiceResultSerializationTest {
@@ -175,6 +178,17 @@ class ReadInvoiceResultSerializationTest {
         assertThat(jacksonResult).isEqualTo(kotlinxSerializationResult)
     }
 
+    @Test
+    fun extractXmlFromPdf_EnsureJacksonDoesNotSerializeIgnoredDelegates() {
+        val attachmentExtractionResult = reader.extractXmlFromPdf(getTestFile("ZUGFeRD.pdf"))
+
+        val json = jacksonObjectMapper.writeValueAsString(attachmentExtractionResult)
+
+
+        // ensure PdfAttachmentExtractionResult val invoiceXml: String? by lazy { attachments.firstOrNull { it.isProbablyEN16931InvoiceXml && it.xml != null }?.xml } does not get serialized
+        assertThat(json.contains("\"invoiceXml\"")).isFalse()
+    }
+
 
     @Test
     fun extractFromFile_Xml() {
@@ -200,6 +214,54 @@ class ReadInvoiceResultSerializationTest {
         assertThat(decoded.filename).isEqualTo(readFileResult.filename)
         assertThat(decoded.readPdfResult).isNotNull()
         assertEquals(readFileResult.readPdfResult, decoded.readPdfResult!!)
+    }
+
+    @Test
+    fun extractFromFile_Pdf_EnsureJacksonDoesNotSerializeIgnoredDelegates() {
+        val readFileResult = reader.extractFromFile(getTestFile("ZUGFeRD.pdf"), "ZUGFeRD.pdf")
+
+        val json = jacksonObjectMapper.writeValueAsString(readFileResult)
+
+
+        // ensure delegates of ReadEInvoiceFileResult do not get serialized
+        assertThat(json.contains("\"mapInvoiceResult\"")).isFalse()
+        assertThat(json.countOccurrences("\"invoice\"")).isEqualTo(2)
+    }
+
+
+    @Test
+    fun emailAttachment() = runTest {
+        val readPdfResult = reader.extractFromPdf(getTestFile("ZUGFeRD.pdf").readAllBytes())
+        val attachment = EmailAttachment("ZUGFeRD.pdf", "pdf", 17, ContentDisposition.Attachment, "application/pdf", "application/pdf", readPdfResult?.invoice)
+
+        val json = jacksonObjectMapper.writeValueAsString(attachment)
+
+        val decoded = kotlinxJson.decodeFromString<EmailAttachment>(json)
+
+
+        assertThat(decoded.filename).isEqualTo(attachment.filename)
+        assertThat(decoded.extension).isEqualTo(attachment.extension)
+        assertThat(decoded.size).isEqualTo(attachment.size)
+        assertThat(decoded.disposition).isEqualTo(attachment.disposition)
+        assertThat(decoded.mediaType).isEqualTo(attachment.mediaType)
+        assertThat(decoded.contentType).isEqualTo(attachment.contentType)
+
+        InvoiceAsserter.assertInvoice(decoded.mapInvoiceResult)
+    }
+
+    @Test
+    fun emailAttachment_EnsureJacksonDoesNotSerializeIgnoredDelegates() = runTest {
+        val readPdfResult = reader.extractFromPdf(getTestFile("ZUGFeRD.pdf").readAllBytes())
+        val attachment = EmailAttachment("ZUGFeRD.pdf", "pdf", 17, ContentDisposition.Attachment, "application/pdf", "application/pdf", readPdfResult?.invoice)
+
+        val json = jacksonObjectMapper.writeValueAsString(attachment)
+
+
+        // ensure delegates of EmailAttachment do not get serialized
+        assertThat(json.contains("\"isPdfFile\"")).isFalse()
+        assertThat(json.contains("\"containsEInvoice\"")).isFalse()
+        assertThat(json.contains("\"couldExtractPdfInvoiceData\"")).isFalse()
+        assertThat(json.countOccurrences("\"invoice\"")).isEqualTo(1)
     }
 
 
