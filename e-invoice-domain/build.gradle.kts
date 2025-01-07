@@ -190,9 +190,43 @@ kotlin {
         val nonJvmMain by creating {
             dependsOn(commonMain.get())
         }
+        val nonJvmTest by creating {
+            dependsOn(commonTest.get())
+        }
+
+        val jsCommonMain by creating {
+            dependsOn(nonJvmMain)
+        }
+        val jsCommonTest by creating {
+            dependsOn(nonJvmTest)
+        }
+        jsMain {
+            dependsOn(jsCommonMain)
+        }
+        jsTest {
+            dependsOn(jsCommonTest)
+        }
+        val wasmJsMain by getting {
+            dependsOn(jsCommonMain)
+        }
+        val wasmJsTest by getting {
+            dependsOn(jsCommonTest)
+        }
+
         nativeMain {
             dependsOn(nonJvmMain)
         }
+        val linuxAndMingwMain by creating {
+            dependsOn(nativeMain.get())
+        }
+        linuxMain {
+            dependsOn(linuxAndMingwMain)
+        }
+        mingwMain {
+            dependsOn(linuxAndMingwMain)
+        }
+
+
         appleMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$ktorVersion")
         }
@@ -204,15 +238,11 @@ kotlin {
         }
 
         jsMain {
-            dependsOn(nonJvmMain)
-
             dependencies {
                 implementation("io.ktor:ktor-client-js:$ktorVersion")
             }
         }
         wasmJsMain {
-            dependsOn(nonJvmMain)
-
             dependencies {
                 implementation("io.ktor:ktor-client-js:$ktorVersion")
             }

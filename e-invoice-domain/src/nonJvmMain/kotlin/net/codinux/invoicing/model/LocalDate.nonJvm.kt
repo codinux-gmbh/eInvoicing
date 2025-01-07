@@ -1,6 +1,7 @@
 package net.codinux.invoicing.model
 
 import kotlinx.serialization.Serializable
+import net.codinux.invoicing.platform.NonJvmPlatform
 import net.codinux.invoicing.serialization.LocalDateSerializer
 
 /**
@@ -11,7 +12,7 @@ import net.codinux.invoicing.serialization.LocalDateSerializer
 actual class LocalDate actual constructor(actual val year: Int, actual val month: Int, actual val dayOfMonth: Int): Comparable<LocalDate> {
 
     actual companion object {
-        actual fun now() = LocalDate(2025, 1, 1) // TODO
+        actual fun now() = NonJvmPlatform.getLocalDateNow()
     }
 
 
