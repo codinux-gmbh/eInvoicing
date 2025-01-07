@@ -1,9 +1,16 @@
 package net.codinux.invoicing.platform
 
+import net.codinux.invoicing.model.Instant
 import net.codinux.invoicing.model.LocalDate
 import kotlin.js.Date
 
 internal actual object NonJvmPlatform {
+
+    actual fun getInstantNow(): Instant {
+        val millisSinceEpoch = Date.now()
+
+        return Instant((millisSinceEpoch / 1_000).toLong(), (millisSinceEpoch % 1_000).toInt() * 1_000_000)
+    }
 
     actual fun getLocalDateNow(): LocalDate {
         val now = Date(Date.now())

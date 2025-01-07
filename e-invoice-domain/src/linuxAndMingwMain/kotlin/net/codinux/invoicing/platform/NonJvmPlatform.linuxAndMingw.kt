@@ -1,12 +1,25 @@
 package net.codinux.invoicing.platform
 
 import kotlinx.cinterop.*
+import net.codinux.invoicing.model.Instant
 import platform.posix.*
 import net.codinux.invoicing.model.LocalDate
 
+@OptIn(ExperimentalForeignApi::class)
 internal actual object NonJvmPlatform {
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(UnsafeNumber::class)
+    actual fun getInstantNow(): Instant {
+        val (seconds, nanos) = memScoped {
+            val time = alloc<timespec>()
+            clock_gettime(CLOCK_REALTIME, time.ptr)
+
+            time.tv_sec to time.tv_nsec.toInt()
+        }
+
+        return Instant(seconds, nanos)
+    }
+
     actual fun getLocalDateNow(): LocalDate {
         val localTime = memScoped {
             // Get the current time as seconds since Unix epoch
