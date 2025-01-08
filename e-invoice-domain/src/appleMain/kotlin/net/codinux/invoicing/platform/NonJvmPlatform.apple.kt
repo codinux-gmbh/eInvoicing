@@ -34,9 +34,9 @@ internal actual object NonJvmPlatform {
     actual fun getDayOfWeek(date: LocalDate): Int? {
         val components = NSDateComponents().apply {
             // date components expect an NSInteger, which is Int on 32-bit system and Long on 64-bit systems -> convert Ints to NSInteger
-            this.year = NSNumber(int = date.year).integerValue
-            this.month = NSNumber(int = date.month).integerValue
-            this.day = NSNumber(int = date.dayOfMonth).integerValue
+            this.year = date.year.toNSInteger()
+            this.month = date.month.toNSInteger()
+            this.day = date.dayOfMonth.toNSInteger()
         }
 
         val calendar = NSCalendar.currentCalendar
