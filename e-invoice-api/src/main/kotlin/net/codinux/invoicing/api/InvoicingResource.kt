@@ -34,21 +34,21 @@ class InvoicingResource(
     @POST
     @Operation(summary = "Create an e-invoice XML in format determined by format parameter")
     @Tag(name = "Create")
-    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat) =
+    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat): String =
         service.createInvoiceXml(invoice, format)
 
     @Path("create/xrechnung")
     @POST
     @Operation(summary = "Create a XRechnung XML")
     @Tag(name = "Create")
-    fun createXRechnung(invoice: Invoice) =
+    fun createXRechnung(invoice: Invoice): String =
         service.createXRechnung(invoice)
 
     @Path("create/facturx/xml")
     @POST
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML (ZUGFeRD is a synonym for Factur-X)")
     @Tag(name = "Create")
-    fun createFacturXXml(invoice: Invoice) =
+    fun createFacturXXml(invoice: Invoice): String =
         service.createFacturXXml(invoice)
 
     @Path("create/facturx/pdf")
