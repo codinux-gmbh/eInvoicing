@@ -13,6 +13,10 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
     }
 
 
+    // 1 = Monday, ..., 7 = Sunday
+    actual val dayOfWeek: Int? = java.time.LocalDate.of(year, month, dayOfMonth).dayOfWeek.value - 1
+
+
     fun toJvmDate() = java.time.LocalDate.of(year, month, dayOfMonth)
 
     fun toJvmInstantAtSystemDefaultZone(): Instant = toJvmDate().atStartOfDay(ZoneId.systemDefault()).toInstant()

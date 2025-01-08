@@ -38,4 +38,31 @@ internal actual object NonJvmPlatform {
         return LocalDate(year, month, day)
     }
 
+    actual fun getDayOfWeek(date: LocalDate): Int? {
+        val weekDay = memScoped {
+            val date = alloc<tm>().apply {
+                tm_year = date.year - 1900
+                tm_mon = date.month - 1
+                tm_mday = date.dayOfMonth
+                tm_hour = 12 // Set a safe time (no DST issues)
+                tm_min = 0
+                tm_sec = 0
+            }
+
+            // convert to time_t and normalize
+            val time = mktime(date.ptr)
+            if (time == -1L) {
+                null // Invalid date
+            } else {
+                date.tm_wday
+            }
+        }
+
+        return weekDay?.let {
+            // 0 = Sunday, ..., 6 = Saturday
+            if (it == 0) 6
+            else it - 1
+        }
+    }
+
 }

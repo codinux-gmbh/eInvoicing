@@ -9,4 +9,6 @@ internal expect object NonJvmPlatform {
 
     fun getLocalDateNow(): LocalDate
 
+    fun getDayOfWeek(date: LocalDate): Int?
+
 }

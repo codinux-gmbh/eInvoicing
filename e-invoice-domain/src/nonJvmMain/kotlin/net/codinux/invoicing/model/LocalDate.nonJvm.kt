@@ -16,6 +16,9 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
     }
 
 
+    actual val dayOfWeek = NonJvmPlatform.getDayOfWeek(this)
+
+
     actual override fun compareTo(other: LocalDate): Int {
         val yearCompare = year.compareTo(other.year)
         if (yearCompare != 0) return yearCompare

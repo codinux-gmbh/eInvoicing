@@ -19,4 +19,14 @@ internal actual object NonJvmPlatform {
         return LocalDate(now.getFullYear(), now.getMonth() + 1, now.getDate())
     }
 
+    actual fun getDayOfWeek(date: LocalDate): Int? {
+        val jsDate = Date(date.year, date.month - 1, date.dayOfMonth)
+
+        // 0 = Sunday
+        return jsDate.getDay().let {
+            if (it == 0) 6
+            else it - 1
+        }
+    }
+
 }

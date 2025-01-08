@@ -19,6 +19,8 @@ expect class LocalDate(year: Int, month: Int, dayOfMonth: Int) : Comparable<Loca
     val month: Int
     val year: Int
 
+    val dayOfWeek: Int?
+
 
     override fun compareTo(other: LocalDate): Int
 

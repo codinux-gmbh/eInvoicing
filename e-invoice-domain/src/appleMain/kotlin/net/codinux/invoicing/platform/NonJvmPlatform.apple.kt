@@ -5,6 +5,7 @@ import net.codinux.invoicing.model.Instant
 import platform.Foundation.*
 import net.codinux.invoicing.model.LocalDate
 
+@OptIn(UnsafeNumber::class)
 internal actual object NonJvmPlatform {
 
     actual fun getInstantNow(): Instant {
@@ -18,7 +19,6 @@ internal actual object NonJvmPlatform {
         return Instant(secondsSinceEpoch.toLong(), nanosString.toInt())
     }
 
-    @OptIn(UnsafeNumber::class)
     actual fun getLocalDateNow(): LocalDate {
         val currentDate = NSDate()
 
@@ -29,6 +29,23 @@ internal actual object NonJvmPlatform {
         )
 
         return LocalDate(components.year.toInt(), components.month.toInt(), components.day.toInt())
+    }
+
+    actual fun getDayOfWeek(date: LocalDate): Int? {
+        val components = NSDateComponents().apply {
+            this.year = date.year.toLong()
+            this.month = date.month.toLong()
+            this.day = date.dayOfMonth.toLong()
+        }
+
+        val calendar = NSCalendar.currentCalendar
+        val nsDate = calendar.dateFromComponents(components) ?: return null
+
+        // The weekday units are the numbers 1 through N (where for the Gregorian calendar N=7 and 1 is Sunday).
+        val weekDay = calendar.component(NSCalendarUnitWeekday, nsDate).toInt()
+        // NSCalendarUnitWeekdayOrdinal == week of month
+
+        return if (weekDay == 1) 6 else weekDay - 2
     }
 
 }
