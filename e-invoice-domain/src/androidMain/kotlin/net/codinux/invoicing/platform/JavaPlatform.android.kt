@@ -2,6 +2,7 @@ package net.codinux.invoicing.platform
 
 import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.pdf.*
+import net.codinux.kotlin.android.AndroidContext
 
 actual object JavaPlatform {
 

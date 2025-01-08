@@ -18,7 +18,7 @@ implementation("net.codinux.invoicing:e-invoice:0.7.0")
 On Android for working with PDFs the Android application context is required. Call this line before creating and PDF relevant classes (like EInvoiceReader or EInvoiceCreator):
 
 ```kotlin
-AndroidContext.applicationContext = this.applicationContext
+net.codinux.kotlin.android.AndroidContext.applicationContext = this.applicationContext
 ```
 
 E.g. in MainActivity:
