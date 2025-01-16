@@ -30,8 +30,10 @@ open class EInvoiceFormatDetector(
             pdfAttachmentReader.getFileAttachments(file.inputStream()).invoiceXml?.let { xml ->
                 detectFormat(xml)
             }
-        } else {
+        } else if (file.extension.lowercase() == "xml") {
             detectFormat(file.readText())
+        } else {
+            null
         }
 
     open fun detectFormat(xml: String): EInvoiceFormatDetectionResult? =
@@ -44,11 +46,8 @@ open class EInvoiceFormatDetector(
 
     open fun detectFormat(xmlDocument: Document): EInvoiceFormatDetectionResult? {
         val root = xmlDocument.documentElement
-        val namespacePrefix = root.tagName.substringBeforeOrNull(':')
-        if (namespacePrefix != null) {
-            val namespaceDeclarations = root.getNamespaceDeclarations()
-            val namespace = namespaceDeclarations[namespacePrefix]
-
+        val namespace = getRootElementNamespace(root)
+        if (namespace != null) {
             val formatFromRootNamespace = when (namespace) {
                 "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" -> EInvoiceFormat.CII
                 else -> null
@@ -63,8 +62,19 @@ open class EInvoiceFormatDetector(
         return null
     }
 
+    protected open fun getRootElementNamespace(root: Element): String? {
+        val namespacePrefix = root.tagName.substringBeforeOrNull(':')
+
+        return if (namespacePrefix != null) {
+            val namespaceDeclarations = root.getNamespaceDeclarations()
+            namespaceDeclarations[namespacePrefix]
+        } else {
+            root.getAttribute("xmlns").takeUnless { it.isBlank() }
+        }
+    }
+
     protected open fun detectFormatOfCiiFile(root: Element): EInvoiceFormatDetectionResult? {
-        val ciiFormatId = root.getElementOrNull("rsm:ExchangedDocumentContext")
+        val ciiFormatId = (root.getElementOrNull("rsm:ExchangedDocumentContext") ?: root.getElementOrNull("ExchangedDocumentContext")) // Zugferd 2.0 uses "ExchangedDocumentContext:
             ?.getElementOrNull("ram:GuidelineSpecifiedDocumentContextParameter")
             ?.getElementOrNull("ram:ID")
             ?.textContent
@@ -73,11 +83,23 @@ open class EInvoiceFormatDetector(
             null
         } else {
             when (ciiFormatId) {
+                // for a list of CII and UBL formats see: https://peppol.helger.com/public/locale-en_US/menuitem-validation-ws2
                 "urn:factur-x.eu:1p0:minimum" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
                 "urn:factur-x.eu:1p0:basicwl" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
                 "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
                 "urn:cen.eu:en16931:2017" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
                 "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+
+                // XRechnung
+                "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2",
+                "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1",
+                "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung) // TODO: or use extra EInvoiceFormat?
+
+                // Zugferd 2.0
+                "urn:zugferd.de:2p0:minimum" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Minimum)
+                "urn:cen.eu:en16931:2017#compliant#urn:zugferd.de:2p0:basic" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Basic)
+                "urn:cen.eu:en16931:2017#conformant#urn:zugferd.de:2p0:extended" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Extended)
+
                 else -> null
             }
         }

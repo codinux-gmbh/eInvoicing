@@ -105,6 +105,7 @@ kotlin {
     val kmpBaseVersion: String by project
     val klfVersion: String by project
 
+    val invoiceTestFilesVersion: String by project
     val assertKVersion: String by project
     val xunitVersion: String by project
     val jacksonVersion: String by project
@@ -148,6 +149,8 @@ kotlin {
             dependsOn(commonTest.get())
 
             dependencies {
+                implementation("net.codinux.invoicing:e-invoice-test-files:$invoiceTestFilesVersion")
+
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
                 implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
