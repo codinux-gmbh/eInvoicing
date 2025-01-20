@@ -98,6 +98,8 @@ kotlin {
     val textExtractorVersion: String by project
     val pdfBoxAndroidVersion: String by project
 
+    val veraPdfVersion: String by project
+
     val angusMailVersion: String by project
 
     val ktorVersion: String by project
@@ -138,6 +140,8 @@ kotlin {
                 // pdf invoice data extraction
                 api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractorVersion")
                 api("net.dankito.text.extraction:pdfbox-text-extractor:$textExtractorVersion")
+
+                implementation("org.verapdf:validation-model-jakarta:$veraPdfVersion")
 
                 implementation("org.eclipse.angus:angus-mail:$angusMailVersion")
 
