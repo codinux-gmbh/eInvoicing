@@ -4,7 +4,9 @@ import net.codinux.invoicing.model.EInvoiceProfile
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.log.logger
 import org.apache.pdfbox.Loader
+import org.apache.pdfbox.cos.COSArray
 import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.cos.COSObject
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary
 import org.apache.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode
@@ -20,6 +22,7 @@ import org.apache.xmpbox.schema.XMPSchema
 import org.apache.xmpbox.xml.DomXmpParser
 import org.apache.xmpbox.xml.XmpSerializer
 import org.mustangproject.ZUGFeRD.PDFAConformanceLevel
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.nio.file.Path
@@ -52,40 +55,82 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
     protected open fun attachInvoiceXmlToPdf(document: PDDocument, profile: EInvoiceProfile, xml: String, output: OutputStream) {
         val attachmentName = if (profile == EInvoiceProfile.XRechnung) "xrechnung.xml" else "factur-x.xml"
 
-        embedInvoiceXml(document, xml, attachmentName)
+        val fileSpec = addInvoiceXmlToAssociatedFiles(document, xml, attachmentName)
 
-        // TODO: create /AF array as depictured on Factur-X 1.0.07 DE.pdf, p. 28
+        addInvoiceXmlToEmbeddedFilesDictionary(document, fileSpec)
 
         addFacturXXmp(document, profile)
 
         document.save(output)
     }
 
-    protected open fun embedInvoiceXml(document: PDDocument, xml: String, attachmentName: String) {
-        val names = PDDocumentNameDictionary(document.documentCatalog)
-        val embeddedFiles = names.embeddedFiles ?: PDEmbeddedFilesNameTreeNode()
 
-        val fileMap = (embeddedFiles.names?.toMutableMap() ?: mutableMapOf())
+    // builds the structure outlined in Factur-X 1.0.07 DE.pdf p. 28
+    protected open fun addInvoiceXmlToAssociatedFiles(document: PDDocument, xml: String, attachmentName: String): PDComplexFileSpecification {
+        // Key Fields in /AF
+        //    /F: The file name of the embedded file.
+        //    /UF: The file name in Unicode, allowing non-ASCII characters.
+        //    /Desc: A description of the file's purpose or contents.
+        //    /EF: A dictionary linking to the embedded file's content stream.
+        val fileSpecificationDictionary = PDComplexFileSpecification()
+        fileSpecificationDictionary.file = attachmentName // /F
+        fileSpecificationDictionary.fileUnicode = attachmentName // /UF
+        fileSpecificationDictionary.fileDescription = "Factur-x invoice" // /Desc
+        fileSpecificationDictionary.cosObject.setName(COSName.AF_RELATIONSHIP, "Alternative") // don't use setString(), VeraPDF gives an error then
 
-        val cosStream = document.document.createCOSStream()
-        cosStream.createOutputStream().use {
-            it.bufferedWriter().use { writer ->
-                writer.write(xml)
+        val xmlBytes = xml.encodeToByteArray()
+        fileSpecificationDictionary.embeddedFile = PDEmbeddedFile(document, ByteArrayInputStream(xmlBytes)).apply {
+            subtype = "application/xml" // according to spec "text/xml", but "application/text" is recommended by RFC 7303
+            size = xmlBytes.size
+            creationDate = Calendar.getInstance()
+            modDate = Calendar.getInstance()
+        }
+
+        val afArray = getAssociatedFilesArray(document)
+        afArray.add(fileSpecificationDictionary)
+
+        return fileSpecificationDictionary
+    }
+
+    protected open fun getAssociatedFilesArray(document: PDDocument): COSArray {
+        // The /AF (Associated Files) entry is used to attach external files to the PDF in a way that links the attachment
+        // to a specific part of the document, such as the document as a whole, a page, or an annotation. This is a key feature
+        // of PDF/A-3, which permits embedding arbitrary file formats for archival and document exchange purposes.
+        // The /AF entry is an array of File Specification dictionaries. These dictionaries describe the embedded files
+        // and contain details such as the file name, description, and content stream.
+
+        val existingAfArray = document.documentCatalog.cosObject.getItem(COSName.AF)
+        if (existingAfArray == null) {
+            return COSArray().also {
+                document.documentCatalog.cosObject.setItem(COSName.AF, it)
             }
         }
-        cosStream.setItem(COSName.TYPE, COSName.EMBEDDED_FILES)
-        cosStream.setString(COSName.SUBTYPE, "application/xml")
 
-        val fileSpec = PDComplexFileSpecification()
-        fileSpec.file = attachmentName
-        fileSpec.embeddedFile = PDEmbeddedFile(cosStream)
+        return if (existingAfArray.isDirect) { // like all objects in a COSDictionary value can be a direct or indirect object
+            existingAfArray as COSArray
+        } else {
+            (existingAfArray as COSObject).`object` as COSArray
+        }
+    }
+
+    protected open fun addInvoiceXmlToEmbeddedFilesDictionary(document: PDDocument, fileSpec: PDComplexFileSpecification) {
+        val catalog = document.documentCatalog
+        val names = catalog.names ?: PDDocumentNameDictionary(document.documentCatalog).apply {
+            catalog.names = this
+        }
+        val embeddedFiles = names.embeddedFiles ?: PDEmbeddedFilesNameTreeNode().apply {
+            names.embeddedFiles = this
+        }
+
+        // embeddedFiles.names returned UnmodifiableMap, therefore embeddedFiles.names?.toMutableMap() did not work
+        val fileMap = mutableMapOf<String, PDComplexFileSpecification>().apply {
+            embeddedFiles.names?.let {
+                it.forEach { (name, fileSpec) -> this.put(name.toString(), fileSpec) }
+            }
+        }
 
         fileMap.put(fileSpec.file, fileSpec)
-
         embeddedFiles.names = fileMap
-
-        names.embeddedFiles = embeddedFiles
-        document.documentCatalog.names = names
     }
 
     protected open fun addFacturXXmp(document: PDDocument, profile: EInvoiceProfile) {

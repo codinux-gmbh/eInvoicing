@@ -1,19 +1,16 @@
 package net.codinux.invoicing.pdf
 
 import assertk.assertThat
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
-import assertk.assertions.isTrue
+import assertk.assertions.*
 import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.validation.EInvoicePdfValidator
 import java.nio.file.Files
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
+import java.nio.file.Path
+import java.util.*
+import kotlin.io.path.*
 import kotlin.test.Test
 
 class PdfBoxPdfAttachmentWriterTest {
@@ -30,6 +27,7 @@ class PdfBoxPdfAttachmentWriterTest {
         val format = EInvoiceXmlFormat.FacturX
         val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rsm:CrossIndustryInvoice" // to trick Mustang's simple validation
         val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
+        destination.deleteIfExists()
 
         underTest.addFileAttachment(getTestFile("NoAttachments.pdf"), format, xmlContent, destination.outputStream())
 
@@ -59,6 +57,7 @@ class PdfBoxPdfAttachmentWriterTest {
         val validationResult = pdfValidator.validate(destination)
 
         assertThat(validationResult.isValid).isTrue()
+        assertThat(validationResult.validationErrors).isEmpty()
     }
 
 
