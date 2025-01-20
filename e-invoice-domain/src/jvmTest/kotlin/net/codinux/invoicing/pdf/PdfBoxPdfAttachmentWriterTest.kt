@@ -7,8 +7,11 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
+import net.codinux.invoicing.validation.EInvoicePdfValidator
 import java.nio.file.Files
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.test.Test
@@ -18,6 +21,8 @@ class PdfBoxPdfAttachmentWriterTest {
     private val underTest = PdfBoxPdfAttachmentWriter()
 
     private val reader = PdfBoxPdfAttachmentReader()
+
+    private val pdfValidator = EInvoicePdfValidator()
 
 
     @Test
@@ -38,6 +43,22 @@ class PdfBoxPdfAttachmentWriterTest {
         assertThat(attachment.isXmlFile).isTrue()
         assertThat(attachment.xml).isNotNull()
         assertThat(attachment.xml!!).isEqualTo(xmlContent)
+    }
+
+    @Test
+    fun addFileAttachment_PdfIsValid() {
+        val format = EInvoiceXmlFormat.FacturX
+        val xmlContent = TestData.FacturXXml
+        val pdfBytes = underTest.createEmptyPdfA3()
+
+        val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
+        destination.deleteIfExists()
+
+        underTest.addFileAttachment(pdfBytes, format, xmlContent, destination.outputStream())
+
+        val validationResult = pdfValidator.validate(destination)
+
+        assertThat(validationResult.isValid).isTrue()
     }
 
 
