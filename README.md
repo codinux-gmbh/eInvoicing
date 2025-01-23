@@ -1,5 +1,8 @@
 # eInvoicing
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.codinux.invoicing/e-invoice/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.codinux.invoicing/e-invoice)
+
+
 Tools for working with eInvoicing according to EU standard EU 16931.
 
 As ZUGFeRD 2 and Factur-X unified their specification, these two names are used synonymously and interchangeably 
