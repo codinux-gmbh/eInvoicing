@@ -1,6 +1,8 @@
 package net.codinux.invoicing.format
 
 import net.codinux.invoicing.reader.fixXmlForReading
+import net.codinux.invoicing.reader.readToNextStartTag
+import net.codinux.invoicing.reader.readToNextText
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.EventType
 import nl.adaptivity.xmlutil.XmlReader
@@ -15,22 +17,17 @@ open class EInvoiceFormatDetector {
         try {
             val reader = xmlStreaming.newReader(fixXmlForReading(xml)) // a simple non-breaking space before first '<' makes XmlReader crash
 
-            if (reader.hasNext() == false) {
+            if (reader.readToNextStartTag() == false) {
                 null
             } else {
-                val event = reader.nextTag()
-                if (event != EventType.START_ELEMENT) {
-                    null
-                } else {
-                    val standard = detectEInvoiceStandard(reader.localName, reader.namespaceURI)
+                val standard = detectEInvoiceStandard(reader.localName, reader.namespaceURI)
 
-                    if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
-                        detectCiiFormat(reader)
-                    } else if (standard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
-                        detectUblFormat(reader)
-                    } else {
-                        EInvoiceFormatDetectionResult(standard)
-                    }
+                if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
+                    detectCiiFormat(reader)
+                } else if (standard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
+                    detectUblFormat(reader)
+                } else {
+                    EInvoiceFormatDetectionResult(standard)
                 }
             }
         } catch (e: Throwable) {
@@ -51,20 +48,13 @@ open class EInvoiceFormatDetector {
         }
 
     protected open fun detectCiiFormat(reader: XmlReader): EInvoiceFormatDetectionResult? {
-        while (reader.hasNext()) {
-            var event = reader.next() // .nextTag() throws an exception on TEXT events
-
-            if (event == EventType.START_ELEMENT) {
-                if (reader.localName == "GuidelineSpecifiedDocumentContextParameter") {
-                    // not get in its content the <ram:ID> -> TEXT node
-                    while (reader.hasNext()) {
-                        event = reader.next()
-                        if (event == EventType.TEXT) {
-                            return detectCiiFormat(reader.text)
-                        } else if (event == EventType.END_ELEMENT) {
-                            return null
-                        }
-                    }
+        while (reader.readToNextStartTag()) {
+            if (reader.localName == "GuidelineSpecifiedDocumentContextParameter") {
+                // now get in its content the <ram:ID> -> TEXT node
+                return if (reader.readToNextStartTag() && reader.readToNextText()) {
+                    detectCiiFormat(reader.text)
+                } else {
+                    null
                 }
             }
         }
