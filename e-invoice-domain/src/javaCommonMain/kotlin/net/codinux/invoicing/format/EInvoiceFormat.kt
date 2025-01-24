@@ -9,5 +9,6 @@ package net.codinux.invoicing.format
  */
 enum class EInvoiceFormat {
     FacturX,
-    Zugferd
+    Zugferd,
+    XRechnung
 }

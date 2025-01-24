@@ -99,7 +99,7 @@ class EInvoiceFormatDetectorTest {
     fun `Zugferd Version 2-3-2 Profile XRechnung`() {
         val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.XRechnung)
 
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung)
+        assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
     }
 
 
@@ -142,7 +142,7 @@ class EInvoiceFormatDetectorTest {
     fun `Zugferd Version 2-2 Profile XRechnung`() {
         val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.XRechnung)
 
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung)
+        assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
     }
 
 
@@ -180,7 +180,7 @@ class EInvoiceFormatDetectorTest {
         val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.EN16931)
             .filter { it.name.contains("_XRechnung") } // maintainers have put same XRechnung files into EN16931 folder
 
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung)
+        assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
     }
 
     @Test
@@ -220,6 +220,21 @@ class EInvoiceFormatDetectorTest {
     }
 
 
+    @Test
+    fun `XRechnung CII`() {
+        val testFiles = EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.CII)
+
+        assertFiles(testFiles, EInvoicingStandard.CII, EInvoiceFormat.XRechnung)
+    }
+
+    @Test
+    fun `XRechnung UBL`() {
+        val testFiles = EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.UBL)
+
+        assertFiles(testFiles, EInvoicingStandard.UBL, EInvoiceFormat.XRechnung)
+    }
+
+
     private fun assertCiiFiles(testFiles: List<Path>, format: EInvoiceFormat, formatVersion: String? = null, profile: FacturXProfile? = null) {
         assertFiles(testFiles, EInvoicingStandard.CII, format, formatVersion, profile)
     }
@@ -235,7 +250,10 @@ class EInvoiceFormatDetectorTest {
                 assertThat(result).isNotNull()
                 assertThat(result!!.standard).isEqualTo(standard)
                 assertThat(result.format).isEqualTo(format)
-                assertThat(result.formatVersion).isEqualTo(formatVersion)
+
+                if (formatVersion != null) { // version may be stated by not tested, e.g. for XRechnung it can be any value of "1.2", "2.1" or "3.0"
+                    assertThat(result.formatVersion).isEqualTo(formatVersion)
+                }
 
                 if (profile == null) {
                     assertThat(result.profile).isNull()
