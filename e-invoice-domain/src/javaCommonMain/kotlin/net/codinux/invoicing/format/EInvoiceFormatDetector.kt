@@ -22,6 +22,7 @@ open class EInvoiceFormatDetector {
                     null
                 } else {
                     val eInvoiceStandard = detectEInvoiceStandard(reader.name.localPart, reader.name.namespaceURI)
+
                     if (eInvoiceStandard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
                         detectCiiFormat(reader)
                     } else if (eInvoiceStandard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
@@ -49,21 +50,21 @@ open class EInvoiceFormatDetector {
         }
 
     protected open fun detectCiiFormat(reader: XmlReader): EInvoiceFormatDetectionResult? {
-        var isInGuidelineSpecifiedDocumentContextParameterElement = false
-
         while (reader.hasNext()) {
             var event = reader.next() // .nextTag() throws an exception on TEXT events
+
             if (event == EventType.START_ELEMENT) {
                 if (reader.localName == "GuidelineSpecifiedDocumentContextParameter") {
-                    isInGuidelineSpecifiedDocumentContextParameterElement = true
-                } else if (isInGuidelineSpecifiedDocumentContextParameterElement && reader.localName == "ID") {
-                    event = reader.next()
-                    if (event == EventType.TEXT) {
-                        return detectCiiFormat(reader.text)
+                    // not get in its content the <ram:ID> -> TEXT node
+                    while (reader.hasNext()) {
+                        event = reader.next()
+                        if (event == EventType.TEXT) {
+                            return detectCiiFormat(reader.text)
+                        } else if (event == EventType.END_ELEMENT) {
+                            return null
+                        }
                     }
                 }
-            } else if (event == EventType.END_ELEMENT && reader.localName == "GuidelineSpecifiedDocumentContextParameter") {
-                return null
             }
         }
 
