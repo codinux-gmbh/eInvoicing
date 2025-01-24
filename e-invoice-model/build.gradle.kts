@@ -45,13 +45,24 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
 
+    val kotlinxSerializationVersion: String by project
+    val kotlinxSerializationSerializers: String by project
+
+    val xmlUtilVersion: String by project
+
     val klfVersion: String by project
 
+    val invoiceTestFilesVersion: String by project
     val assertKVersion: String by project
     val logbackVersion: String by project
 
     sourceSets {
         commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
+            implementation("net.codinux.kotlin.serialization:kotlinx-serialization-serializers:$kotlinxSerializationSerializers")
+
+            implementation("io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion")
+
             implementation("net.codinux.log:klf:$klfVersion")
         }
         commonTest.dependencies {
@@ -61,7 +72,7 @@ kotlin {
         }
 
         jvmTest.dependencies {
-
+            implementation("net.codinux.invoicing:e-invoice-test-files:$invoiceTestFilesVersion")
         }
     }
 }

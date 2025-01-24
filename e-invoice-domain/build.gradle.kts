@@ -92,6 +92,9 @@ kotlin {
 
     val kotlinCoroutinesVersion: String by project
 
+    val kotlinxSerializationVersion: String by project
+    val kotlinxSerializationSerializers: String by project
+
     val mustangVersion: String by project
 
     val textInfoExtractorVersion: String by project
@@ -104,6 +107,8 @@ kotlin {
 
     val ktorVersion: String by project
 
+    val xmlUtilVersion: String by project
+
     val kmpBaseVersion: String by project
     val klfVersion: String by project
 
@@ -115,11 +120,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":e-invoice-model"))
+
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
+
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
+            implementation("net.codinux.kotlin.serialization:kotlinx-serialization-serializers:$kotlinxSerializationSerializers")
+
+            implementation("io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion")
 
             implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
             implementation("net.codinux.log:klf:$klfVersion")
