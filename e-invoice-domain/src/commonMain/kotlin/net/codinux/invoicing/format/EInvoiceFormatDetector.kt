@@ -1,5 +1,6 @@
 package net.codinux.invoicing.format
 
+import net.codinux.invoicing.reader.fixXmlForReading
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.EventType
 import nl.adaptivity.xmlutil.XmlReader
@@ -12,7 +13,7 @@ open class EInvoiceFormatDetector {
 
     open fun detectFormat(xml: String): EInvoiceFormatDetectionResult? =
         try {
-            val reader = xmlStreaming.newReader(xml)
+            val reader = xmlStreaming.newReader(fixXmlForReading(xml)) // a simple non-breaking space before first '<' makes XmlReader crash
 
             if (reader.hasNext() == false) {
                 null
