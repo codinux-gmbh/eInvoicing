@@ -29,6 +29,8 @@ plugins {
 
 rootProject.name = "eInvoicing"
 
+include("e-invoice-model")
+
 include("e-invoice-domain")
 
 include("invoice-creator")
