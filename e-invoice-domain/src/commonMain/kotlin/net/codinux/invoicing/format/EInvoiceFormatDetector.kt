@@ -21,7 +21,7 @@ open class EInvoiceFormatDetector {
                 if (event != EventType.START_ELEMENT) {
                     null
                 } else {
-                    val standard = detectEInvoiceStandard(reader.name.localPart, reader.name.namespaceURI)
+                    val standard = detectEInvoiceStandard(reader.localName, reader.namespaceURI)
 
                     if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
                         detectCiiFormat(reader)
@@ -73,6 +73,39 @@ open class EInvoiceFormatDetector {
 
     protected open fun detectCiiFormat(formatId: String): EInvoiceFormatDetectionResult? =
         when (formatId) {
+            /*
+                Laut ChatGPT:
+
+                CII (Cross Industry Invoice):
+                    Namespace: "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice"
+                    Root Element: <rsm:CrossIndustryInvoice>
+
+                UBL (Universal Business Language):
+                    Namespace: "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+                    Root Element: <Invoice>
+
+                XRechnung (a UBL customization for Germany):
+                    Namespace: "urn:eu:factur-x:ubl:invoice:2p1" (for Factur-X UBL version)
+                    Additional elements might include <cbc:CustomizationID> containing "urn:cen.eu:en16931:2017"
+
+                ZUGFeRD 1.x:
+                    Namespace: "urn:ferd:CrossIndustryDocument:invoice:1p0"
+                    Root Element: <rsm:CrossIndustryDocument>
+
+                Profiles:
+
+                - Zugferd 1
+                            "urn:factur-x.eu:1p0:basic" → Basic
+                            "urn:factur-x.eu:1p0:basicwl" → Basic Without Lines
+                            "urn:factur-x.eu:1p0:en16931:extended" → Extended
+                            "urn:factur-x.eu:1p0:en16931:minimum" → Minimum
+
+                - XRechnung:
+                    <cbc:CustomizationID> with "urn:cen.eu:en16931:2017"
+
+                - UBL:
+                    <cbc:ProfileID> or <cbc:CustomizationID> can provide profile-specific information.
+             */
             // for a list of CII and UBL formats see: https://peppol.helger.com/public/locale-en_US/menuitem-validation-ws2
             "urn:factur-x.eu:1p0:minimum" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
             "urn:factur-x.eu:1p0:basicwl" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
