@@ -4,6 +4,7 @@ import kotlinx.serialization.decodeFromString
 import net.codinux.invoicing.format.EInvoiceFormatDetector
 import net.codinux.invoicing.format.EInvoicingStandard
 import net.codinux.invoicing.model.cii.lenient.CrossIndustryInvoice
+import net.codinux.invoicing.model.mapper.CiiMapper
 import net.codinux.kotlin.extensions.ofMaxLength
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
@@ -12,6 +13,7 @@ import nl.adaptivity.xmlutil.serialization.XML
 
 open class EInvoiceXmlReader(
     protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector(),
+    protected val mapper: CiiMapper = CiiMapper()
 ) {
 
     @OptIn(ExperimentalXmlUtilApi::class)
@@ -27,13 +29,14 @@ open class EInvoiceXmlReader(
     private val log by logger()
 
 
-    open fun parseInvoiceXml(invoiceXml: String): CrossIndustryInvoice? =
+    open fun parseInvoiceXml(invoiceXml: String): ReadEInvoiceXmlResult? =
         try {
             val fixedXml = fixXmlForReading(invoiceXml) // a simple non-breaking space before first '<' makes XmlReader crash
             val format = formatDetector.detectFormat(fixedXml)
 
             if (format?.standard == EInvoicingStandard.CII) {
-                xml.decodeFromString<CrossIndustryInvoice>(fixedXml)
+                val ciiInvoice = xml.decodeFromString<CrossIndustryInvoice>(fixedXml)
+                mapper.map(ciiInvoice, format.profile)
             } else {
                 null
             }

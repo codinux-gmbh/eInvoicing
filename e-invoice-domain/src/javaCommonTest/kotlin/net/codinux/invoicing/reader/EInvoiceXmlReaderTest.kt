@@ -1,6 +1,8 @@
 package net.codinux.invoicing.reader
 
 import assertk.assertThat
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import net.codinux.invoicing.format.EInvoicingStandard
@@ -257,6 +259,11 @@ class EInvoiceXmlReaderTest {
                 val result = underTest.parseInvoiceXml(invoiceXml)
 
                 assertThat(result).isNotNull()
+                assertThat(result!!.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
+                assertThat(result.readError).isNull()
+                assertThat(result.invoice).isNotNull()
+                assertThat(result.invoice!!.invoiceDataErrors).isEmpty()
+
 //                assertThat(result!!.standard).isEqualTo(standard)
 //                assertThat(result.format).isEqualTo(format)
 //
