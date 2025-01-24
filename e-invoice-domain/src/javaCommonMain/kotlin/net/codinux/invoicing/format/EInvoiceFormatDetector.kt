@@ -21,14 +21,14 @@ open class EInvoiceFormatDetector {
                 if (event != EventType.START_ELEMENT) {
                     null
                 } else {
-                    val eInvoiceStandard = detectEInvoiceStandard(reader.name.localPart, reader.name.namespaceURI)
+                    val standard = detectEInvoiceStandard(reader.name.localPart, reader.name.namespaceURI)
 
-                    if (eInvoiceStandard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
+                    if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
                         detectCiiFormat(reader)
-                    } else if (eInvoiceStandard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
+                    } else if (standard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
                         detectUblFormat(reader)
                     } else {
-                        null
+                        EInvoiceFormatDetectionResult(standard)
                     }
                 }
             }
@@ -74,24 +74,27 @@ open class EInvoiceFormatDetector {
     protected open fun detectCiiFormat(formatId: String): EInvoiceFormatDetectionResult? =
         when (formatId) {
             // for a list of CII and UBL formats see: https://peppol.helger.com/public/locale-en_US/menuitem-validation-ws2
-            "urn:factur-x.eu:1p0:minimum" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
-            "urn:factur-x.eu:1p0:basicwl" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
-            "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
-            "urn:cen.eu:en16931:2017" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
-            "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+            "urn:factur-x.eu:1p0:minimum" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
+            "urn:factur-x.eu:1p0:basicwl" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
+            "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
+            "urn:cen.eu:en16931:2017" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
+            "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended" -> ciiResult(EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
 
             // XRechnung
             "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2",
             "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1",
-            "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung) // TODO: or use extra EInvoiceFormat?
+            "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" -> ciiResult(EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung) // TODO: or use extra EInvoiceFormat?
 
             // Zugferd 2.0
-            "urn:zugferd.de:2p0:minimum" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Minimum)
-            "urn:cen.eu:en16931:2017#compliant#urn:zugferd.de:2p0:basic" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Basic)
-            "urn:cen.eu:en16931:2017#conformant#urn:zugferd.de:2p0:extended" -> EInvoiceFormatDetectionResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Extended)
+            "urn:zugferd.de:2p0:minimum" -> ciiResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Minimum)
+            "urn:cen.eu:en16931:2017#compliant#urn:zugferd.de:2p0:basic" -> ciiResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Basic)
+            "urn:cen.eu:en16931:2017#conformant#urn:zugferd.de:2p0:extended" -> ciiResult(EInvoiceFormat.Zugferd, "2", FacturXProfile.Extended)
 
             else -> null
         }
+
+    protected open fun ciiResult(format: EInvoiceFormat, formatVersion: String, profile: FacturXProfile) =
+        EInvoiceFormatDetectionResult(EInvoicingStandard.CII, format, formatVersion, profile)
 
     protected open fun detectUblFormat(reader: XmlReader): EInvoiceFormatDetectionResult? {
         return null // TODO
@@ -102,7 +105,8 @@ open class EInvoiceFormatDetector {
             // XRechnung
             "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2",
             "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1",
-            "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" -> EInvoiceFormatDetectionResult(EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung) // TODO: or use extra EInvoiceFormat?
+            "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" ->
+                EInvoiceFormatDetectionResult(EInvoicingStandard.UBL, EInvoiceFormat.FacturX, "2", FacturXProfile.XRechnung) // TODO: or use extra EInvoiceFormat?
 
             else -> null
         }

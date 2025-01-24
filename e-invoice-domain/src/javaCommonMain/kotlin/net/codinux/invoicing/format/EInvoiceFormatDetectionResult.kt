@@ -1,7 +1,8 @@
 package net.codinux.invoicing.format
 
 data class EInvoiceFormatDetectionResult(
-    val format: EInvoiceFormat,
+    val standard: EInvoicingStandard,
+    val format: EInvoiceFormat? = null,
     val formatVersion: String? = null,
     val profile: FacturXProfile? = null,
 ) {
