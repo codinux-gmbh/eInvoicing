@@ -5,12 +5,20 @@ import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.testfiles.*
 import java.nio.file.Path
+import kotlin.io.path.extension
+import kotlin.io.path.inputStream
 import kotlin.io.path.name
+import kotlin.io.path.readText
 import kotlin.test.Test
+import kotlin.test.fail
 
 class EInvoiceFormatDetectorTest {
+
+    private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 
     private val underTest = EInvoiceFormatDetector()
 
@@ -214,19 +222,34 @@ class EInvoiceFormatDetectorTest {
 
     private fun assertFiles(testFiles: List<Path>, format: EInvoiceFormat, formatVersion: String? = null, profile: FacturXProfile? = null) {
         testFiles.forEach { testFile ->
-            val result = underTest.detectFormat(testFile)
-
-            assertThat(result).isNotNull()
-            assertThat(result!!.format).isEqualTo(format)
-            assertThat(result.formatVersion).isEqualTo(formatVersion)
-
-            if (profile == null) {
-                assertThat(result.profile).isNull()
+            val invoiceXml = getInvoiceXml(testFile)
+            if (invoiceXml == null) {
+                fail("Could not get invoice XML for test file: $testFile")
             } else {
-                assertThat(result.profile).isNotNull().isEqualByComparingTo(profile)
+                val result = underTest.detectFormat(invoiceXml)
+
+                assertThat(result).isNotNull()
+                assertThat(result!!.format).isEqualTo(format)
+                assertThat(result.formatVersion).isEqualTo(formatVersion)
+
+                if (profile == null) {
+                    assertThat(result.profile).isNull()
+                } else {
+                    assertThat(result.profile).isNotNull().isEqualByComparingTo(profile)
+                }
             }
         }
     }
+
+    private fun getInvoiceXml(file: Path): String? =
+        // TODO: improve file detection
+        if (file.extension.lowercase() == "pdf") {
+            pdfAttachmentReader.getFileAttachments(file.inputStream()).invoiceXml
+        } else if (file.extension.lowercase() == "xml") {
+            file.readText()
+        } else {
+            null
+        }
 
     private fun getTestFiles(format: EInvoiceFormat, version: EInvoiceFormatVersion, profile: FacturXProfile? = null): List<Path> =
         EInvoiceTestFiles.getTestFiles(net.codinux.invoicing.testfiles.EInvoiceFormat.valueOf(format.name), version, profile?.let { EInvoiceProfile.valueOf(it.name) })

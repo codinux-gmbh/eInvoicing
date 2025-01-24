@@ -2,39 +2,19 @@ package net.codinux.invoicing.format
 
 import net.codinux.invoicing.extension.getElementOrNull
 import net.codinux.invoicing.extension.getNamespaceDeclarations
-import net.codinux.invoicing.pdf.PdfAttachmentReader
-import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.kotlin.extensions.substringBeforeOrNull
 import net.codinux.log.logger
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.io.ByteArrayInputStream
-import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.io.path.extension
-import kotlin.io.path.inputStream
-import kotlin.io.path.readText
 
-open class EInvoiceFormatDetector(
-    protected open val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
-) {
+open class EInvoiceFormatDetector {
 
     protected val documentBuilderFactory = DocumentBuilderFactory.newInstance()
 
     private val log by logger()
 
-
-    open fun detectFormat(file: Path): EInvoiceFormatDetectionResult? =
-        // TODO: improve file detection
-        if (file.extension.lowercase() == "pdf") {
-            pdfAttachmentReader.getFileAttachments(file.inputStream()).invoiceXml?.let { xml ->
-                detectFormat(xml)
-            }
-        } else if (file.extension.lowercase() == "xml") {
-            detectFormat(file.readText())
-        } else {
-            null
-        }
 
     open fun detectFormat(xml: String): EInvoiceFormatDetectionResult? =
         try {
