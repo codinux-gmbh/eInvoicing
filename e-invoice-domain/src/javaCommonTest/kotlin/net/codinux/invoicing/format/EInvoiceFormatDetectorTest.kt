@@ -1,10 +1,7 @@
 package net.codinux.invoicing.format
 
 import assertk.assertThat
-import assertk.assertions.isEqualByComparingTo
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
-import assertk.assertions.isNull
+import assertk.assertions.*
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.testfiles.*
@@ -240,6 +237,8 @@ class EInvoiceFormatDetectorTest {
     }
 
     private fun assertFiles(testFiles: List<Path>, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        assertThat(testFiles).isNotEmpty()
+
         testFiles.forEach { testFile ->
             val invoiceXml = getInvoiceXml(testFile)
             if (invoiceXml == null) {

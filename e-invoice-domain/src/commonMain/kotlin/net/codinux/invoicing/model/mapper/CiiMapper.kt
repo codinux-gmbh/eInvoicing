@@ -4,6 +4,7 @@ import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.cii.lenient.*
 import net.codinux.invoicing.model.codes.Currency
+import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResult
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResultType
 import net.codinux.log.logger
@@ -54,13 +55,17 @@ open class CiiMapper {
 
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
-            items = emptyList() // invoice.zfItems.map { mapInvoiceItem(it, dataErrors) },
+            items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
+                if (it.isEmpty() && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+                    dataErrors.add(InvoiceDataError(InvoiceField.Items, InvoiceDataErrorType.ValueNotSet))
+                }
+            },
 
-//                customerReferenceNumber = invoice.referenceNumber,
-//
+            customerReferenceNumber = tradeAgreement.buyerReference?.value,
+
 //                amountAdjustments = mapAmountAdjustments(invoice),
-//
-//                totals = calculator.calculateTotalAmounts(invoice)
+
+                totals = mapTotalAmounts(tradeSettlement.specifiedTradeSettlementHeaderMonetarySummation, dataErrors)
         )
     }
 
@@ -94,6 +99,78 @@ open class CiiMapper {
             Party(map(party.name), map(address?.streetName), address?.additionalStreetName?.value, address?.postcodeCode?.value, map(address?.cityName))
         }
 
+    protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, tradeSettlement: HeaderTradeSettlement, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? =
+        item.specifiedLineTradeAgreement?.let { agreement ->
+            // gross: Der Einheitspreis ohne Umsatzsteuer vor Abzug des Nachlass auf den Artikelpreis
+            // net: Der Preis eines Artikels ohne Umsatzsteuer nach Abzug des Nachlass auf den Artikelpreis
+            (agreement.grossPriceProductTradePrice ?: agreement.netPriceProductTradePrice)?.let { price -> // netPrice is mandatory, grossPrice optional
+                // billedQuantity: Die Menge der in der betreffenden Zeile in Rechnung gestellten Einzelartikel (Waren oder Dienstleistungen) (both, specifiedLineTradeDelivery and billedQuantity, are mandatory)
+                item.specifiedLineTradeDelivery?.billedQuantity?.let { quantity ->
+                    InvoiceItem(
+                        mapText(item.specifiedTradeProduct?.name, InvoiceField.ItemName, dataErrors),
+                        mapQuantity(quantity, InvoiceField.ItemQuantity, dataErrors),
+                        mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
+                        mapAmount(price.chargeAmount, InvoiceField.ItemUnit, dataErrors),
+                        mapVatRate(tradeSettlement.applicableTradeTax)
+                    )
+                }
+            }
+        }
+
+    protected open fun mapVatRate(tradeTax: List<TradeTax>): BigDecimal =
+        tradeTax.firstOrNull { it.rateApplicablePercent?.value != null && it.calculatedAmount.any { it.value?.toPlainString()?.startsWith("-") == false } }
+            ?.rateApplicablePercent?.value ?: BigDecimal.Zero
+
+    protected open fun mapText(texts: List<Text>?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
+        mapNullableText(texts) ?: run {
+            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotSet))
+            ""
+        }
+
+    protected open fun mapNullableText(texts: List<Text>?): String? =
+        texts?.firstOrNull()?.value
+
+    protected open fun mapTotalAmounts(summation: TradeSettlementHeaderMonetarySummation?, dataErrors: MutableList<InvoiceDataError>): TotalAmounts =
+        if (summation == null) {
+            dataErrors.add(InvoiceDataError(InvoiceField.TotalAmount, InvoiceDataErrorType.ValueNotSet))
+            TotalAmounts.Zero
+        } else {
+
+            // TaxBasisTotalAmount, GrandTotalAmount and DuePayableAmount have to be set. TaxTotalAmount may be not set
+            TotalAmounts(
+                BigDecimal.Zero, // TODO: sum line items
+                BigDecimal.Zero, BigDecimal.Zero, // TODO: map allowances and charges
+                mapAmount(summation.taxBasisTotalAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
+                mapNullableAmount(summation.taxTotalAmount), // TODO: there may be more than one taxTotalAmount
+                mapAmount(summation.grandTotalAmount, InvoiceField.GrandTotalAmount, dataErrors),
+                BigDecimal.Zero, // TODO: get totalPrepaidAmount
+                mapAmount(summation.duePayableAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
+            )
+        }
+
+
+    protected open fun mapNullableAmount(amounts: List<Amount>): BigDecimal =
+        amounts.firstOrNull()?.value ?: BigDecimal.Zero
+
+    protected open fun mapAmount(amounts: List<Amount>, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
+        if (amounts.isEmpty() || amounts.firstOrNull()?.value == null) {
+            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            BigDecimal.Zero
+        } else {
+            amounts.first().value!!
+        }
+
+    protected open fun mapQuantity(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
+        quantity?.value ?: run {
+            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            BigDecimal.Zero
+        }
+
+    protected open fun mapUnit(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure =
+        quantity?.unitCode?.let { unitCode -> UnitOfMeasure.entries.firstOrNull { it.code == unitCode } } ?: run {
+            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            UnitOfMeasure.ZZ
+        }
 
     protected open fun mapCurrency(currencyCode: CurrencyCode?, dataErrors: MutableList<InvoiceDataError>): Currency =
         if (currencyCode == null || currencyCode.value == null) {
@@ -103,6 +180,7 @@ open class CiiMapper {
             val code = currencyCode.value
             Currency.entries.first { it.alpha3Code == code }
         }
+
 
     protected open fun map(dateTime: DateTime?): LocalDate =
         mapNullable(dateTime) ?: LocalDate(0, 1, 1)

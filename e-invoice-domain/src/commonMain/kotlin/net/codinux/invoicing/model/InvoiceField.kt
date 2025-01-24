@@ -11,7 +11,15 @@ enum class InvoiceField {
     CustomerAddress,
     CustomerCountry,
 
+    Items,
+    ItemName,
+    ItemQuantity,
     ItemUnit,
+    ItemUnitPrice,
 
-    TotalAmount
+    TotalAmount,
+    TaxBasisTotalAmount,
+    GrandTotalAmount,
+    DuePayableAmount
+
 }
