@@ -105,6 +105,14 @@ open class CiiMapper {
                 map(address?.additionalStreetName ?: address?.lineTwo), // lineTwo & lineThree = An additional address line in an address that can be used to give further details supplementing the main line.
                 mapNullable(address?.postcodeCode), map(address?.cityName),
                 address?.countryID?.value?.let { code -> Country.entries.firstOrNull { it.alpha2Code == code || it.alpha3Code == code } } ?: Country.UnknownCountry,
+
+                party.specifiedTaxRegistration.mapNotNull { it.id }.firstOrNull { it.schemeID == "VA" }?.value,
+
+                party.uRIUniversalCommunication.firstOrNull { it.channelCode?.value == "EM" }?.completeNumber?.value
+                    ?: party.definedTradeContact.firstNotNullOfOrNull { it.emailURIUniversalCommunication?.uriid?.value },
+                party.definedTradeContact.firstNotNullOfOrNull { it.mobileTelephoneUniversalCommunication?.completeNumber?.value }
+                    ?: party.definedTradeContact.firstNotNullOfOrNull { it.telephoneUniversalCommunication?.completeNumber?.value },
+                party.definedTradeContact.firstNotNullOfOrNull { it.faxUniversalCommunication?.completeNumber?.value }
             )
         }
 
