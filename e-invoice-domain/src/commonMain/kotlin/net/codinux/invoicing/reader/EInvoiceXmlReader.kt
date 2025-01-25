@@ -36,7 +36,7 @@ open class EInvoiceXmlReader(
 
             if (format?.standard == EInvoicingStandard.CII) {
                 val ciiInvoice = xml.decodeFromString<CrossIndustryInvoice>(fixedXml)
-                mapper.map(ciiInvoice, format.profile)
+                mapper.map(ciiInvoice, format)
             } else {
                 null
             }

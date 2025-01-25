@@ -1,8 +1,11 @@
 package net.codinux.invoicing.model.mapper
 
+import net.codinux.invoicing.format.EInvoiceFormat
+import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
 import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.cii.lenient.*
+import net.codinux.invoicing.model.codes.Country
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResult
@@ -13,7 +16,7 @@ open class CiiMapper {
 
     private val log by logger()
 
-    open fun map(ciiInvoice: CrossIndustryInvoice, profile: FacturXProfile?): ReadEInvoiceXmlResult {
+    open fun map(ciiInvoice: CrossIndustryInvoice, profile: EInvoiceFormatDetectionResult?): ReadEInvoiceXmlResult {
         try {
             val dataErrors = mutableListOf<InvoiceDataError>()
             val exchangedDocument = ciiInvoice.exchangedDocument
@@ -46,7 +49,7 @@ open class CiiMapper {
         }
     }
 
-    protected open fun map(ciiInvoice: CrossIndustryInvoice, profile: FacturXProfile?, dataErrors: MutableList<InvoiceDataError>,
+    protected open fun map(ciiInvoice: CrossIndustryInvoice, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>,
                            exchangedDocument: ExchangedDocument, tradeTransaction: SupplyChainTradeTransaction,
                            tradeAgreement: HeaderTradeAgreement, tradeSettlement: HeaderTradeSettlement): Invoice {
 
@@ -56,7 +59,7 @@ open class CiiMapper {
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
             items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
-                if (it.isEmpty() && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+                if (it.isEmpty() && profile?.profile != FacturXProfile.Minimum && profile?.profile != FacturXProfile.BasicWL) {
                     dataErrors.add(InvoiceDataError(InvoiceField.Items, InvoiceDataErrorType.ValueNotSet))
                 }
             },
@@ -78,25 +81,31 @@ open class CiiMapper {
 
         return InvoiceDetails(
             map(exchangedDocument.id), map(tradeSettlement.invoiceDateTime), mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
-            map(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), map(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description?.firstOrNull())
+            map(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
         )
     }
 
-    protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: FacturXProfile?, dataErrors: MutableList<InvoiceDataError>): Party =
+    protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>): Party =
         if (party == null) {
             dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.Supplier else InvoiceField.Customer, InvoiceDataErrorType.ValueNotSet))
             Party("", "", null, null, "")
         } else {
+            // according to XSD the TradeParty object has no mandatory field - even in Extended profile. Only the Technical Appendix says that name is required
             val address = party.postalTradeAddress
-            val isAddressMandatory = isSeller || profile != FacturXProfile.Minimum // in the Minimum profile the buyer address may be null
-            if (address == null && isAddressMandatory) {
-                dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.SupplierAddress else InvoiceField.CustomerAddress, InvoiceDataErrorType.ValueNotSet))
-            }
-            if (address?.countryID?.value == null && isAddressMandatory) {
+            // countryId is the only mandatory field of address. And only in Factur-X, neither in CII nor in XRechnung
+            if (profile?.format == EInvoiceFormat.FacturX && address != null && address.countryID?.value == null) {
                 dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.SupplierCountry else InvoiceField.CustomerCountry, InvoiceDataErrorType.ValueNotSet))
             }
 
-            Party(map(party.name), map(address?.streetName), address?.additionalStreetName?.value, address?.postcodeCode?.value, map(address?.cityName))
+            Party(
+                map(party.name), // that's curious, the XSD says name is optional, the Technical Appendix says it's mandatory
+                // streetName is only in CII and XRechnung, not in Factur-X, that uses lineOne
+                map(address?.streetName ?: address?.lineOne), // lineOne = Usually the street name and number or post office box.
+                // also additionalStreetName is only in CII and XRechnung, not in Factur-X, that uses lineTwo and lineThree
+                map(address?.additionalStreetName ?: address?.lineTwo), // lineTwo & lineThree = An additional address line in an address that can be used to give further details supplementing the main line.
+                mapNullable(address?.postcodeCode), map(address?.cityName),
+                address?.countryID?.value?.let { code -> Country.entries.firstOrNull { it.alpha2Code == code || it.alpha3Code == code } } ?: Country.UnknownCountry,
+            )
         }
 
     protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, tradeSettlement: HeaderTradeSettlement, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? =
@@ -189,10 +198,16 @@ open class CiiMapper {
         dateTime?.dateTime?.let { LocalDate(it.year, it.month, it.dayOfMonth) }
 
     protected open fun map(text: Text?): String =
-        text?.value ?: ""
+        mapNullable(text) ?: ""
+
+    protected open fun mapNullable(text: Text?): String? =
+        text?.value
 
     protected open fun map(code: Code?): String =
-        code?.value ?: ""
+        mapNullable(code) ?: ""
+
+    protected open fun mapNullable(code: Code?): String? =
+        code?.value
 
     protected open fun map(id: ID?): String =
         id?.value ?: ""
