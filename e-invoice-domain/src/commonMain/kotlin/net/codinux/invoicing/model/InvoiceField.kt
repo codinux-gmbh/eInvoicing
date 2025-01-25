@@ -4,11 +4,9 @@ enum class InvoiceField {
     Currency,
 
     Supplier,
-    SupplierAddress,
     SupplierCountry,
 
     Customer,
-    CustomerAddress,
     CustomerCountry,
 
     Items,

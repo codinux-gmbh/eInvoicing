@@ -56,7 +56,7 @@ open class CiiMapper {
         return Invoice(
             details = mapInvoiceDetails(exchangedDocument, tradeSettlement, dataErrors),
 
-            supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors),
+            supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors, mapBankDetails(tradeSettlement)),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
             items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
                 if (it.isEmpty() && profile?.profile != FacturXProfile.Minimum && profile?.profile != FacturXProfile.BasicWL) {
@@ -85,7 +85,7 @@ open class CiiMapper {
         )
     }
 
-    protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>): Party =
+    protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>, bankDetails: BankDetails? = null): Party =
         if (party == null) {
             dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.Supplier else InvoiceField.Customer, InvoiceDataErrorType.ValueNotSet))
             Party("", "", null, null, "")
@@ -112,8 +112,22 @@ open class CiiMapper {
                     ?: party.definedTradeContact.firstNotNullOfOrNull { it.emailURIUniversalCommunication?.uriid?.value },
                 party.definedTradeContact.firstNotNullOfOrNull { it.mobileTelephoneUniversalCommunication?.completeNumber?.value }
                     ?: party.definedTradeContact.firstNotNullOfOrNull { it.telephoneUniversalCommunication?.completeNumber?.value },
-                party.definedTradeContact.firstNotNullOfOrNull { it.faxUniversalCommunication?.completeNumber?.value }
+                party.definedTradeContact.firstNotNullOfOrNull { it.faxUniversalCommunication?.completeNumber?.value },
+                null, // TODO: map contact name
+
+                bankDetails
             )
+        }
+
+    protected open fun mapBankDetails(settlement: HeaderTradeSettlement): BankDetails? =
+        // TODO: der paymentMeans.PaymentMeansCodeType gibt an, um welche Art von Zahlungsmethode es sich handelt wie Bank card, Direct debit, SEPA direct debit, ...
+        // even in Extended profile there's only at max one payeePartyCreditorFinancialAccount and payerPartyDebtorFinancialAccount
+        // (but there can be of course multiple specifiedTradeSettlementPaymentMeans)
+        // payerSpecifiedDebtorFinancialInstitution does not exist in Factur-X
+        settlement.specifiedTradeSettlementPaymentMeans.firstNotNullOfOrNull { it.payeePartyCreditorFinancialAccount.firstOrNull { it.ibanid?.value != null } }?.let { account ->
+            // Nutzen Sie die IBANID bei SEPA-Zahlungen, sonst die ProprietaryID - but in Factur-X there is no ProprietaryID
+            val bic = settlement.specifiedTradeSettlementPaymentMeans.firstNotNullOfOrNull { it.payeeSpecifiedCreditorFinancialInstitution }?.let { it.bicid }?.value
+            BankDetails(account.ibanid!!.value!!, bic, mapNullable(account.accountName)) // TODO: where's the bank name?
         }
 
     protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, tradeSettlement: HeaderTradeSettlement, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? =
