@@ -126,9 +126,9 @@ open class CiiMapper {
                 mapNullable(address?.postcodeCode), map(address?.cityName),
                 address?.countryID?.value?.let { code -> Country.entries.firstOrNull { it.alpha2Code == code || it.alpha3Code == code } } ?: CountryFallbackValue,
 
-                party.specifiedTaxRegistration.mapNotNull { it.id }.firstOrNull { it.schemeID == "VA" }?.value,
+                party.specifiedTaxRegistration.mapNotNull { it.id }.firstOrNull { it.schemeID == ReferenceType.VA.code }?.value,
 
-                party.uRIUniversalCommunication.firstOrNull { it.channelCode?.value == "EM" }?.completeNumber?.value
+                party.uRIUniversalCommunication.firstOrNull { it.channelCode?.value == ElectronicAddressSchemeIdentifier.EM.code }?.completeNumber?.value
                     ?: party.definedTradeContact.firstNotNullOfOrNull { it.emailURIUniversalCommunication?.uriid?.value },
                 party.definedTradeContact.firstNotNullOfOrNull { it.mobileTelephoneUniversalCommunication?.completeNumber?.value }
                     ?: party.definedTradeContact.firstNotNullOfOrNull { it.telephoneUniversalCommunication?.completeNumber?.value },
