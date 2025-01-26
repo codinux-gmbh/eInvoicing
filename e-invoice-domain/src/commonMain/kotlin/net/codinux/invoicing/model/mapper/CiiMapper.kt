@@ -80,8 +80,8 @@ open class CiiMapper {
         val paymentTerms = tradeSettlement.specifiedTradePaymentTerms.firstOrNull()
 
         return InvoiceDetails(
-            map(exchangedDocument.id), map(tradeSettlement.invoiceDateTime), mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
-            map(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
+            map(exchangedDocument.id), mapDate(exchangedDocument.issueDateTime), mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
+            mapDate(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
         )
     }
 
@@ -213,10 +213,16 @@ open class CiiMapper {
         }
 
 
-    protected open fun map(dateTime: DateTime?): LocalDate =
-        mapNullable(dateTime) ?: LocalDate(0, 1, 1)
+    protected open fun mapDate(dateTime: DateTime?, field: InvoiceField, dataErrors: MutableList<InvoiceDataError>): LocalDate =
+        mapDateOrNull(dateTime) ?: run {
+            dataErrors.add(InvoiceDataError.missing(field))
+            LocalDate(0, 1, 1)
+        }
 
-    protected open fun mapNullable(dateTime: DateTime?): LocalDate? =
+    protected open fun mapDate(dateTime: DateTime?): LocalDate =
+        mapDateOrNull(dateTime) ?: LocalDate(0, 1, 1)
+
+    protected open fun mapDateOrNull(dateTime: DateTime?): LocalDate? =
         dateTime?.dateTime?.let { LocalDate(it.year, it.month, it.dayOfMonth) }
 
     protected open fun map(text: Text?): String =
