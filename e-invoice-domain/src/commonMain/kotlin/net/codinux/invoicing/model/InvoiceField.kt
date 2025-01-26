@@ -1,6 +1,9 @@
 package net.codinux.invoicing.model
 
 enum class InvoiceField {
+    InvoiceDate,
+    InvoiceNumber,
+
     Currency,
 
     Supplier,

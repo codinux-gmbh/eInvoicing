@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.format.EInvoicingStandard
 import net.codinux.invoicing.format.FacturXProfile
+import net.codinux.invoicing.model.Party
+import net.codinux.invoicing.model.mapper.CiiMapper
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.test.TestUtils
@@ -263,9 +265,34 @@ class EInvoiceXmlReaderTest {
             assertThat(result.invoice).isNotNull()
             assertThat(result.invoice!!.invoiceDataErrors).isEmpty()
 
+            assertThat(result.invoice!!.invoice).isNotNull()
+            val invoice = result.invoice!!.invoice
+
+            assertThat(invoice.details).isNotNull()
+            val details = invoice.details
+            assertThat(details.invoiceNumber).isNotEqualTo(CiiMapper.IdFallbackValue)
+            assertThat(details.invoiceDate).isNotEqualTo(CiiMapper.LocalDateFallbackValue)
+            assertThat(details.currency).isNotEqualTo(CiiMapper.CurrencyFallbackValue)
+
+            assertParty(invoice.supplier, profile)
+            assertParty(invoice.customer, profile)
+
             if (profile != null && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
-                assertThat(result.invoice!!.invoice.items).isNotEmpty()
+                assertThat(invoice.items).isNotEmpty()
+
+                invoice.items.forEach { item ->
+                    assertThat(item.name).isNotEqualTo(CiiMapper.TextFallbackValue)
+                    assertThat(item.quantity).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    assertThat(item.unit).isNotEqualTo(CiiMapper.TextFallbackValue)
+                    assertThat(item.unitPrice).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    // vatRate may be zero
+                }
             }
+
+            assertThat(invoice.totals).isNotNull()
+            assertThat(invoice.totals!!.taxBasisTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+            assertThat(invoice.totals!!.grandTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+            assertThat(invoice.totals!!.duePayableAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
 
 //                assertThat(result!!.standard).isEqualTo(standard)
 //                assertThat(result.format).isEqualTo(format)
@@ -279,6 +306,15 @@ class EInvoiceXmlReaderTest {
 //                } else {
 //                    assertThat(result.profile).isNotNull().isEqualByComparingTo(profile)
 //                }
+        }
+    }
+
+    private fun assertParty(party: Party?, profile: FacturXProfile?) {
+        assertThat(party).isNotNull()
+
+        assertThat(party!!.name).isNotEqualTo(CiiMapper.TextFallbackValue)
+        if (profile != FacturXProfile.Minimum) { // in Minimum profile TradeParty has no countryId
+            assertThat(party.country).isNotEqualTo(CiiMapper.CountryFallbackValue)
         }
     }
 

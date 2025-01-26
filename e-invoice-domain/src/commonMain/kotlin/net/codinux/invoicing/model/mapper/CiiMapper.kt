@@ -5,14 +5,31 @@ import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
 import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.cii.lenient.*
-import net.codinux.invoicing.model.codes.Country
-import net.codinux.invoicing.model.codes.Currency
-import net.codinux.invoicing.model.codes.UnitOfMeasure
+import net.codinux.invoicing.model.codes.*
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResult
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResultType
 import net.codinux.log.logger
 
 open class CiiMapper {
+
+    companion object {
+        val IdFallbackValue = ""
+
+        val CodeFallbackValue = ""
+
+        val TextFallbackValue = ""
+
+        val BigDecimalFallbackValue = BigDecimal.Zero
+
+        val LocalDateFallbackValue = LocalDate(0, 1, 1)
+
+        val CurrencyFallbackValue = Currency.TheCodesAssignedForTransactionsWhereNoCurrencyIsInvolved
+
+        val CountryFallbackValue = Country.UnknownCountry
+
+        val UnitFallbackValue = UnitOfMeasure.ZZ
+    }
+
 
     private val log by logger()
 
@@ -90,7 +107,7 @@ open class CiiMapper {
     protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>, bankDetails: BankDetails? = null): Party =
         if (party == null) {
             dataErrors.add(InvoiceDataError.missing(if (isSeller) InvoiceField.Supplier else InvoiceField.Customer))
-            Party("", "", null, null, "")
+            Party(TextFallbackValue, TextFallbackValue, null, null, TextFallbackValue)
         } else {
             // according to XSD the TradeParty object has no mandatory field - even in Extended profile. Only the Technical Appendix says that name is required
             val address = party.postalTradeAddress
@@ -106,7 +123,7 @@ open class CiiMapper {
                 // also additionalStreetName is only in CII and XRechnung, not in Factur-X, that uses lineTwo and lineThree
                 map(address?.additionalStreetName ?: address?.lineTwo), // lineTwo & lineThree = An additional address line in an address that can be used to give further details supplementing the main line.
                 mapNullable(address?.postcodeCode), map(address?.cityName),
-                address?.countryID?.value?.let { code -> Country.entries.firstOrNull { it.alpha2Code == code || it.alpha3Code == code } } ?: Country.UnknownCountry,
+                address?.countryID?.value?.let { code -> Country.entries.firstOrNull { it.alpha2Code == code || it.alpha3Code == code } } ?: CountryFallbackValue,
 
                 party.specifiedTaxRegistration.mapNotNull { it.id }.firstOrNull { it.schemeID == "VA" }?.value,
 
@@ -152,13 +169,16 @@ open class CiiMapper {
 
     protected open fun mapVatRate(tradeTax: List<TradeTax>): BigDecimal =
         tradeTax.firstOrNull { it.rateApplicablePercent?.value != null && it.calculatedAmount.any { it.value?.toPlainString()?.startsWith("-") == false } }
-            ?.rateApplicablePercent?.value ?: BigDecimal.Zero
+            ?.rateApplicablePercent?.value ?: BigDecimalFallbackValue
 
     protected open fun mapText(texts: List<Text>?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
         mapNullableText(texts) ?: run {
             dataErrors.add(InvoiceDataError.missing(invoiceField))
-            ""
+            TextFallbackValue
         }
+
+    protected open fun mapText(texts: List<Text>?): String =
+        mapNullableText(texts) ?: TextFallbackValue
 
     protected open fun mapNullableText(texts: List<Text>?): String? =
         texts?.firstOrNull()?.value
@@ -183,12 +203,12 @@ open class CiiMapper {
 
 
     protected open fun mapNullableAmount(amounts: List<Amount>): BigDecimal =
-        amounts.firstOrNull()?.value ?: BigDecimal.Zero
+        amounts.firstOrNull()?.value ?: BigDecimalFallbackValue
 
     protected open fun mapAmount(amounts: List<Amount>, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         if (amounts.isEmpty() || amounts.firstOrNull()?.value == null) {
             dataErrors.add(InvoiceDataError.missing(amountField))
-            BigDecimal.Zero
+            BigDecimalFallbackValue
         } else {
             amounts.first().value!!
         }
@@ -196,19 +216,19 @@ open class CiiMapper {
     protected open fun mapQuantity(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         quantity?.value ?: run {
             dataErrors.add(InvoiceDataError.missing(amountField))
-            BigDecimal.Zero
+            BigDecimalFallbackValue
         }
 
     protected open fun mapUnit(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure =
         quantity?.unitCode?.let { unitCode -> UnitOfMeasure.entries.firstOrNull { it.code == unitCode } } ?: run {
             dataErrors.add(InvoiceDataError.missing(amountField))
-            UnitOfMeasure.ZZ
+            UnitFallbackValue
         }
 
     protected open fun mapCurrency(currencyCode: CurrencyCode?, dataErrors: MutableList<InvoiceDataError>): Currency =
         if (currencyCode == null || currencyCode.value == null) {
             dataErrors.add(InvoiceDataError.missing(InvoiceField.Currency))
-            Currency.TheCodesAssignedForTransactionsWhereNoCurrencyIsInvolved
+            CurrencyFallbackValue
         } else {
             val code = currencyCode.value
             Currency.entries.first { it.alpha3Code == code }
@@ -218,11 +238,11 @@ open class CiiMapper {
     protected open fun mapDate(dateTime: DateTime?, field: InvoiceField, dataErrors: MutableList<InvoiceDataError>): LocalDate =
         mapDateOrNull(dateTime) ?: run {
             dataErrors.add(InvoiceDataError.missing(field))
-            LocalDate(0, 1, 1)
+            LocalDateFallbackValue
         }
 
     protected open fun mapDate(dateTime: DateTime?): LocalDate =
-        mapDateOrNull(dateTime) ?: LocalDate(0, 1, 1)
+        mapDateOrNull(dateTime) ?: LocalDateFallbackValue
 
     protected open fun mapDateOrNull(dateTime: DateTime?): LocalDate? =
         dateTime?.dateTime?.let { LocalDate(it.year, it.month, it.dayOfMonth) }
@@ -246,13 +266,13 @@ open class CiiMapper {
         }
 
     protected open fun map(text: Text?): String =
-        mapNullable(text) ?: ""
+        mapNullable(text) ?: TextFallbackValue
 
     protected open fun mapNullable(text: Text?): String? =
         text?.value
 
     protected open fun map(code: Code?): String =
-        mapNullable(code) ?: ""
+        mapNullable(code) ?: CodeFallbackValue
 
     protected open fun mapNullable(code: Code?): String? =
         code?.value
@@ -263,11 +283,11 @@ open class CiiMapper {
     protected open fun mapId(id: ID?, field: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
         mapIdOrNull(id) ?: run {
             dataErrors.add(InvoiceDataError.missing(field))
-            ""
+            IdFallbackValue
         }
 
     protected open fun mapId(id: ID?): String =
-        mapIdOrNull(id) ?: ""
+        mapIdOrNull(id) ?: IdFallbackValue
 
     protected open fun mapIdOrNull(id: ID?): String? =
         id?.value
