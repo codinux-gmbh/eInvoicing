@@ -60,7 +60,7 @@ open class CiiMapper {
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
             items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
                 if (it.isEmpty() && profile?.profile != FacturXProfile.Minimum && profile?.profile != FacturXProfile.BasicWL) {
-                    dataErrors.add(InvoiceDataError(InvoiceField.Items, InvoiceDataErrorType.ValueNotSet))
+                    dataErrors.add(InvoiceDataError.missing(InvoiceField.Items))
                 }
             },
 
@@ -87,14 +87,14 @@ open class CiiMapper {
 
     protected open fun mapParty(party: TradeParty?, isSeller: Boolean, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>, bankDetails: BankDetails? = null): Party =
         if (party == null) {
-            dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.Supplier else InvoiceField.Customer, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(if (isSeller) InvoiceField.Supplier else InvoiceField.Customer))
             Party("", "", null, null, "")
         } else {
             // according to XSD the TradeParty object has no mandatory field - even in Extended profile. Only the Technical Appendix says that name is required
             val address = party.postalTradeAddress
             // countryId is the only mandatory field of address. And only in Factur-X, neither in CII nor in XRechnung
             if (profile?.format == EInvoiceFormat.FacturX && address != null && address.countryID?.value == null) {
-                dataErrors.add(InvoiceDataError(if (isSeller) InvoiceField.SupplierCountry else InvoiceField.CustomerCountry, InvoiceDataErrorType.ValueNotSet))
+                dataErrors.add(InvoiceDataError.missing(if (isSeller) InvoiceField.SupplierCountry else InvoiceField.CustomerCountry))
             }
 
             Party(
@@ -154,7 +154,7 @@ open class CiiMapper {
 
     protected open fun mapText(texts: List<Text>?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
         mapNullableText(texts) ?: run {
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(invoiceField))
             ""
         }
 
@@ -163,7 +163,7 @@ open class CiiMapper {
 
     protected open fun mapTotalAmounts(summation: TradeSettlementHeaderMonetarySummation?, dataErrors: MutableList<InvoiceDataError>): TotalAmounts =
         if (summation == null) {
-            dataErrors.add(InvoiceDataError(InvoiceField.TotalAmount, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(InvoiceField.TotalAmount))
             TotalAmounts.Zero
         } else {
 
@@ -185,7 +185,7 @@ open class CiiMapper {
 
     protected open fun mapAmount(amounts: List<Amount>, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         if (amounts.isEmpty() || amounts.firstOrNull()?.value == null) {
-            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(amountField))
             BigDecimal.Zero
         } else {
             amounts.first().value!!
@@ -193,19 +193,19 @@ open class CiiMapper {
 
     protected open fun mapQuantity(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         quantity?.value ?: run {
-            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(amountField))
             BigDecimal.Zero
         }
 
     protected open fun mapUnit(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure =
         quantity?.unitCode?.let { unitCode -> UnitOfMeasure.entries.firstOrNull { it.code == unitCode } } ?: run {
-            dataErrors.add(InvoiceDataError(amountField, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(amountField))
             UnitOfMeasure.ZZ
         }
 
     protected open fun mapCurrency(currencyCode: CurrencyCode?, dataErrors: MutableList<InvoiceDataError>): Currency =
         if (currencyCode == null || currencyCode.value == null) {
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueNotSet))
+            dataErrors.add(InvoiceDataError.missing(InvoiceField.Currency))
             Currency.TheCodesAssignedForTransactionsWhereNoCurrencyIsInvolved
         } else {
             val code = currencyCode.value

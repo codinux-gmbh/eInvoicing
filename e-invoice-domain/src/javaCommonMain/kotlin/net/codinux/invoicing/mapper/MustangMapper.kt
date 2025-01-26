@@ -170,7 +170,7 @@ open class MustangMapper(
 
     private fun mapCountry(isoAlpha2CountryCode: String?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): Country {
         if (isoAlpha2CountryCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotSet, isoAlpha2CountryCode))
+            dataErrors.add(InvoiceDataError.missing(invoiceField, isoAlpha2CountryCode))
             return CountryFallbackValue
         }
 
@@ -179,7 +179,7 @@ open class MustangMapper(
             dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueNotUpperCase, isoAlpha2CountryCode))
         } else if (country == null) {
             log.warn { "Unknown ISO Alpha-2 country code \"$isoAlpha2CountryCode\", therefore cannot map ISO code to Country" }
-            dataErrors.add(InvoiceDataError(invoiceField, InvoiceDataErrorType.ValueIsInvalid, isoAlpha2CountryCode))
+            dataErrors.add(InvoiceDataError.invalid(invoiceField, isoAlpha2CountryCode))
         }
 
         return country ?: CountryFallbackValue
@@ -187,7 +187,7 @@ open class MustangMapper(
 
     private fun mapCurrency(isoCurrencyCode: String?, dataErrors: MutableList<InvoiceDataError>): Currency {
         if (isoCurrencyCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueNotSet, isoCurrencyCode))
+            dataErrors.add(InvoiceDataError.missing(InvoiceField.Currency, isoCurrencyCode))
             return CurrencyFallbackValue
         }
 
@@ -196,7 +196,7 @@ open class MustangMapper(
             dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueNotUpperCase, isoCurrencyCode))
         } else if (currency == null) {
             log.warn { "Unknown ISO currency code \"$isoCurrencyCode\", therefore cannot map ISO code to Currency" }
-            dataErrors.add(InvoiceDataError(InvoiceField.Currency, InvoiceDataErrorType.ValueIsInvalid, isoCurrencyCode))
+            dataErrors.add(InvoiceDataError.invalid(InvoiceField.Currency, isoCurrencyCode))
         }
 
         return currency ?: CurrencyFallbackValue
@@ -204,7 +204,7 @@ open class MustangMapper(
 
     private fun mapUnit(unitUnCefactCode: String?, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure {
         if (unitUnCefactCode.isNullOrBlank()) {
-            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueNotSet, unitUnCefactCode))
+            dataErrors.add(InvoiceDataError.missing(InvoiceField.ItemUnit, unitUnCefactCode))
             return UnitFallbackValue
         }
 
@@ -213,7 +213,7 @@ open class MustangMapper(
             dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueNotUpperCase, unitUnCefactCode))
         } else if (unit == null) {
             log.warn { "Unknown UN/CEFACT unit of measurement code \"$unitUnCefactCode\", therefore cannot map code to UnitOfMeasurement" }
-            dataErrors.add(InvoiceDataError(InvoiceField.ItemUnit, InvoiceDataErrorType.ValueIsInvalid, unitUnCefactCode))
+            dataErrors.add(InvoiceDataError.invalid(InvoiceField.ItemUnit, unitUnCefactCode))
         }
 
         return unit ?: UnitFallbackValue
