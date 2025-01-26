@@ -1,7 +1,10 @@
 package net.codinux.invoicing.test
 
+import net.codinux.invoicing.testfiles.*
+import org.junit.jupiter.api.Named
 import java.io.InputStream
 import java.nio.file.Path
+import kotlin.io.path.name
 import kotlin.io.path.toPath
 
 object TestUtils {
@@ -18,5 +21,96 @@ object TestUtils {
 
     fun getInvalidInvoiceFile(filename: String, testFileFolder: String = "erroneousInvoiceFiles") =
         getTestFile(filename, testFileFolder)
+
+
+    val FacturXMinimumProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Minimum) }
+
+    val FacturXBasicWLProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.BasicWL) }
+
+    val FacturXBasicProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Basic) }
+
+    val FacturXEN16931ProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.EN16931) }
+
+    val FacturXExtendedProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Extended) }
+
+
+//    val ZugferdMinimumProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.Minimum) }
+//
+//    val ZugferdBasicWLProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.BasicWL) }
+//
+//    val ZugferdBasicProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.Basic) }
+//
+//    val ZugferdEN16931ProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.EN16931) }
+//
+//    val ZugferdExtendedProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.Extended) }
+//
+//    val ZugferdXRechnungProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.XRechnung) }
+
+
+    val Zugferd_2_3_MinimumProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.Minimum) }
+
+    val Zugferd_2_3_BasicWLProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.BasicWL) }
+
+    val Zugferd_2_3_BasicProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.Basic) }
+
+    val Zugferd_2_3_EN16931ProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.EN16931) }
+
+    val Zugferd_2_3_ExtendedProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.Extended) }
+
+    val Zugferd_2_3_XRechnungProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_3, EInvoiceProfile.XRechnung) }
+
+
+    val Zugferd_2_2_MinimumProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.Minimum) }
+
+    val Zugferd_2_2_BasicWLProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.BasicWL) }
+
+    val Zugferd_2_2_BasicProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.Basic) }
+
+    val Zugferd_2_2_EN16931ProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.EN16931) }
+
+    val Zugferd_2_2_ExtendedProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.Extended) }
+
+    val Zugferd_2_2_XRechnungProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_2, EInvoiceProfile.XRechnung) }
+
+
+    val Zugferd_2_1_MinimumProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_1, EInvoiceProfile.Minimum) }
+
+    val Zugferd_2_1_BasicWLProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_1, EInvoiceProfile.BasicWL) }
+
+    val Zugferd_2_1_BasicProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_1, EInvoiceProfile.Basic) }
+
+    val Zugferd_2_1_EN16931ProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_1, EInvoiceProfile.EN16931) }
+
+    val Zugferd_2_1_ExtendedProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_1, EInvoiceProfile.Extended) }
+
+
+    val Zugferd_2_0_MinimumProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_0, EInvoiceProfile.Minimum) }
+
+    val Zugferd_2_0_BasicProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_0, EInvoiceProfile.Basic) }
+
+    val Zugferd_2_0_EN16931ProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_0, EInvoiceProfile.EN16931) }
+
+    val Zugferd_2_0_ExtendedProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_0, EInvoiceProfile.Extended) }
+
+
+    val XRechnungInvoices by lazy {
+        zugferdInvoicesFor(EInvoiceProfile.XRechnung) +
+                EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.CII)
+                    .map { Named.of(it.name, it) }
+    }
+
+    val EN16931CIIXmlInvoices by lazy { EInvoiceTestFiles.getEN16931TestFiles(EInvoiceXmlFlavour.CII) }
+
+
+    private fun facturXInvoicesFor(profile: EInvoiceProfile): List<Named<Path>> =
+        named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, profile))
+
+    private fun zugferdInvoicesFor(profile: EInvoiceProfile): List<Named<Path>> =
+        named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, profile))
+
+    private fun zugferdInvoicesFor(version: ZugferdVersion, profile: EInvoiceProfile): List<Named<Path>> =
+        named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd, version, profile))
+
+    private fun named(paths: List<Path>): List<Named<Path>> = paths.map { Named.of(it.parent.name, it) }
 
 }

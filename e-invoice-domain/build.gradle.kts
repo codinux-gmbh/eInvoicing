@@ -169,6 +169,8 @@ kotlin {
                 implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
                 implementation("org.xmlunit:xmlunit-core:$xunitVersion")
+
+                implementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
             }
         }
 

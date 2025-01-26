@@ -6,7 +6,10 @@ import net.codinux.invoicing.format.EInvoicingStandard
 import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
+import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.*
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
@@ -23,155 +26,135 @@ class EInvoiceXmlReaderTest {
     private val underTest = EInvoiceXmlReader()
 
 
-    @Test
-    fun `Factur-X Version 1-0-7 Profile Minimum`() {
-        val testFiles = getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, FacturXProfile.Minimum)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
+    @ParameterizedTest
+    @MethodSource("provideFacturXMinimumProfileInvoices")
+    fun `Factur-X Version 1-0-7 Profile Minimum`(invoiceFile: Path) {
+        assertFacturXFile(invoiceFile, FacturXProfile.Minimum)
     }
 
-    @Test
-    fun `Factur-X Version 1-0-7 Profile BasicWL`() {
-        val testFiles = getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, FacturXProfile.BasicWL)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
+    @ParameterizedTest
+    @MethodSource("provideFacturXBasicWLProfileInvoices")
+    fun `Factur-X Version 1-0-7 Profile BasicWL`(invoiceFile: Path) {
+        assertFacturXFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
-    @Test
-    fun `Factur-X Version 1-0-7 Profile Basic`() {
-        val testFiles = getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, FacturXProfile.Basic)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
+    @ParameterizedTest
+    @MethodSource("provideFacturXBasicProfileInvoices")
+    fun `Factur-X Version 1-0-7 Profile Basic`(invoiceFile: Path) {
+        assertFacturXFile(invoiceFile, FacturXProfile.Basic)
     }
 
-    @Test
-    fun `Factur-X Version 1-0-7 Profile EN16931`() {
-        val testFiles = getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, FacturXProfile.EN16931)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
+    @ParameterizedTest
+    @MethodSource("provideFacturXEN16931ProfileInvoices")
+    fun `Factur-X Version 1-0-7 Profile EN16931`(invoiceFile: Path) {
+        assertFacturXFile(invoiceFile, FacturXProfile.EN16931)
     }
 
-    @Test
-    fun `Factur-X Version 1-0-7 Profile Extended`() {
-        val testFiles = getTestFiles(EInvoiceFormat.FacturX, FacturXVersion.V1_0_7, FacturXProfile.Extended)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+    @ParameterizedTest
+    @MethodSource("provideFacturXExtendedProfileInvoices")
+    fun `Factur-X Version 1-0-7 Profile Extended`(invoiceFile: Path) {
+        assertFacturXFile(invoiceFile, FacturXProfile.Extended)
     }
 
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile Minimum`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.Minimum)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_MinimumProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile Minimum`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Minimum)
     }
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile BasicWL`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.BasicWL)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_BasicWLProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile BasicWL`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile Basic`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.Basic)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_BasicProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile Basic`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Basic)
     }
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile EN16931`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.EN16931)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_EN16931ProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile EN16931`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.EN16931)
     }
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile Extended`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.Extended)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_ExtendedProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile Extended`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Extended)
     }
 
-    @Test
-    fun `Zugferd Version 2-3-2 Profile XRechnung`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_3, FacturXProfile.XRechnung)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_3_XRechnungProfileInvoices")
+    fun `Zugferd Version 2-3-2 Profile XRechnung`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.XRechnung)
     }
 
 
-    @Test
-    fun `Zugferd Version 2-2 Profile Minimum`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.Minimum)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_MinimumProfileInvoices")
+    fun `Zugferd Version 2-2 Profile Minimum`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Minimum)
     }
 
-    @Test
-    fun `Zugferd Version 2-2 Profile BasicWL`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.BasicWL)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_BasicWLProfileInvoices")
+    fun `Zugferd Version 2-2 Profile BasicWL`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
-    @Test
-    fun `Zugferd Version 2-2 Profile Basic`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.Basic)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_BasicProfileInvoices")
+    fun `Zugferd Version 2-2 Profile Basic`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Basic)
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_EN16931ProfileInvoices")
     fun `Zugferd Version 2-2 Profile EN16931`() {
         val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.EN16931)
 
         assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
     }
 
-    @Test
-    fun `Zugferd Version 2-2 Profile Extended`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.Extended)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_ExtendedProfileInvoices")
+    fun `Zugferd Version 2-2 Profile Extended`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Extended)
     }
 
-    @Test
-    fun `Zugferd Version 2-2 Profile XRechnung`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_2, FacturXProfile.XRechnung)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_2_XRechnungProfileInvoices")
+    fun `Zugferd Version 2-2 Profile XRechnung`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.XRechnung)
     }
 
 
-    @Test
-    fun `Zugferd Version 2-1 Profile Minimum`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.Minimum)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Minimum)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_1_MinimumProfileInvoices")
+    fun `Zugferd Version 2-1 Profile Minimum`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Minimum)
     }
 
-    @Test
-    fun `Zugferd Version 2-1 Profile BasicWL`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.BasicWL)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.BasicWL)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_1_BasicWLProfileInvoices")
+    fun `Zugferd Version 2-1 Profile BasicWL`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
-    @Test
-    fun `Zugferd Version 2-1 Profile Basic`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.Basic)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Basic)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_1_BasicProfileInvoices")
+    fun `Zugferd Version 2-1 Profile Basic`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Basic)
     }
 
-    @Test
-    fun `Zugferd Version 2-1 Profile EN16931`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.EN16931)
-            .filter { it.name.contains("_XRechnung") == false } // maintainers have put same XRechnung files into EN16931 folder
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_1_EN16931ProfileInvoices")
+    fun `Zugferd Version 2-1 Profile EN16931`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.EN16931)
     }
 
     @Test
@@ -182,40 +165,35 @@ class EInvoiceXmlReaderTest {
         assertCiiFiles(testFiles, EInvoiceFormat.XRechnung, null, null)
     }
 
-    @Test
-    fun `Zugferd Version 2-1 Profile Extended`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, FacturXProfile.Extended)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.Extended)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_1_ExtendedProfileInvoices")
+    fun `Zugferd Version 2-1 Profile Extended`(invoiceFile: Path) {
+        assertZugferdFile(invoiceFile, FacturXProfile.Extended)
     }
 
 
-    @Test
-    fun `Zugferd Version 2-0 Profile Minimum`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_0, FacturXProfile.Minimum)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.Zugferd, "2", FacturXProfile.Minimum)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_0_MinimumProfileInvoices")
+    fun `Zugferd Version 2-0 Profile Minimum`(invoiceFile: Path) {
+        assertOldZugferdFile(invoiceFile, "2", FacturXProfile.Minimum)
     }
 
-    @Test
-    fun `Zugferd Version 2-0 Profile Basic`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_0, FacturXProfile.Basic)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.Zugferd, "2", FacturXProfile.Basic)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_0_BasicProfileInvoices")
+    fun `Zugferd Version 2-0 Profile Basic`(invoiceFile: Path) {
+        assertOldZugferdFile(invoiceFile, "2", FacturXProfile.Basic)
     }
 
-    @Test
-    fun `Zugferd Version 2-0 Profile EN16931`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_0, FacturXProfile.EN16931)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.FacturX, "1", FacturXProfile.EN16931)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_0_EN16931ProfileInvoices")
+    fun `Zugferd Version 2-0 Profile EN16931`(invoiceFile: Path) {
+        assertOldZugferdFile(invoiceFile, "2", FacturXProfile.EN16931)
     }
 
-    @Test
-    fun `Zugferd Version 2-0 Profile Extended`() {
-        val testFiles = getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_0, FacturXProfile.Extended)
-
-        assertCiiFiles(testFiles, EInvoiceFormat.Zugferd, "2", FacturXProfile.Extended)
+    @ParameterizedTest
+    @MethodSource("provideZugferd_2_0_ExtendedProfileInvoices")
+    fun `Zugferd Version 2-0 Profile Extended`(invoiceFile: Path) {
+        assertOldZugferdFile(invoiceFile, "2", FacturXProfile.Extended)
     }
 
 
@@ -237,35 +215,57 @@ class EInvoiceXmlReaderTest {
             } else {
                 val result = underTest.parseInvoiceXml(invoiceXml)
 
-                assertThat(result).isNull() // UBL is not supported (yet)
+                assertThat(result).isNotNull()
+                assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat) // UBL is not supported (yet)
             }
         }
     }
 
 
-    private fun assertCiiFiles(testFiles: List<Path>, format: EInvoiceFormat, formatVersion: String? = null, profile: FacturXProfile? = null) {
-        assertFiles(testFiles, EInvoicingStandard.CII, format, formatVersion, profile)
+    private fun assertCiiFiles(invoiceFile: List<Path>, format: EInvoiceFormat, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        assertFiles(invoiceFile, EInvoicingStandard.CII, format, formatVersion, profile)
     }
 
-    private fun assertFiles(testFiles: List<Path>, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
-        assertThat(testFiles).isNotEmpty()
+    private fun assertFiles(invoiceFiles: List<Path>, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        assertThat(invoiceFiles).isNotEmpty()
 
-        testFiles.forEach { testFile ->
-            val invoiceXml = getInvoiceXml(testFile)
-            if (invoiceXml == null) {
-                fail("Could not get invoice XML for test file: $testFile")
-            } else {
-                val result = underTest.parseInvoiceXml(invoiceXml)
+        invoiceFiles.forEach { invoiceFile ->
+            assertFile(invoiceFile, standard, format, formatVersion, profile)
+        }
+    }
 
-                assertThat(result).isNotNull()
-                assertThat(result!!.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
-                assertThat(result.readError).isNull()
-                assertThat(result.invoice).isNotNull()
-                assertThat(result.invoice!!.invoiceDataErrors).isEmpty()
+    private fun assertFacturXFile(invoiceFile: Path, profile: FacturXProfile? = null) {
+        assertCiiFile(invoiceFile, EInvoiceFormat.FacturX, "1", profile)
+    }
 
-                if (profile != null && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
-                    assertThat(result.invoice!!.invoice.items).isNotEmpty()
-                }
+    private fun assertZugferdFile(invoiceFile: Path, profile: FacturXProfile? = null) {
+        assertFacturXFile(invoiceFile, profile)
+    }
+
+    private fun assertOldZugferdFile(invoiceFile: Path, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        assertCiiFile(invoiceFile, EInvoiceFormat.Zugferd, formatVersion, profile)
+    }
+
+    private fun assertCiiFile(invoiceFile: Path, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        assertFile(invoiceFile, EInvoicingStandard.CII, format, formatVersion, profile)
+    }
+
+    private fun assertFile(invoiceFile: Path, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
+        val invoiceXml = getInvoiceXml(invoiceFile)
+        if (invoiceXml == null) {
+            fail("Could not get invoice XML for test file: $invoiceFile")
+        } else {
+            val result = underTest.parseInvoiceXml(invoiceXml)
+
+            assertThat(result).isNotNull()
+            assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
+            assertThat(result.readError).isNull()
+            assertThat(result.invoice).isNotNull()
+            assertThat(result.invoice!!.invoiceDataErrors).isEmpty()
+
+            if (profile != null && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+                assertThat(result.invoice!!.invoice.items).isNotEmpty()
+            }
 
 //                assertThat(result!!.standard).isEqualTo(standard)
 //                assertThat(result.format).isEqualTo(format)
@@ -279,7 +279,6 @@ class EInvoiceXmlReaderTest {
 //                } else {
 //                    assertThat(result.profile).isNotNull().isEqualByComparingTo(profile)
 //                }
-            }
         }
     }
 
@@ -295,5 +294,100 @@ class EInvoiceXmlReaderTest {
 
     private fun getTestFiles(format: EInvoiceFormat, version: EInvoiceFormatVersion, profile: FacturXProfile? = null): List<Path> =
         EInvoiceTestFiles.getTestFiles(net.codinux.invoicing.testfiles.EInvoiceFormat.valueOf(format.name), version, profile?.let { EInvoiceProfile.valueOf(it.name) })
+
+
+
+    companion object {
+
+        @JvmStatic
+        fun provideFacturXMinimumProfileInvoices() = TestUtils.FacturXMinimumProfileInvoices
+
+        @JvmStatic
+        fun provideFacturXBasicWLProfileInvoices() = TestUtils.FacturXBasicWLProfileInvoices
+
+        @JvmStatic
+        fun provideFacturXBasicProfileInvoices() = TestUtils.FacturXBasicProfileInvoices
+
+        @JvmStatic
+        fun provideFacturXEN16931ProfileInvoices() = TestUtils.FacturXEN16931ProfileInvoices
+
+        @JvmStatic
+        fun provideFacturXExtendedProfileInvoices() = TestUtils.FacturXExtendedProfileInvoices
+
+
+        @JvmStatic
+        fun provideZugferd_2_3_MinimumProfileInvoices() = TestUtils.Zugferd_2_3_MinimumProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_3_BasicWLProfileInvoices() = TestUtils.Zugferd_2_3_BasicWLProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_3_BasicProfileInvoices() = TestUtils.Zugferd_2_3_BasicProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_3_EN16931ProfileInvoices() = TestUtils.Zugferd_2_3_EN16931ProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_3_ExtendedProfileInvoices() = TestUtils.Zugferd_2_3_ExtendedProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_3_XRechnungProfileInvoices() = TestUtils.Zugferd_2_3_XRechnungProfileInvoices
+
+
+        @JvmStatic
+        fun provideZugferd_2_2_MinimumProfileInvoices() = TestUtils.Zugferd_2_2_MinimumProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_2_BasicWLProfileInvoices() = TestUtils.Zugferd_2_2_BasicWLProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_2_BasicProfileInvoices() = TestUtils.Zugferd_2_2_BasicProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_2_EN16931ProfileInvoices() = TestUtils.Zugferd_2_2_EN16931ProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_2_ExtendedProfileInvoices() = TestUtils.Zugferd_2_2_ExtendedProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_2_XRechnungProfileInvoices() = TestUtils.Zugferd_2_2_XRechnungProfileInvoices
+
+
+        @JvmStatic
+        fun provideZugferd_2_1_MinimumProfileInvoices() = TestUtils.Zugferd_2_1_MinimumProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_1_BasicWLProfileInvoices() = TestUtils.Zugferd_2_1_BasicWLProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_1_BasicProfileInvoices() = TestUtils.Zugferd_2_1_BasicProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_1_EN16931ProfileInvoices() = TestUtils.Zugferd_2_1_EN16931ProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_1_ExtendedProfileInvoices() = TestUtils.Zugferd_2_1_ExtendedProfileInvoices
+
+
+        @JvmStatic
+        fun provideZugferd_2_0_MinimumProfileInvoices() = TestUtils.Zugferd_2_0_MinimumProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_0_BasicProfileInvoices() = TestUtils.Zugferd_2_0_BasicProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_0_EN16931ProfileInvoices() = TestUtils.Zugferd_2_0_EN16931ProfileInvoices
+
+        @JvmStatic
+        fun provideZugferd_2_0_ExtendedProfileInvoices() = TestUtils.Zugferd_2_0_ExtendedProfileInvoices
+
+
+        @JvmStatic
+        fun provideXRechnungXmlInvoices() = TestUtils.XRechnungInvoices
+
+        @JvmStatic
+        fun provideEN16931CIIXmlInvoices() = TestUtils.EN16931CIIXmlInvoices
+
+    }
 
 }
