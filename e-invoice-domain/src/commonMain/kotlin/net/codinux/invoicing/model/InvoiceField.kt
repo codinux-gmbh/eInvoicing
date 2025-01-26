@@ -19,6 +19,7 @@ enum class InvoiceField {
     ItemUnitPrice,
 
     TotalAmount,
+    LineTotalAmount,
     TaxBasisTotalAmount,
     GrandTotalAmount,
     DuePayableAmount

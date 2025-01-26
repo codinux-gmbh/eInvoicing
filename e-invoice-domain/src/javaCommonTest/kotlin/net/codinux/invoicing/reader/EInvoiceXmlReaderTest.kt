@@ -10,6 +10,7 @@ import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.*
+import net.codinux.log.logger
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.nio.file.Path
@@ -26,6 +27,8 @@ class EInvoiceXmlReaderTest {
     private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 
     private val underTest = EInvoiceXmlReader()
+
+    private val log by logger()
 
 
     @ParameterizedTest
@@ -248,7 +251,7 @@ class EInvoiceXmlReaderTest {
         assertFile(invoiceFile, EInvoicingStandard.CII, format, formatVersion, profile)
     }
 
-    private fun assertFile(invoiceFile: Path, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null) {
+    private fun assertFile(invoiceFile: Path, standard: EInvoicingStandard, format: EInvoiceFormat? = null, formatVersion: String? = null, profile: FacturXProfile? = null, areAmountsAllowedToBeZero: Boolean = false) {
         val invoiceXml = getInvoiceXml(invoiceFile)
         if (invoiceXml == null) {
             fail("Could not get invoice XML for test file: $invoiceFile")
@@ -256,6 +259,10 @@ class EInvoiceXmlReaderTest {
             val result = underTest.parseInvoiceXml(invoiceXml)
 
             assertThat(result).isNotNull()
+            if (result.invoice?.invoiceDataErrors.isNullOrEmpty() == false) {
+                log.info { "The following invoice fields are erroneous:" }
+                result.invoice!!.invoiceDataErrors.forEach { log.info { "${it.field}: ${it.errorType}" } }
+            }
             assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.Success)
             assertThat(result.readError).isNull()
             assertThat(result.invoice).isNotNull()
@@ -286,9 +293,17 @@ class EInvoiceXmlReaderTest {
             }
 
             assertThat(invoice.totals).isNotNull()
-            assertThat(invoice.totals!!.taxBasisTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
-            assertThat(invoice.totals!!.grandTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
-            assertThat(invoice.totals!!.duePayableAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+            val totals = invoice.totals!!
+            if (areAmountsAllowedToBeZero == false) {
+                if (profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+                    assertThat(totals.lineTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                }
+                assertThat(totals.taxBasisTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                assertThat(totals.grandTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                if (totals.totalPrepaidAmount != totals.grandTotalAmount) { // if the whole amount has been prepaid, than duePayableAmount is zero
+                    assertThat(totals.duePayableAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                }
+            }
 
 //                assertThat(result!!.standard).isEqualTo(standard)
 //                assertThat(result.format).isEqualTo(format)

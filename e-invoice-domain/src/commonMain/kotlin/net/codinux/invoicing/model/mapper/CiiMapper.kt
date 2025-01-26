@@ -2,7 +2,8 @@ package net.codinux.invoicing.model.mapper
 
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
-import net.codinux.invoicing.format.FacturXProfile
+import net.codinux.invoicing.format.EInvoiceFormatDetectionResult.Companion.isMinimumOrBasicWLProfile
+import net.codinux.invoicing.format.EInvoiceFormatDetectionResult.Companion.isNotMinimumOrBasicWLProfile
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.cii.lenient.*
 import net.codinux.invoicing.model.codes.*
@@ -76,7 +77,7 @@ open class CiiMapper {
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors, mapBankDetails(tradeSettlement)),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
             items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
-                if (it.isEmpty() && profile?.profile != FacturXProfile.Minimum && profile?.profile != FacturXProfile.BasicWL) {
+                if (it.isEmpty() && profile.isNotMinimumOrBasicWLProfile) {
                     dataErrors.add(InvoiceDataError.missing(InvoiceField.Items))
                 }
             },
@@ -85,7 +86,7 @@ open class CiiMapper {
 
 //                amountAdjustments = mapAmountAdjustments(invoice),
 
-                totals = mapTotalAmounts(tradeSettlement.specifiedTradeSettlementHeaderMonetarySummation, dataErrors)
+                totals = mapTotalAmounts(tradeSettlement.specifiedTradeSettlementHeaderMonetarySummation, profile, dataErrors)
         )
     }
 
@@ -183,7 +184,7 @@ open class CiiMapper {
     protected open fun mapNullableText(texts: List<Text>?): String? =
         texts?.firstOrNull()?.value
 
-    protected open fun mapTotalAmounts(summation: TradeSettlementHeaderMonetarySummation?, dataErrors: MutableList<InvoiceDataError>): TotalAmounts =
+    protected open fun mapTotalAmounts(summation: TradeSettlementHeaderMonetarySummation?, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>): TotalAmounts =
         if (summation == null) {
             dataErrors.add(InvoiceDataError.missing(InvoiceField.TotalAmount))
             TotalAmounts.Zero
@@ -191,12 +192,14 @@ open class CiiMapper {
 
             // TaxBasisTotalAmount, GrandTotalAmount and DuePayableAmount have to be set. TaxTotalAmount may be not set
             TotalAmounts(
-                BigDecimal.Zero, // TODO: sum line items
-                BigDecimal.Zero, BigDecimal.Zero, // TODO: map allowances and charges
+                if (profile.isMinimumOrBasicWLProfile) mapNullableAmount(summation.lineTotalAmount) // there are no line items in Minimum and BasicWL profile
+                else mapAmount(summation.lineTotalAmount, InvoiceField.LineTotalAmount, dataErrors),
+                mapNullableAmount(summation.chargeTotalAmount),
+                mapNullableAmount(summation.allowanceTotalAmount),
                 mapAmount(summation.taxBasisTotalAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
                 mapNullableAmount(summation.taxTotalAmount), // TODO: there may be more than one taxTotalAmount
                 mapAmount(summation.grandTotalAmount, InvoiceField.GrandTotalAmount, dataErrors),
-                BigDecimal.Zero, // TODO: get totalPrepaidAmount
+                mapNullableAmount(summation.totalPrepaidAmount),
                 mapAmount(summation.duePayableAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
             )
         }
