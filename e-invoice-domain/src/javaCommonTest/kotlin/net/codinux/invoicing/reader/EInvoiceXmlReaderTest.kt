@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.format.EInvoicingStandard
 import net.codinux.invoicing.format.FacturXProfile
+import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimum
+import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.model.mapper.CiiMapper
 import net.codinux.invoicing.pdf.PdfAttachmentReader
@@ -280,7 +282,7 @@ class EInvoiceXmlReaderTest {
             assertParty(invoice.supplier, profile)
             assertParty(invoice.customer, profile)
 
-            if (profile != null && profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+            if (profile.isNotMinimumOrBasicWL) {
                 assertThat(invoice.items).isNotEmpty()
 
                 invoice.items.forEach { item ->
@@ -295,7 +297,7 @@ class EInvoiceXmlReaderTest {
             assertThat(invoice.totals).isNotNull()
             val totals = invoice.totals!!
             if (areAmountsAllowedToBeZero == false) {
-                if (profile != FacturXProfile.Minimum && profile != FacturXProfile.BasicWL) {
+                if (profile.isNotMinimumOrBasicWL) {
                     assertThat(totals.lineTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
                 }
                 assertThat(totals.taxBasisTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
@@ -324,7 +326,7 @@ class EInvoiceXmlReaderTest {
         assertThat(party).isNotNull()
 
         assertThat(party!!.name).isNotEqualTo(CiiMapper.TextFallbackValue)
-        if (profile != FacturXProfile.Minimum) { // in Minimum profile TradeParty has no countryId
+        if (profile.isNotMinimum) { // in Minimum profile TradeParty has no countryId
             assertThat(party.country).isNotEqualTo(CiiMapper.CountryFallbackValue)
         }
     }

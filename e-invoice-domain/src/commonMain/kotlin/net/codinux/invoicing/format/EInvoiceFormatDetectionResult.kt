@@ -1,5 +1,8 @@
 package net.codinux.invoicing.format
 
+import net.codinux.invoicing.format.FacturXProfile.Companion.isMinimumOrBasicWL
+import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
+
 data class EInvoiceFormatDetectionResult(
     val standard: EInvoicingStandard,
     val format: EInvoiceFormat? = null,
@@ -7,14 +10,11 @@ data class EInvoiceFormatDetectionResult(
     val profile: FacturXProfile? = null,
 ) {
     companion object {
-        val EInvoiceFormatDetectionResult?.isMinimumProfile: Boolean
-            get() = this?.profile == FacturXProfile.Minimum
-
         val EInvoiceFormatDetectionResult?.isMinimumOrBasicWLProfile: Boolean
-            get() = this.isMinimumProfile || this?.profile == FacturXProfile.BasicWL
+            get() = this?.profile.isMinimumOrBasicWL
 
         val EInvoiceFormatDetectionResult?.isNotMinimumOrBasicWLProfile: Boolean
-            get() = this.isMinimumOrBasicWLProfile == false
+            get() = this?.profile.isNotMinimumOrBasicWL
     }
 
     override fun toString() = "$format${(formatVersion ?: profile)?.let { " ($it)" } ?: ""}"
