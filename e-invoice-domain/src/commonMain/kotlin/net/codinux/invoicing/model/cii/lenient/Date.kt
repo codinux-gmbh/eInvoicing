@@ -10,14 +10,14 @@ data class Date(
   @XmlSerialName(
     value = "DateString",
     prefix = "udt",
-    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35",
+    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
   )
   @XmlElement(value = true)
   val dateString: DateString? = null,
   @XmlSerialName(
     value = "Date",
     prefix = "udt",
-    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35",
+    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
   )
   @XmlElement(value = true)
   val date: LocalDate? = null,

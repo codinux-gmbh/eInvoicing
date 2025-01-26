@@ -13,7 +13,7 @@ data class Quantity(
   @XmlSerialName(
     value = "value",
     prefix = "udt",
-    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35",
+    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
   )
   @XmlElement(value = true)
   @XmlValue

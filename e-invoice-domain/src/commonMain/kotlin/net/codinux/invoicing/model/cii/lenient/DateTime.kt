@@ -10,14 +10,14 @@ data class DateTime(
   @XmlSerialName(
     value = "DateTimeString",
     prefix = "udt",
-    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35",
+    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
   )
   @XmlElement(value = true)
   val dateTimeString: DateTimeString? = null,
   @XmlSerialName(
     value = "DateTime",
     prefix = "udt",
-    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35",
+    namespace = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
   )
   @XmlElement(value = true)
   val dateTime: LocalDateTime? = null,
