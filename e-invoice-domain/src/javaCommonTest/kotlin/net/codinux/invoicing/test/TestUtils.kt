@@ -93,10 +93,12 @@ object TestUtils {
     val Zugferd_2_0_ExtendedProfileInvoices by lazy { zugferdInvoicesFor(ZugferdVersion.V2_0, EInvoiceProfile.Extended) }
 
 
-    val XRechnungInvoices by lazy {
-        zugferdInvoicesFor(EInvoiceProfile.XRechnung) +
-                EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.CII)
-                    .map { Named.of(it.name, it) }
+    val XRechnungCiiInvoices by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.CII))
+    }
+
+    val XRechnungUblInvoices by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.UBL))
     }
 
     val EN16931CIIXmlInvoices by lazy { EInvoiceTestFiles.getEN16931TestFiles(EInvoiceXmlFlavour.CII) }
@@ -114,6 +116,10 @@ object TestUtils {
     private fun named(paths: List<Path>): List<Named<Path>> = paths.map {
         if (it.name == "factur-x.xml" || it.name == "xrechnung.xml") Named.of(it.parent.name, it)
         else Named.of(it.name, it)
+    }
+
+    private fun namedIncludingParent(paths: List<Path>): List<Named<Path>> = paths.map {
+        Named.of("${it.parent.name}/${it.name}", it)
     }
 
 }

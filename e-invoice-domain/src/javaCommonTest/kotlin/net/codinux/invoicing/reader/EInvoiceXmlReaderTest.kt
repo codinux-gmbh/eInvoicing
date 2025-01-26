@@ -199,27 +199,23 @@ class EInvoiceXmlReaderTest {
     }
 
 
-    @Test
-    fun `XRechnung CII`() {
-        val testFiles = EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.CII)
-
-        assertFiles(testFiles, EInvoicingStandard.CII, EInvoiceFormat.XRechnung)
+    @ParameterizedTest
+    @MethodSource("provideXRechnungCiiInvoices")
+    fun `XRechnung CII`(invoiceFile: Path) {
+        assertFile(invoiceFile, EInvoicingStandard.CII, EInvoiceFormat.XRechnung)
     }
 
-    @Test
-    fun `XRechnung UBL`() {
-        val testFiles = EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.UBL)
+    @ParameterizedTest
+    @MethodSource("provideXRechnungUblInvoices")
+    fun `XRechnung UBL`(invoiceFile: Path) {
+        val invoiceXml = getInvoiceXml(invoiceFile)
+        if (invoiceXml == null) {
+            fail("Could not get invoice XML for test file: $invoiceFile")
+        } else {
+            val result = underTest.parseInvoiceXml(invoiceXml)
 
-        testFiles.forEach { testFile ->
-            val invoiceXml = getInvoiceXml(testFile)
-            if (invoiceXml == null) {
-                fail("Could not get invoice XML for test file: $testFile")
-            } else {
-                val result = underTest.parseInvoiceXml(invoiceXml)
-
-                assertThat(result).isNotNull()
-                assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat) // UBL is not supported (yet)
-            }
+            assertThat(result).isNotNull()
+            assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat) // UBL is not supported (yet)
         }
     }
 
@@ -419,7 +415,10 @@ class EInvoiceXmlReaderTest {
 
 
         @JvmStatic
-        fun provideXRechnungXmlInvoices() = TestUtils.XRechnungInvoices
+        fun provideXRechnungCiiInvoices() = TestUtils.XRechnungCiiInvoices
+
+        @JvmStatic
+        fun provideXRechnungUblInvoices() = TestUtils.XRechnungUblInvoices
 
         @JvmStatic
         fun provideEN16931CIIXmlInvoices() = TestUtils.EN16931CIIXmlInvoices
