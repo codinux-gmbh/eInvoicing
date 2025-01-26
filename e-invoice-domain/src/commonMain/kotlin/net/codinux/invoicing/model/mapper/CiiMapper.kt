@@ -161,7 +161,7 @@ open class CiiMapper {
                         mapText(item.specifiedTradeProduct?.name, InvoiceField.ItemName, dataErrors),
                         mapQuantity(quantity, InvoiceField.ItemQuantity, dataErrors),
                         mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
-                        mapAmount(price.chargeAmount, InvoiceField.ItemUnit, dataErrors),
+                        mapAmount(price.chargeAmount, InvoiceField.ItemUnitPrice, dataErrors),
                         mapVatRate(tradeSettlement.applicableTradeTax)
                     )
                 }
