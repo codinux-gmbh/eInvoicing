@@ -83,7 +83,7 @@ open class CiiMapper {
             mapId(exchangedDocument.id, InvoiceField.InvoiceNumber, dataErrors),
             mapDate(exchangedDocument.issueDateTime, InvoiceField.InvoiceDate, dataErrors),
             mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
-            mapDate(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
+            mapDateOrNull(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
         )
     }
 
@@ -226,6 +226,24 @@ open class CiiMapper {
 
     protected open fun mapDateOrNull(dateTime: DateTime?): LocalDate? =
         dateTime?.dateTime?.let { LocalDate(it.year, it.month, it.dayOfMonth) }
+            ?: dateTime?.dateTimeString?.let { mapDateOrNull(it.format, it.value) }
+
+    protected open fun mapDateOrNull(format: String?, dateTimeString: String?): LocalDate? =
+        dateTimeString?.let {
+            when (format) {
+                "102" -> { // YYYYMMDD
+                    LocalDate(dateTimeString.substring(0, 4).toInt(), dateTimeString.substring(4, 6).toInt(), dateTimeString.substring(6).toInt())
+                }
+                // "203" == YYYYMMDDHHMM
+                // "303" == HHMM
+                // assume an ISO 8601 date = yyyy-MM-dd
+                // else -> LocalDate.parse(dateTimeString)
+                else -> dateTimeString.split('-').let { parts ->
+                    if (parts.size == 3) LocalDate(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
+                    else null
+                }
+            }
+        }
 
     protected open fun map(text: Text?): String =
         mapNullable(text) ?: ""
