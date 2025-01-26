@@ -111,6 +111,9 @@ object TestUtils {
     private fun zugferdInvoicesFor(version: ZugferdVersion, profile: EInvoiceProfile): List<Named<Path>> =
         named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd, version, profile))
 
-    private fun named(paths: List<Path>): List<Named<Path>> = paths.map { Named.of(it.parent.name, it) }
+    private fun named(paths: List<Path>): List<Named<Path>> = paths.map {
+        if (it.name == "factur-x.xml" || it.name == "xrechnung.xml") Named.of(it.parent.name, it)
+        else Named.of(it.name, it)
+    }
 
 }
