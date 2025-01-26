@@ -16,7 +16,16 @@ data class CargoCategoryCode(
   @XmlElement(value = true)
   @XmlValue
   val `value`: String? = null,
+  @XmlSerialName(value = "listID")
+  @XmlElement(value = false)
+  val listID: String? = null,
   @XmlSerialName(value = "listAgencyID")
   @XmlElement(value = false)
   val listAgencyID: String? = null,
+  @XmlSerialName(value = "listVersionID")
+  @XmlElement(value = false)
+  val listVersionID: String? = null,
+  @XmlSerialName(value = "name")
+  @XmlElement(value = false)
+  val name: String? = null,
 )

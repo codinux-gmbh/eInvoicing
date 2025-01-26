@@ -42,18 +42,4 @@ data class SubordinateLineTradeSettlement(
   )
   @XmlElement(value = true)
   val specifiedTradeAllowanceCharge: List<TradeAllowanceCharge> = emptyList(),
-  @XmlSerialName(
-    value = "BillingSpecifiedPeriod",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val billingSpecifiedPeriod: SpecifiedPeriod? = null,
-  @XmlSerialName(
-    value = "PurchaseSpecifiedTradeAccountingAccount",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val purchaseSpecifiedTradeAccountingAccount: List<TradeAccountingAccount> = emptyList(),
 )

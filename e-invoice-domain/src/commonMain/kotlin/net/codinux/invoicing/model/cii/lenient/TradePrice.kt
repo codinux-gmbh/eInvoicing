@@ -112,11 +112,4 @@ data class TradePrice(
   )
   @XmlElement(value = true)
   val associatedReferencedDocument: List<ReferencedDocument> = emptyList(),
-  @XmlSerialName(
-    value = "SpecifiedTradeLocation",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val specifiedTradeLocation: TradeLocation? = null,
 )

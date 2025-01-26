@@ -154,11 +154,4 @@ data class TradeSettlementHeaderMonetarySummation(
   )
   @XmlElement(value = true)
   val includingTaxesLineTotalAmount: List<Amount> = emptyList(),
-  @XmlSerialName(
-    value = "SpecifiedReferencedDocument",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val specifiedReferencedDocument: List<ReferencedDocument> = emptyList(),
 )

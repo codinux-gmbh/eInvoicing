@@ -28,13 +28,6 @@ data class TradeAccountingAccount(
   @XmlElement(value = true)
   val typeCode: AccountingAccountTypeCode? = null,
   @XmlSerialName(
-    value = "SubAccountID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val subAccountID: ID? = null,
-  @XmlSerialName(
     value = "AmountTypeCode",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",

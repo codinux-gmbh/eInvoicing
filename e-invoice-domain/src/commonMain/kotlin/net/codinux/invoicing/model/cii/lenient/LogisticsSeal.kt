@@ -27,7 +27,7 @@ data class LogisticsSeal(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val typeCode: SealTypeCode? = null,
+  val typeCode: Code? = null,
   @XmlSerialName(
     value = "ConditionCode",
     prefix = "ram",

@@ -90,7 +90,7 @@ data class TradeProduct(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val netWeightMeasure: WeightUnitMeasure? = null,
+  val netWeightMeasure: Measure? = null,
   @XmlSerialName(
     value = "GrossWeightMeasure",
     prefix = "ram",
@@ -118,7 +118,7 @@ data class TradeProduct(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val netVolumeMeasure: VolumeUnitMeasure? = null,
+  val netVolumeMeasure: Measure? = null,
   @XmlSerialName(
     value = "GrossVolumeMeasure",
     prefix = "ram",
@@ -309,34 +309,6 @@ data class TradeProduct(
   @XmlElement(value = true)
   val sizeCode: Code? = null,
   @XmlSerialName(
-    value = "ClassificationCode",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val classificationCode: Code? = null,
-  @XmlSerialName(
-    value = "GlobalSerialID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val globalSerialID: List<ID> = emptyList(),
-  @XmlSerialName(
-    value = "SKUID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val skuid: ID? = null,
-  @XmlSerialName(
-    value = "Trademark",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val trademark: List<Text> = emptyList(),
-  @XmlSerialName(
     value = "ApplicableProductCharacteristic",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -470,11 +442,4 @@ data class TradeProduct(
   )
   @XmlElement(value = true)
   val buyerSuppliedPartsReferenceReferencedDocument: List<ReferencedDocument> = emptyList(),
-  @XmlSerialName(
-    value = "WarrantySpecifiedPeriod",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val warrantySpecifiedPeriod: SpecifiedPeriod? = null,
 )

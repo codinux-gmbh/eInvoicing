@@ -48,7 +48,7 @@ data class SupplyChainPackaging(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val weightMeasure: List<WeightUnitMeasure> = emptyList(),
+  val weightMeasure: List<Measure> = emptyList(),
   @XmlSerialName(
     value = "MaximumStackabilityQuantity",
     prefix = "ram",
@@ -98,13 +98,6 @@ data class SupplyChainPackaging(
   )
   @XmlElement(value = true)
   val additionalInstructionIndicator: Indicator? = null,
-  @XmlSerialName(
-    value = "VolumeMeasure",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val volumeMeasure: List<VolumeUnitMeasure> = emptyList(),
   @XmlSerialName(
     value = "LinearSpatialDimension",
     prefix = "ram",

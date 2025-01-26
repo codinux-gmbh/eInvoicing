@@ -13,7 +13,7 @@ data class SpecifiedPeriod(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val durationMeasure: List<DurationUnitMeasure> = emptyList(),
+  val durationMeasure: List<Measure> = emptyList(),
   @XmlSerialName(
     value = "InclusiveIndicator",
     prefix = "ram",

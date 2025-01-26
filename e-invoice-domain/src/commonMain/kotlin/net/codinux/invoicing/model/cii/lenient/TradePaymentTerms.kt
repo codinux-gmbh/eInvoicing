@@ -50,13 +50,6 @@ data class TradePaymentTerms(
   @XmlElement(value = true)
   val typeCode: PaymentTermsTypeCode? = null,
   @XmlSerialName(
-    value = "InstructedAmount",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val instructedAmount: List<Amount> = emptyList(),
-  @XmlSerialName(
     value = "InstructionTypeCode",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -106,13 +99,6 @@ data class TradePaymentTerms(
   @XmlElement(value = true)
   val billStartDateTime: DateTime? = null,
   @XmlSerialName(
-    value = "PayeeTradeParty",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val payeeTradeParty: List<TradeParty> = emptyList(),
-  @XmlSerialName(
     value = "ApplicableTradePaymentPenaltyTerms",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -126,4 +112,11 @@ data class TradePaymentTerms(
   )
   @XmlElement(value = true)
   val applicableTradePaymentDiscountTerms: TradePaymentDiscountTerms? = null,
+  @XmlSerialName(
+    value = "PayeeTradeParty",
+    prefix = "ram",
+    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+  )
+  @XmlElement(value = true)
+  val payeeTradeParty: List<TradeParty> = emptyList(),
 )

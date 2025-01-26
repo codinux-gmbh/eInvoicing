@@ -29,13 +29,6 @@ data class SubordinateTradeLineItem(
   @XmlElement(value = true)
   val categoryCode: Code? = null,
   @XmlSerialName(
-    value = "RequestedResponseTypeCode",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val requestedResponseTypeCode: Code? = null,
-  @XmlSerialName(
     value = "SpecifiedReferencedProduct",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -70,11 +63,4 @@ data class SubordinateTradeLineItem(
   )
   @XmlElement(value = true)
   val specifiedSubordinateLineTradeSettlement: SubordinateLineTradeSettlement? = null,
-  @XmlSerialName(
-    value = "IncludedNote",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val includedNote: List<Note> = emptyList(),
 )

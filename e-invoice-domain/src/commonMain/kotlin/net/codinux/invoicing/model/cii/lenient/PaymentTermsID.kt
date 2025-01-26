@@ -16,7 +16,13 @@ data class PaymentTermsID(
   @XmlElement(value = true)
   @XmlValue
   val `value`: String? = null,
+  @XmlSerialName(value = "schemeID")
+  @XmlElement(value = false)
+  val schemeID: String? = null,
   @XmlSerialName(value = "schemeAgencyID")
   @XmlElement(value = false)
   val schemeAgencyID: String? = null,
+  @XmlSerialName(value = "schemeVersionID")
+  @XmlElement(value = false)
+  val schemeVersionID: String? = null,
 )

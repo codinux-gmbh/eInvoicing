@@ -16,7 +16,16 @@ data class AccountingDocumentCode(
   @XmlElement(value = true)
   @XmlValue
   val `value`: String? = null,
+  @XmlSerialName(value = "listID")
+  @XmlElement(value = false)
+  val listID: String? = null,
   @XmlSerialName(value = "listAgencyID")
   @XmlElement(value = false)
   val listAgencyID: String? = null,
+  @XmlSerialName(value = "listVersionID")
+  @XmlElement(value = false)
+  val listVersionID: String? = null,
+  @XmlSerialName(value = "listURI")
+  @XmlElement(value = false)
+  val listURI: String? = null,
 )

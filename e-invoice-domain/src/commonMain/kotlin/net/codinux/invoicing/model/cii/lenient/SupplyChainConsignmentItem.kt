@@ -13,14 +13,14 @@ data class SupplyChainConsignmentItem(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val typeCode: Code? = null,
+  val typeCode: GoodsTypeCode? = null,
   @XmlSerialName(
     value = "TypeExtensionCode",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val typeExtensionCode: Code? = null,
+  val typeExtensionCode: GoodsTypeExtensionCode? = null,
   @XmlSerialName(
     value = "DeclaredValueForCustomsAmount",
     prefix = "ram",

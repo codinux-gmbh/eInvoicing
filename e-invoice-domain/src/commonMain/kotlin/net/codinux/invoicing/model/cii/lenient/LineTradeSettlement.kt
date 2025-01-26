@@ -148,11 +148,4 @@ data class LineTradeSettlement(
   )
   @XmlElement(value = true)
   val specifiedTradeSettlementFinancialCard: TradeSettlementFinancialCard? = null,
-  @XmlSerialName(
-    value = "SpecifiedTradeAccountingAccount",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val specifiedTradeAccountingAccount: List<TradeAccountingAccount> = emptyList(),
 )

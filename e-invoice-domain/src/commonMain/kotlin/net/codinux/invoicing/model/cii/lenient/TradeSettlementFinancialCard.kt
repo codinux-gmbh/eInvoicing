@@ -1,5 +1,6 @@
 package net.codinux.invoicing.model.cii.lenient
 
+import kotlin.String
 import kotlin.collections.List
 import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
@@ -55,7 +56,7 @@ data class TradeSettlementFinancialCard(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val validFromDateTime: DateOnlyFormattedDateTime? = null,
+  val validFromDateTime: String? = null,
   @XmlSerialName(
     value = "CreditLimitAmount",
     prefix = "ram",

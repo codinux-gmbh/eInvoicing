@@ -64,27 +64,6 @@ data class TradeParty(
   @XmlElement(value = true)
   val role: List<Text> = emptyList(),
   @XmlSerialName(
-    value = "LEIID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val leiid: ID? = null,
-  @XmlSerialName(
-    value = "TradeName",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val tradeName: List<Text> = emptyList(),
-  @XmlSerialName(
-    value = "EORIID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val eoriid: ID? = null,
-  @XmlSerialName(
     value = "SpecifiedLegalOrganization",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -140,11 +119,4 @@ data class TradeParty(
   )
   @XmlElement(value = true)
   val logoAssociatedSpecifiedBinaryFile: List<SpecifiedBinaryFile> = emptyList(),
-  @XmlSerialName(
-    value = "AuthorizedRepresentativeTradeParty",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val authorizedRepresentativeTradeParty: List<TradeParty> = emptyList(),
 )

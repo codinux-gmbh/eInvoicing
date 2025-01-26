@@ -85,20 +85,6 @@ data class SupplyChainConsignment(
   @XmlElement(value = true)
   val netVolumeMeasure: List<VolumeUnitMeasure> = emptyList(),
   @XmlSerialName(
-    value = "ConsignorAgentIndicator",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val consignorAgentIndicator: Indicator? = null,
-  @XmlSerialName(
-    value = "FacilityDespatchDateTime",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val facilityDespatchDateTime: List<DateTime> = emptyList(),
-  @XmlSerialName(
     value = "ConsignorTradeParty",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -218,11 +204,4 @@ data class SupplyChainConsignment(
   )
   @XmlElement(value = true)
   val applicableCrossBorderCustomsValuation: List<CrossBorderCustomsValuation> = emptyList(),
-  @XmlSerialName(
-    value = "StatementNote",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val statementNote: List<Note> = emptyList(),
 )

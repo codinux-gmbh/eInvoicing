@@ -50,13 +50,6 @@ data class DocumentLineDocument(
   @XmlElement(value = true)
   val responseReasonCode: Code? = null,
   @XmlSerialName(
-    value = "RequestedResponseTypeCode",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val requestedResponseTypeCode: Code? = null,
-  @XmlSerialName(
     value = "IncludedNote",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",

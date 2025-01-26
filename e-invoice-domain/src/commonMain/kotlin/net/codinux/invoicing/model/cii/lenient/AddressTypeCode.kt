@@ -25,7 +25,4 @@ data class AddressTypeCode(
   @XmlSerialName(value = "listVersionID")
   @XmlElement(value = false)
   val listVersionID: String? = null,
-  @XmlSerialName(value = "name")
-  @XmlElement(value = false)
-  val name: String? = null,
 )

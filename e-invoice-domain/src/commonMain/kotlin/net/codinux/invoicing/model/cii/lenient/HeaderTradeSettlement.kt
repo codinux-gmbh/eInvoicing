@@ -303,26 +303,4 @@ data class HeaderTradeSettlement(
   )
   @XmlElement(value = true)
   val ultimatePayeeTradeParty: TradeParty? = null,
-  @XmlSerialName(
-    value = "OutstandingSpecifiedTradeSettlementHeaderMonetarySummation",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val outstandingSpecifiedTradeSettlementHeaderMonetarySummation:
-      TradeSettlementHeaderMonetarySummation? = null,
-  @XmlSerialName(
-    value = "TradeFinanceAccounteeTradeParty",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val tradeFinanceAccounteeTradeParty: TradeParty? = null,
-  @XmlSerialName(
-    value = "IncludedNote",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val includedNote: List<Note> = emptyList(),
 )

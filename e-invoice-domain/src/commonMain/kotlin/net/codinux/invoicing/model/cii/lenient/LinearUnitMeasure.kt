@@ -22,4 +22,7 @@ data class LinearUnitMeasure(
   @XmlSerialName(value = "unitCode")
   @XmlElement(value = false)
   val unitCode: String? = null,
+  @XmlSerialName(value = "unitCodeListVersionID")
+  @XmlElement(value = false)
+  val unitCodeListVersionID: String? = null,
 )

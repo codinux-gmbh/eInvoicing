@@ -13,7 +13,7 @@ data class SpatialDimension(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val valueMeasure: UnitMeasure? = null,
+  val valueMeasure: Measure? = null,
   @XmlSerialName(
     value = "TypeCode",
     prefix = "ram",
@@ -34,21 +34,21 @@ data class SpatialDimension(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val widthMeasure: LinearUnitMeasure? = null,
+  val widthMeasure: Measure? = null,
   @XmlSerialName(
     value = "LengthMeasure",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val lengthMeasure: LinearUnitMeasure? = null,
+  val lengthMeasure: Measure? = null,
   @XmlSerialName(
     value = "HeightMeasure",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val heightMeasure: LinearUnitMeasure? = null,
+  val heightMeasure: Measure? = null,
   @XmlSerialName(
     value = "ID",
     prefix = "ram",

@@ -27,11 +27,4 @@ data class ContactPerson(
   )
   @XmlElement(value = true)
   val familyName: Text? = null,
-  @XmlSerialName(
-    value = "SignatoryAuthorizedIndicator",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val signatoryAuthorizedIndicator: Indicator? = null,
 )

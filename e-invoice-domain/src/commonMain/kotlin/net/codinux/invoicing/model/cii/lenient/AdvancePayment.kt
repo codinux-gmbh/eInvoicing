@@ -22,13 +22,6 @@ data class AdvancePayment(
   @XmlElement(value = true)
   val formattedReceivedDateTime: FormattedDateTime? = null,
   @XmlSerialName(
-    value = "ID",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val id: ID? = null,
-  @XmlSerialName(
     value = "IncludedTradeTax",
     prefix = "ram",
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
@@ -42,11 +35,4 @@ data class AdvancePayment(
   )
   @XmlElement(value = true)
   val invoiceSpecifiedReferencedDocument: List<ReferencedDocument> = emptyList(),
-  @XmlSerialName(
-    value = "IdentifiedTradePaymentTerms",
-    prefix = "ram",
-    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-  )
-  @XmlElement(value = true)
-  val identifiedTradePaymentTerms: TradePaymentTerms? = null,
 )

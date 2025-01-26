@@ -1,5 +1,6 @@
 package net.codinux.invoicing.model.cii.lenient
 
+import kotlin.String
 import kotlin.collections.List
 import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
@@ -69,7 +70,7 @@ data class SupplyChainEvent(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val timeOccurrenceDateTime: TimeOnlyFormattedDateTime? = null,
+  val timeOccurrenceDateTime: String? = null,
   @XmlSerialName(
     value = "OccurrenceSpecifiedPeriod",
     prefix = "ram",
