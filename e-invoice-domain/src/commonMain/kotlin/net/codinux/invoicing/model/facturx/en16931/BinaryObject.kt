@@ -3,7 +3,7 @@ package net.codinux.invoicing.model.facturx.en16931
 import kotlin.ByteArray
 import kotlin.String
 import kotlinx.serialization.Serializable
-import net.codinux.kotlin.serialization.ByteArrayBase64Serializer
+import net.codinux.invoicing.serialization.ByteArrayBase64Serializer
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import nl.adaptivity.xmlutil.serialization.XmlValue

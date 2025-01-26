@@ -93,7 +93,6 @@ kotlin {
     val kotlinCoroutinesVersion: String by project
 
     val kotlinxSerializationVersion: String by project
-    val kotlinxSerializationSerializers: String by project
 
     val mustangVersion: String by project
 
@@ -129,7 +128,6 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
 
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
-            implementation("net.codinux.kotlin.serialization:kotlinx-serialization-serializers:$kotlinxSerializationSerializers")
 
             implementation("io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion")
 

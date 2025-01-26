@@ -46,7 +46,6 @@ kotlin {
 
 
     val kotlinxSerializationVersion: String by project
-    val kotlinxSerializationSerializers: String by project
 
     val xmlUtilVersion: String by project
 
@@ -59,7 +58,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
-            implementation("net.codinux.kotlin.serialization:kotlinx-serialization-serializers:$kotlinxSerializationSerializers")
 
             implementation("io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion")
 
