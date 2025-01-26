@@ -80,7 +80,9 @@ open class CiiMapper {
         val paymentTerms = tradeSettlement.specifiedTradePaymentTerms.firstOrNull()
 
         return InvoiceDetails(
-            map(exchangedDocument.id), mapDate(exchangedDocument.issueDateTime), mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
+            mapId(exchangedDocument.id, InvoiceField.InvoiceNumber, dataErrors),
+            mapDate(exchangedDocument.issueDateTime, InvoiceField.InvoiceDate, dataErrors),
+            mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
             mapDate(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
         )
     }
@@ -237,6 +239,18 @@ open class CiiMapper {
     protected open fun mapNullable(code: Code?): String? =
         code?.value
 
-    protected open fun map(id: ID?): String =
-        id?.value ?: ""
+    protected open fun mapIdOrNull(ids: List<ID>?): String? =
+        ids?.firstNotNullOfOrNull { mapIdOrNull(it) }
+
+    protected open fun mapId(id: ID?, field: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
+        mapIdOrNull(id) ?: run {
+            dataErrors.add(InvoiceDataError.missing(field))
+            ""
+        }
+
+    protected open fun mapId(id: ID?): String =
+        mapIdOrNull(id) ?: ""
+
+    protected open fun mapIdOrNull(id: ID?): String? =
+        id?.value
 }
