@@ -29,7 +29,7 @@ open class EInvoiceXmlReader(
     private val log by logger()
 
 
-    open fun parseInvoiceXml(invoiceXml: String): ReadEInvoiceXmlResult? =
+    open fun parseInvoiceXml(invoiceXml: String): ReadEInvoiceXmlResult =
         try {
             val fixedXml = fixXmlForReading(invoiceXml) // a simple non-breaking space before first '<' makes XmlReader crash
             val format = formatDetector.detectFormat(fixedXml)
@@ -38,11 +38,11 @@ open class EInvoiceXmlReader(
                 val ciiInvoice = xml.decodeFromString<CrossIndustryInvoice>(fixedXml)
                 mapper.map(ciiInvoice, format)
             } else {
-                null
+                ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat, null as? Throwable)
             }
         } catch (e: Throwable) {
             log.error(e) { "Error while parsing invoice: ${invoiceXml.ofMaxLength(250)}" }
-                null
+            ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
         }
 
 }
