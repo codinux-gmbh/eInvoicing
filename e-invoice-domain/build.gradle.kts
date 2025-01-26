@@ -119,7 +119,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":e-invoice-model"))
+//            implementation(project(":e-invoice-model"))
 
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
