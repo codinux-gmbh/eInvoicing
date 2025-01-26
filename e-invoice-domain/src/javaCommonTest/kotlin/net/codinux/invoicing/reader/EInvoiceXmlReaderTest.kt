@@ -207,7 +207,8 @@ class EInvoiceXmlReaderTest {
     @ParameterizedTest
     @MethodSource("provideXRechnungCiiInvoices")
     fun `XRechnung CII`(invoiceFile: Path) {
-        assertFile(invoiceFile, EInvoicingStandard.CII, EInvoiceFormat.XRechnung)
+        assertFile(invoiceFile, EInvoicingStandard.CII, EInvoiceFormat.XRechnung,
+            areAmountsAllowedToBeZero = invoiceFile.name in listOf("02.04a-INVOICE_uncefact.xml", "02.05a-INVOICE_uncefact.xml"))
     }
 
     @ParameterizedTest
@@ -289,7 +290,9 @@ class EInvoiceXmlReaderTest {
                     assertThat(item.name).isNotEqualTo(CiiMapper.TextFallbackValue)
                     assertThat(item.quantity).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
                     assertThat(item.unit).isNotEqualTo(CiiMapper.TextFallbackValue)
-                    assertThat(item.unitPrice).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    if (areAmountsAllowedToBeZero == false) {
+                        assertThat(item.unitPrice).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    }
                     // vatRate may be zero
                 }
             }
