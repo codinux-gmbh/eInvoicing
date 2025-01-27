@@ -215,6 +215,10 @@ kotlin {
 
         val jsCommonMain by creating {
             dependsOn(nonJvmMain)
+
+            dependencies {
+                implementation(npm("big.js", "6.2.2"))
+            }
         }
         val jsCommonTest by creating {
             dependsOn(nonJvmTest)
