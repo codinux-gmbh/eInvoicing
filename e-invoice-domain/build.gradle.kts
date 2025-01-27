@@ -242,11 +242,20 @@ kotlin {
         val linuxAndMingwMain by creating {
             dependsOn(nativeMain.get())
         }
+        val linuxAndMingwTest by creating {
+            dependsOn(nativeTest.get())
+        }
         linuxMain {
             dependsOn(linuxAndMingwMain)
         }
+        linuxTest {
+            dependsOn(linuxAndMingwTest)
+        }
         mingwMain {
             dependsOn(linuxAndMingwMain)
+        }
+        mingwTest {
+            dependsOn(linuxAndMingwTest)
         }
 
 

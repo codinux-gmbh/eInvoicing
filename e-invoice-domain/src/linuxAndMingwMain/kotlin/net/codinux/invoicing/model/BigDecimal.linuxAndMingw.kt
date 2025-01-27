@@ -67,7 +67,18 @@ actual class BigDecimal(private val value: Double) : Comparable<BigDecimal> {
         return this
     }
 
-    actual fun toPlainString(): String = value.toString()
+    actual fun toPlainString(): String = value.toString().let {
+        var trimmed = it
+        while (trimmed.lastOrNull() == '0') {
+            trimmed = trimmed.substring(0, trimmed.length - 1)
+        }
+
+        if (trimmed.endsWith('.')) {
+            trimmed = trimmed.substring(0, trimmed.length - 1)
+        }
+
+        trimmed
+    }
 
     actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)
 
