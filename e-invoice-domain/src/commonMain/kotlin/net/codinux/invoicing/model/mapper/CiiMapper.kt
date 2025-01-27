@@ -14,6 +14,10 @@ import net.codinux.log.logger
 open class CiiMapper {
 
     companion object {
+        const val Iso8601DateFormatCode = "102" // YYYYMMDD
+        const val Iso8601TimeFormatCode = "303" // HHMM
+        const val Iso8601DateTimeFormatCode = "203" // YYYYMMDDHHMM
+
         val IdFallbackValue = ""
 
         val CodeFallbackValue = ""
@@ -254,7 +258,7 @@ open class CiiMapper {
     protected open fun mapDateOrNull(format: String?, dateTimeString: String?): LocalDate? =
         dateTimeString?.let {
             when (format) {
-                "102" -> { // YYYYMMDD
+                Iso8601DateFormatCode-> { // YYYYMMDD
                     LocalDate(dateTimeString.substring(0, 4).toInt(), dateTimeString.substring(4, 6).toInt(), dateTimeString.substring(6).toInt())
                 }
                 // "203" == YYYYMMDDHHMM

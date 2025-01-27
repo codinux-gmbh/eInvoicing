@@ -5,6 +5,17 @@ import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
+/**
+ * ### English
+ * A group of business terms to specify a direct debit.
+ * This group may be used to give prior notice in the invoice that payment will be made through a SEPA or other
+ * direct debit initiated by the Seller, in accordance with the rules of the SEPA or other direct debit scheme.
+ *
+ * ### German
+ * Eine Gruppe von betriebswirtschaftlichen Begriffen, die Informationen über eine Lastschrift enthält<br/>
+ * Diese Gruppe darf genutzt werden, um in der Rechnung vorweg anzugeben, dass die Zahlung über SEPA oder ein
+ * anderes vom Verkäufer eingeleitetes Lastschrif
+ */
 @Serializable
 data class HeaderTradeAgreement(
   @XmlSerialName(

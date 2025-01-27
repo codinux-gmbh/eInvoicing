@@ -6,6 +6,12 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
 @Serializable
 data class CreditorFinancialInstitution(
+  /**
+   * Factur-X: Wie z. B. der BIC oder eine nationale Bankleitzahl, sofern gefordert. Es ist kein Identifikationsschema zu
+   * verwenden.
+   *
+   * Die anderen Felder kennt Factur-X nicht
+   */
   @XmlSerialName(
     value = "BICID",
     prefix = "ram",
@@ -13,4 +19,6 @@ data class CreditorFinancialInstitution(
   )
   @XmlElement(value = true)
   val bicid: ID,
+
+  // TODO: CII also has a name field for the name of the financial institution
 )

@@ -9,9 +9,12 @@ class BankDetails(
      */
     val accountNumber: String,
     /**
-     * In the EU / SEPA area the BIC. Optional for countries like Germany
+     * The domestic bank id (like FedwireRoutingNumberID in USA, RussianCentralBankID in Russia, NCCID in South Africa, ...)
+     * or international bank id (like BIC in SEPA area).
+     *
+     * Optional for countries like Germany
      */
-    val bankCode: String? = null,
+    val bankCode: String? = null, // TODO: rename to (domestic)BankId
 
     val accountHolderName: String? = null,
     val financialInstitutionName: String? = null

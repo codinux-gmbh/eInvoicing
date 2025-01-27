@@ -1,0 +1,36 @@
+package net.codinux.invoicing.creation
+
+import kotlinx.serialization.encodeToString
+import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.mapper.DomainToCiiMapper
+import net.codinux.log.logger
+import nl.adaptivity.xmlutil.XmlDeclMode
+import nl.adaptivity.xmlutil.serialization.XML
+
+open class EInvoiceXmlCreatorMP(
+    protected val mapper: DomainToCiiMapper = DomainToCiiMapper()
+) {
+
+    protected val xml = XML {
+        xmlDeclMode = XmlDeclMode.Charset // without "<?xml version='1.0' encoding='UTF-8' ?>" wouldn't get written
+        // with the default set to false namespace declarations would be written at elements in body where they first
+        // occur instead of in root element
+        isCollectingNSAttributes = true
+        indentString = "  " // pretty print
+    }
+
+    private val log by logger()
+
+
+    open fun createFacturXXml(invoice: Invoice): String =
+        try {
+            val facturXInvoice = mapper.mapInvoice(invoice)
+
+            xml.encodeToString(facturXInvoice)
+        } catch (e: Throwable) {
+            log.error(e) { "Could not create Factur-X invoice" }
+            //null // for now ignore exceptions as EInvoiceXmlCreator does
+            throw e
+        }
+
+}

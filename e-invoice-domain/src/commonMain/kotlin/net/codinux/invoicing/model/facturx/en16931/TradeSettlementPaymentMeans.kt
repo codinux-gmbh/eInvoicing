@@ -4,6 +4,9 @@ import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
+/**
+ * ZAHLUNGSANWEISUNGEN
+ */
 @Serializable
 data class TradeSettlementPaymentMeans(
   @XmlSerialName(
