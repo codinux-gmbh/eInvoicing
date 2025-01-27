@@ -1,50 +1,83 @@
 package net.codinux.invoicing.model
 
+import kotlinx.cinterop.UnsafeNumber
 import kotlinx.serialization.Serializable
+import net.codinux.invoicing.platform.toNSUInteger
 import net.codinux.invoicing.serialization.BigDecimalSerializer
+import platform.Foundation.*
 
+@OptIn(UnsafeNumber::class)
 @Serializable(with = BigDecimalSerializer::class)
-actual class BigDecimal actual constructor(private val value: String) : Comparable<BigDecimal> {
+actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDecimal> {
 
     actual companion object {
         actual val Zero = BigDecimal("0")
+
+        val MinusOne = BigDecimal(NSDecimalNumber(mantissa = 1u, exponent = 0, isNegative = true))
     }
 
+    actual constructor(value: String) : this(NSDecimalNumber(string = value))
+    actual constructor(value: Int) : this(NSDecimalNumber(int = value))
+    constructor(value: Double) : this(NSDecimalNumber(double = value))
 
-    actual constructor(value: Int) : this(value.toString())
 
+    fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByAdding (other.value))
+    fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberBySubtracting(other.value))
+    fun times(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByMultiplyingBy(other.value))
+    fun divide(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByDividingBy(other.value))
+    fun modulo(other: BigDecimal): BigDecimal {
+        val quotient = this.value.decimalNumberByDividingBy(other.value, withBehavior = numberHandler(0, NSRoundingMode.NSRoundDown))
+        val subtractAmount = quotient.decimalNumberByMultiplyingBy(other.value)
+        return BigDecimal(this.value.decimalNumberBySubtracting(subtractAmount))
+    }
 
-    actual fun toInt(): Int = value.split(".").first().toInt()
+    val isNegative: Boolean by lazy { this.compareTo(Zero) < 0 }
+    fun negated(): BigDecimal = this.times(MinusOne)
+//    fun sqrt(): BigDecimal = BigDecimal(value.raising(toPower = 0.5))
+    fun pow(exponent: Int): BigDecimal = BigDecimal(value.decimalNumberByRaisingToPower(exponent.toNSUInteger()))
+    fun abs(): BigDecimal = if (value.compare(NSDecimalNumber.zero) == NSOrderedAscending) negated() else this
 
-    actual fun toDouble(): Double = value.toDouble()
+    fun round(decimalPlaces: Int, roundingMode: NSRoundingMode = NSRoundingMode.NSRoundPlain): BigDecimal {
+        val handler = numberHandler(decimalPlaces, roundingMode)
+        return BigDecimal(value.decimalNumberByRoundingAccordingToBehavior(handler))
+    }
 
-    actual fun setScale(newScale: Int): BigDecimal {
-        val indexOfDot = value.lastIndexOf('.')
-        if (indexOfDot != -1) {
-            val countFractionDigits = value.length - indexOfDot - 1
-            if (countFractionDigits != newScale) {
-                val diff = newScale - countFractionDigits
+    actual fun setScale(newScale: Int): BigDecimal = round(newScale)
 
-                val newValue = if (newScale == 0) {
-                    value.substring(0, indexOfDot)
-                } else if (diff < 0) {
-                    value.substring(0, indexOfDot + newScale + 1)
-                } else {
-                    value.padEnd(indexOfDot + newScale + 1, '0')
-                }
+    private fun numberHandler(decimalPlaces: Int, roundingMode: NSRoundingMode = NSRoundingMode.NSRoundPlain) = NSDecimalNumberHandler(
+        roundingMode = roundingMode,
+        scale = decimalPlaces.toShort(),
+        raiseOnExactness = false,
+        raiseOnOverflow = false,
+        raiseOnUnderflow = false,
+        raiseOnDivideByZero = false
+    )
 
-                return BigDecimal(newValue)
-            }
-        } else if (newScale != 0) {
-            return BigDecimal(value + "." + "".padEnd(newScale, '0'))
+    actual override fun compareTo(other: BigDecimal): Int = when (value.compare(other.value)) {
+        NSOrderedAscending -> -1
+        NSOrderedSame -> 0
+        NSOrderedDescending -> 1
+        else -> throw IllegalStateException("Unexpected comparison result")
+    }
+
+    fun equals(other: BigDecimal): Boolean = value.isEqualToNumber(other.value)
+
+    actual fun toInt(): Int = value.intValue
+    actual fun toDouble(): Double = value.doubleValue
+
+    actual fun toPlainString(): String = value.stringValue
+
+    fun toFixed(decimalPlaces: Int): String {
+        val format = NSNumberFormatter().apply {
+            this.locale = NSLocale(localeIdentifier = "en_US") // otherwise e.g. on German systems ',' would be used as decimal separator
+            this.numberStyle = NSNumberFormatterNoStyle
+            this.minimumFractionDigits = decimalPlaces.toNSUInteger()
+            this.maximumFractionDigits = decimalPlaces.toNSUInteger()
+            this.roundingMode = NSRoundingMode.NSRoundPlain.value
         }
 
-        return this
+        return format.stringFromNumber(this.value)!!
     }
-
-    actual fun toPlainString(): String = value
-
-    actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value) // TODO
 
 
     override fun equals(other: Any?): Boolean {
@@ -58,6 +91,6 @@ actual class BigDecimal actual constructor(private val value: String) : Comparab
         return value.hashCode()
     }
 
-    override fun toString() = value
+    override fun toString() = toPlainString()
 
 }
