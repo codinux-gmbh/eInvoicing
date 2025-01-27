@@ -1,6 +1,7 @@
 package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
+import net.codinux.kotlin.extensions.substringAfterLastOrNull
 import net.codinux.log.Log
 
 expect open class EInvoiceReader constructor() {
@@ -15,7 +16,7 @@ expect open class EInvoiceReader constructor() {
 
 
 suspend fun EInvoiceReader.extractFromFile(fileContent: ByteArray, filename: String, directory: String? = null, mediaType: String? = null): ReadEInvoiceFileResult = try {
-    val extension = filename.substringAfterLast('.').lowercase()
+    val extension = filename.substringAfterLastOrNull('.')?.lowercase()
 
     if (extension == "pdf" || mediaType == "application/pdf" || mediaType == "application/octet-stream") {
         ReadEInvoiceFileResult(filename, directory, extractFromPdf(fileContent), null)
