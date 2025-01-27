@@ -1,6 +1,7 @@
 package net.codinux.invoicing.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -38,6 +39,7 @@ actual class BigDecimal(
     actual operator fun unaryMinus(): BigDecimal = negated()
 
 
+    @get:JsonIgnore
     actual val isNegative: Boolean by lazy { this < Zero }
 
     actual fun negated(): BigDecimal = BigDecimal(this.value.negate())
