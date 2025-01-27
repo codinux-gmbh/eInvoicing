@@ -12,7 +12,7 @@ class Party(
      */
     val address: String,
     val additionalAddressLine: String? = null,
-    var postalCode: String?,
+    var postalCode: String? = null,
     val city: String,
     val country: Country = Country.Germany,
 
