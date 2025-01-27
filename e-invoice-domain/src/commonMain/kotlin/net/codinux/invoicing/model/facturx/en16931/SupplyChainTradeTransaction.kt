@@ -13,7 +13,7 @@ data class SupplyChainTradeTransaction(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val includedSupplyChainTradeLineItem: List<SupplyChainTradeLineItem> = emptyList(),
+  val includedSupplyChainTradeLineItem: List<SupplyChainTradeLineItem>,
   @XmlSerialName(
     value = "ApplicableHeaderTradeAgreement",
     prefix = "ram",

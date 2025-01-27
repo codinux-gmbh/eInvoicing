@@ -98,7 +98,7 @@ data class HeaderTradeSettlement(
     namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
   )
   @XmlElement(value = true)
-  val applicableTradeTax: List<TradeTax> = emptyList(),
+  val applicableTradeTax: List<TradeTax>,
   @XmlSerialName(
     value = "BillingSpecifiedPeriod",
     prefix = "ram",
