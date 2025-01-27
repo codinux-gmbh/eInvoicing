@@ -16,6 +16,26 @@ actual class BigDecimal(private val value: BigJs) : Comparable<BigDecimal> {
     actual constructor(value: Int) : this(value.toString())
 
 
+    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.plus(other.value))
+
+    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.minus(other.value))
+
+    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
+
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.div(other.value))
+
+    actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.mod(other))
+
+    actual operator fun unaryMinus(): BigDecimal = BigDecimal(value.neg())
+
+
+    actual val isNegative: Boolean by lazy { this < Zero }
+
+    actual fun negated(): BigDecimal = BigDecimal(this.value.neg())
+
+    actual fun abs(): BigDecimal = BigDecimal(this.value.abs())
+
+
     actual fun toInt(): Int = value.toNumber().toInt()
 
     actual fun toDouble(): Double = value.toNumber().toDouble()

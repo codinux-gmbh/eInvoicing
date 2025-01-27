@@ -2,49 +2,74 @@ package net.codinux.invoicing.model
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.serialization.BigDecimalSerializer
+import kotlin.math.absoluteValue
 
+// we ignore Linux and Mingw for now, there's no frontend for it, later e.g. use ionspin BigNum or korlibs BigNum
 @Serializable(with = BigDecimalSerializer::class)
-actual class BigDecimal actual constructor(private val value: String) : Comparable<BigDecimal> {
+actual class BigDecimal(private val value: Double) : Comparable<BigDecimal> {
 
     actual companion object {
         actual val Zero = BigDecimal("0")
     }
 
 
-    actual constructor(value: Int) : this(value.toString())
+    actual constructor(value: Int) : this(value.toDouble())
+
+    actual constructor(value: String) : this(value.toDouble())
 
 
-    actual fun toInt(): Int = value.split(".").first().toInt()
+    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.plus(other.value))
 
-    actual fun toDouble(): Double = value.toDouble()
+    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.minus(other.value))
+
+    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
+
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.div(other.value))
+
+    actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(other))
+
+    actual operator fun unaryMinus(): BigDecimal = negated()
+
+
+    actual val isNegative: Boolean by lazy { this < Zero }
+
+    actual fun negated(): BigDecimal = BigDecimal(this.value.unaryMinus())
+
+    actual fun abs(): BigDecimal = BigDecimal(this.value.absoluteValue)
+
+
+    actual fun toInt(): Int = value.toInt()
+
+    actual fun toDouble(): Double = value
 
     actual fun setScale(newScale: Int): BigDecimal {
-        val indexOfDot = value.lastIndexOf('.')
+        val valueAsString = value.toString()
+        val indexOfDot = valueAsString.lastIndexOf('.')
         if (indexOfDot != -1) {
-            val countFractionDigits = value.length - indexOfDot - 1
+            val countFractionDigits = valueAsString.length - indexOfDot - 1
             if (countFractionDigits != newScale) {
                 val diff = newScale - countFractionDigits
 
                 val newValue = if (newScale == 0) {
-                    value.substring(0, indexOfDot)
+                    valueAsString.substring(0, indexOfDot)
                 } else if (diff < 0) {
-                    value.substring(0, indexOfDot + newScale + 1)
+                    valueAsString.substring(0, indexOfDot + newScale + 1)
                 } else {
-                    value.padEnd(indexOfDot + newScale + 1, '0')
+                    valueAsString.padEnd(indexOfDot + newScale + 1, '0')
                 }
 
                 return BigDecimal(newValue)
             }
         } else if (newScale != 0) {
-            return BigDecimal(value + "." + "".padEnd(newScale, '0'))
+            return BigDecimal(valueAsString + "." + "".padEnd(newScale, '0'))
         }
 
         return this
     }
 
-    actual fun toPlainString(): String = value
+    actual fun toPlainString(): String = value.toString()
 
-    actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value) // TODO
+    actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)
 
 
     override fun equals(other: Any?): Boolean {
@@ -58,6 +83,6 @@ actual class BigDecimal actual constructor(private val value: String) : Comparab
         return value.hashCode()
     }
 
-    override fun toString() = value
+    override fun toString() = toPlainString()
 
 }

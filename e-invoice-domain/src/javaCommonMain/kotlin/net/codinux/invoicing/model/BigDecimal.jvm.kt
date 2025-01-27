@@ -25,6 +25,26 @@ actual class BigDecimal(
     actual constructor(value: Int) : this(java.math.BigDecimal(value))
 
 
+    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.plus(other.value))
+
+    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.minus(other.value))
+
+    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
+
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.div(other.value))
+
+    actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(java.math.BigDecimal(other)))
+
+    actual operator fun unaryMinus(): BigDecimal = negated()
+
+
+    actual val isNegative: Boolean by lazy { this < Zero }
+
+    actual fun negated(): BigDecimal = BigDecimal(this.value.negate())
+
+    actual fun abs(): BigDecimal = BigDecimal(this.value.abs())
+
+
     actual fun toInt(): Int = value.toInt()
 
     actual fun toDouble(): Double = value.toDouble()
@@ -39,8 +59,6 @@ actual class BigDecimal(
         BigDecimal(value.setScale(newScale, roundingMode))
 
     fun toJvmBigDecimal() = value
-
-    operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.add(other.value))
 
 
     override fun equals(other: Any?): Boolean {

@@ -21,21 +21,33 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
     constructor(value: Double) : this(NSDecimalNumber(double = value))
 
 
-    fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByAdding (other.value))
-    fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberBySubtracting(other.value))
-    fun times(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByMultiplyingBy(other.value))
-    fun divide(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByDividingBy(other.value))
-    fun modulo(other: BigDecimal): BigDecimal {
-        val quotient = this.value.decimalNumberByDividingBy(other.value, withBehavior = numberHandler(0, NSRoundingMode.NSRoundDown))
-        val subtractAmount = quotient.decimalNumberByMultiplyingBy(other.value)
+    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByAdding(other.value))
+
+    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberBySubtracting(other.value))
+
+    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByMultiplyingBy(other.value))
+
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByDividingBy(other.value))
+
+    actual operator fun rem(other: Int): BigDecimal {
+        val divisor = NSDecimalNumber(int = other)
+        val quotient = this.value.decimalNumberByDividingBy(divisor, withBehavior = numberHandler(0, NSRoundingMode.NSRoundDown))
+        val subtractAmount = quotient.decimalNumberByMultiplyingBy(divisor)
         return BigDecimal(this.value.decimalNumberBySubtracting(subtractAmount))
     }
 
-    val isNegative: Boolean by lazy { this.compareTo(Zero) < 0 }
-    fun negated(): BigDecimal = this.times(MinusOne)
+    actual operator fun unaryMinus(): BigDecimal = this.times(MinusOne)
+
+
+    actual val isNegative: Boolean by lazy { this.compareTo(Zero) < 0 }
+
+    actual fun negated(): BigDecimal = this.times(MinusOne)
+
+    actual fun abs(): BigDecimal = if (value.compare(NSDecimalNumber.zero) == NSOrderedAscending) negated() else this
+
 //    fun sqrt(): BigDecimal = BigDecimal(value.raising(toPower = 0.5))
     fun pow(exponent: Int): BigDecimal = BigDecimal(value.decimalNumberByRaisingToPower(exponent.toNSUInteger()))
-    fun abs(): BigDecimal = if (value.compare(NSDecimalNumber.zero) == NSOrderedAscending) negated() else this
+
 
     fun round(decimalPlaces: Int, roundingMode: NSRoundingMode = NSRoundingMode.NSRoundPlain): BigDecimal {
         val handler = numberHandler(decimalPlaces, roundingMode)

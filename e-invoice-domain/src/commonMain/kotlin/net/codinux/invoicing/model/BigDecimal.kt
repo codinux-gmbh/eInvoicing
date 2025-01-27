@@ -14,6 +14,26 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
     constructor(value: Int)
 
 
+    operator fun plus(other: BigDecimal): BigDecimal
+
+    operator fun minus(other: BigDecimal): BigDecimal
+
+    operator fun times(other: BigDecimal): BigDecimal
+
+    operator fun div(other: BigDecimal): BigDecimal
+
+    operator fun rem(other: Int): BigDecimal
+
+    operator fun unaryMinus(): BigDecimal
+
+
+    val isNegative: Boolean
+
+    fun negated(): BigDecimal
+
+    fun abs(): BigDecimal
+
+
     fun toInt(): Int
 
     fun toDouble(): Double
