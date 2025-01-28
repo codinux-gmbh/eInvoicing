@@ -14,5 +14,5 @@ class InvoiceItem(
     val description: String? = null,
     var monetarySummation: LineMonetarySummation? = null,
 ) {
-    override fun toString() = "$name, $quantity x $unitPrice, $vatRate %"
+    override fun toString() = "$name, ${quantity.toPlainString()} x ${unitPrice.toPlainString()}, $vatRate %"
 }

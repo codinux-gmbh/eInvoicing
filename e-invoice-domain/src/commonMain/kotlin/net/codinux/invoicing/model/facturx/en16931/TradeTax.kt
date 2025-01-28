@@ -6,6 +6,9 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
 @Serializable
 data class TradeTax(
+  /**
+   * On LineItem level only available in Extended profile
+   */
   @XmlSerialName(
     value = "CalculatedAmount",
     prefix = "ram",

@@ -88,9 +88,11 @@ open class CiiMapper {
 
             customerReferenceNumber = tradeAgreement.buyerReference?.value,
 
-//                amountAdjustments = mapAmountAdjustments(invoice),
+            // ApplicableTradeTax: Eine Gruppe von betriebswirtschaftlichen Begriffen, die Informationen über die Umsatzsteueraufschlüsselung in
+            // verschiedene Kategorien, Sätze und Befreiungsgründe enthält
+            amountAdjustments = mapAmountAdjustments(tradeSettlement),
 
-                totals = mapTotalAmounts(tradeSettlement.specifiedTradeSettlementHeaderMonetarySummation, profile, dataErrors)
+            totals = mapTotalAmounts(tradeSettlement.specifiedTradeSettlementHeaderMonetarySummation, profile, dataErrors)
         )
     }
 
@@ -172,8 +174,50 @@ open class CiiMapper {
             mapQuantity(quantity, InvoiceField.ItemQuantity, dataErrors),
             mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
             mapAmount(price?.chargeAmount, InvoiceField.ItemUnitPrice, dataErrors),
-            mapVatRateOrDefault(itemSettlement?.applicableTradeTax)
+            mapVatRateOrDefault(itemSettlement?.applicableTradeTax),
+            monetarySummation = mapLineAmounts(itemSettlement, agreement)
         )
+    }
+
+    protected open fun mapLineAmounts(settlement: LineTradeSettlement?, agreement: LineTradeAgreement?): LineMonetarySummation? =
+        settlement?.let {
+            val summation = settlement.specifiedTradeSettlementLineMonetarySummation
+            val chargesAndAllowances = settlement.specifiedTradeAllowanceCharge
+
+            val lineTotalAmount = mapAmountOrDefault(summation?.lineTotalAmount)
+
+            if (summation == null && chargesAndAllowances.isEmpty()) {
+                null
+            } else {
+                LineMonetarySummation(
+                    mapAmountOrDefault(agreement?.grossPriceProductTradePrice?.chargeAmount),
+                    mapAmountOrDefault(agreement?.netPriceProductTradePrice?.chargeAmount),
+                    mapItemChargeOrAllowances(chargesAndAllowances.filter { isCharge(it) }),
+                    mapItemChargeOrAllowances(chargesAndAllowances.filter { isAllowance(it) }),
+                    lineTotalAmount,
+                    calculateLineTotalTaxAmount(settlement, lineTotalAmount)
+                )
+            }
+        }
+
+    protected open fun mapItemChargeOrAllowances(chargeOrAllowances: List<TradeAllowanceCharge>) =
+        chargeOrAllowances.map { mapItemChargeOrAllowance(it) }
+
+    protected open fun mapItemChargeOrAllowance(chargeOrAllowance: TradeAllowanceCharge) = ItemChargeOrAllowance(
+        mapAmountOrDefault(chargeOrAllowance.actualAmount),
+        mapNullableAmount(chargeOrAllowance.basisAmount),
+        mapNullablePercent(chargeOrAllowance.calculationPercent),
+        mapNullable(chargeOrAllowance.reason),
+        chargeOrAllowance.reasonCode?.value
+    )
+
+    protected open fun calculateLineTotalTaxAmount(settlement: LineTradeSettlement, lineTotalAmount: BigDecimal): BigDecimal {
+        val taxAmounts = settlement.applicableTradeTax.mapNotNull { tax ->
+            mapNullableAmount(tax.calculatedAmount)
+                ?: tax.rateApplicablePercent?.value?.let { lineTotalAmount.percent(it) }
+        }
+
+        return taxAmounts.sumOf { it }
     }
 
 
@@ -196,6 +240,32 @@ open class CiiMapper {
     protected open fun mapNullableText(texts: List<Text>?): String? =
         texts?.firstOrNull()?.value
 
+    protected open fun mapAmountAdjustments(settlement: HeaderTradeSettlement) = AmountAdjustments(
+        mapAmountOrDefault(settlement.specifiedTradeSettlementHeaderMonetarySummation?.totalPrepaidAmount),
+        mapChargeOrAllowances(settlement.specifiedTradeAllowanceCharge.filter { isCharge(it) }),
+        mapChargeOrAllowances(settlement.specifiedTradeAllowanceCharge.filter { isAllowance(it) }),
+    )
+
+    protected open fun isCharge(chargeOrAllowance: TradeAllowanceCharge): Boolean =
+        chargeOrAllowance.chargeIndicator?.indicator == true
+
+    protected open fun isAllowance(chargeOrAllowance: TradeAllowanceCharge): Boolean =
+        chargeOrAllowance.chargeIndicator?.indicator == false
+
+    protected open fun mapChargeOrAllowances(chargeOrAllowances: List<TradeAllowanceCharge>) =
+        chargeOrAllowances.map { mapChargeOrAllowance(it) }
+
+    protected open fun mapChargeOrAllowance(chargeOrAllowance: TradeAllowanceCharge) = ChargeOrAllowance(
+        mapAmountOrDefault(chargeOrAllowance.actualAmount),
+        mapNullableAmount(chargeOrAllowance.basisAmount),
+        mapNullableQuantity(chargeOrAllowance.basisQuantity),
+        mapNullablePercent(chargeOrAllowance.calculationPercent),
+        mapNullable(chargeOrAllowance.reason),
+        chargeOrAllowance.reasonCode?.value,
+        mapNullablePercent(chargeOrAllowance.categoryTradeTax.firstNotNullOfOrNull { it.rateApplicablePercent }),
+        chargeOrAllowance.categoryTradeTax.firstNotNullOfOrNull { it.categoryCode?.value }
+    )
+
     protected open fun mapTotalAmounts(summation: TradeSettlementHeaderMonetarySummation?, profile: EInvoiceFormatDetectionResult?, dataErrors: MutableList<InvoiceDataError>): TotalAmounts =
         if (summation == null) {
             dataErrors.add(InvoiceDataError.missing(InvoiceField.TotalAmount))
@@ -204,21 +274,24 @@ open class CiiMapper {
 
             // TaxBasisTotalAmount, GrandTotalAmount and DuePayableAmount have to be set. TaxTotalAmount may be not set
             TotalAmounts(
-                if (profile.isMinimumOrBasicWLProfile) mapNullableAmount(summation.lineTotalAmount) // there are no line items in Minimum and BasicWL profile
+                if (profile.isMinimumOrBasicWLProfile) mapAmountOrDefault(summation.lineTotalAmount) // there are no line items in Minimum and BasicWL profile
                 else mapAmount(summation.lineTotalAmount, InvoiceField.LineTotalAmount, dataErrors),
-                mapNullableAmount(summation.chargeTotalAmount),
-                mapNullableAmount(summation.allowanceTotalAmount),
+                mapAmountOrDefault(summation.chargeTotalAmount),
+                mapAmountOrDefault(summation.allowanceTotalAmount),
                 mapAmount(summation.taxBasisTotalAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
-                mapNullableAmount(summation.taxTotalAmount), // TODO: there may be more than one taxTotalAmount
+                mapAmountOrDefault(summation.taxTotalAmount), // TODO: there may be more than one taxTotalAmount
                 mapAmount(summation.grandTotalAmount, InvoiceField.GrandTotalAmount, dataErrors),
-                mapNullableAmount(summation.totalPrepaidAmount),
+                mapAmountOrDefault(summation.totalPrepaidAmount),
                 mapAmount(summation.duePayableAmount, InvoiceField.TaxBasisTotalAmount, dataErrors),
             )
         }
 
 
-    protected open fun mapNullableAmount(amounts: List<Amount>): BigDecimal =
-        amounts.firstOrNull()?.value ?: BigDecimalFallbackValue
+    protected open fun mapNullableAmount(amounts: List<Amount>?): BigDecimal? =
+        amounts?.firstOrNull()?.value
+
+    protected open fun mapAmountOrDefault(amounts: List<Amount>?): BigDecimal =
+        mapNullableAmount(amounts) ?: BigDecimalFallbackValue
 
     protected open fun mapAmount(amounts: List<Amount>?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         if (amounts.isNullOrEmpty() || amounts.firstOrNull()?.value == null) {
@@ -228,8 +301,16 @@ open class CiiMapper {
             amounts.first().value!!
         }
 
+    protected open fun mapNullableAmount(amount: Amount?): BigDecimal? =
+        amount?.value
+
+    protected open fun mapNullablePercent(percent: Percent?): BigDecimal? =
+        percent?.value
+
+    protected open fun mapNullableQuantity(quantity: Quantity?): BigDecimal? = quantity?.value
+
     protected open fun mapQuantity(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
-        quantity?.value ?: run {
+        mapNullableQuantity(quantity) ?: run {
             dataErrors.add(InvoiceDataError.missing(amountField))
             BigDecimalFallbackValue
         }
@@ -294,6 +375,9 @@ open class CiiMapper {
 
     protected open fun mapNullable(code: Code?): String? =
         code?.value
+
+    protected open fun mapIds(ids: List<ID>): List<String> =
+        ids.map { mapId(it) }
 
     protected open fun mapIdOrNull(ids: List<ID>?): String? =
         ids?.firstNotNullOfOrNull { mapIdOrNull(it) }
