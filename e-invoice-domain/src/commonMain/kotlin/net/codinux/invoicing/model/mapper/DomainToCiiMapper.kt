@@ -112,10 +112,10 @@ open class DomainToCiiMapper {
     protected open fun mapHeaderTradeSettlement(invoice: Invoice) = HeaderTradeSettlement(
         invoiceCurrencyCode = CurrencyCode(invoice.details.currency.alpha3Code),
         paymentReference = mapText(invoice.details.invoiceNumber), // TODO: make paymentReference configurable
+        applicableTradeTax = mapTradeTax(invoice),
         specifiedTradeSettlementHeaderMonetarySummation = mapMonetarySummation(invoice),
         specifiedTradePaymentTerms = TradePaymentTerms(mapNullableText(invoice.details.paymentDescription), mapNullableDate(invoice.details.dueDate)),
         specifiedTradeSettlementPaymentMeans = mapBankDetails(invoice)?.let { listOf(it) } ?: emptyList(),
-
     )
 
     protected open fun mapBankDetails(invoice: Invoice): TradeSettlementPaymentMeans? =
@@ -130,6 +130,21 @@ open class DomainToCiiMapper {
                 applicableTradeSettlementFinancialCard = null, // in case of card payment
             )
         }
+
+    protected open fun mapTradeTax(invoice: Invoice): List<TradeTax> {
+        val byTaxRateAndCategory = invoice.items.groupBy { it.vatRate } // TODO: also group by CategoryCode and ExamptReason(Code)
+
+        return byTaxRateAndCategory.entries.map { (percent, items) ->
+            // Die Summe des Gesamtnettobetrags der Positionen zuzüglich der Zuschläge abzüglich der Abschläge der
+            // Dokumentenebene, für die ein bestimmter Code der Umsatzsteuerkategorie und ein bestimmter
+            // Umsatzsteuersatz gelten (falls ein kategoriespezifischer Umsatzsteuersatz gilt).
+            val basisAmount = items.sumOf { it.monetarySummation!!.netPrice }
+            val calculatedAmount = basisAmount * percent
+
+            TradeTax(mapAmount(calculatedAmount), TaxTypeCode("VAT"), null, mapAmount(basisAmount),
+                TaxCategoryCode(VatCategoryCode.S.code), rateApplicablePercent = mapPercent(percent))
+        }
+    }
 
     protected open fun mapMonetarySummation(invoice: Invoice): TradeSettlementHeaderMonetarySummation =
         invoice.totals?.let { mapMonetarySummation(it) }

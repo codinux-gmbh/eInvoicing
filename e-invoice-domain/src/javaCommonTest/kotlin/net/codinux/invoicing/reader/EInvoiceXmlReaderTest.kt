@@ -8,25 +8,18 @@ import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimum
 import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.model.mapper.CiiMapper
-import net.codinux.invoicing.pdf.PdfAttachmentReader
-import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.*
 import net.codinux.log.logger
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.nio.file.Path
-import kotlin.io.path.extension
-import kotlin.io.path.inputStream
 import kotlin.io.path.name
-import kotlin.io.path.readText
 import kotlin.test.Test
 import kotlin.test.fail
 
 // TODO: make test-invoices a Kotlin Multiplatform library and move file to commonTest
 class EInvoiceXmlReaderTest {
-
-    private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 
     private val underTest = EInvoiceXmlReader()
 
@@ -334,15 +327,7 @@ class EInvoiceXmlReaderTest {
         }
     }
 
-    private fun getInvoiceXml(file: Path): String? =
-        // TODO: improve file detection
-        if (file.extension.lowercase() == "pdf") {
-            pdfAttachmentReader.getFileAttachments(file.inputStream()).invoiceXml
-        } else if (file.extension.lowercase() == "xml") {
-            file.readText()
-        } else {
-            null
-        }
+    private fun getInvoiceXml(file: Path) = TestUtils.getInvoiceXml(file)
 
     private fun getTestFiles(format: EInvoiceFormat, version: EInvoiceFormatVersion, profile: FacturXProfile? = null): List<Path> =
         EInvoiceTestFiles.getTestFiles(net.codinux.invoicing.testfiles.EInvoiceFormat.valueOf(format.name), version, profile?.let { EInvoiceProfile.valueOf(it.name) })

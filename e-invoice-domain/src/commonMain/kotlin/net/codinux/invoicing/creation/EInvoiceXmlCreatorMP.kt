@@ -1,6 +1,7 @@
 package net.codinux.invoicing.creation
 
 import kotlinx.serialization.encodeToString
+import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.mapper.DomainToCiiMapper
 import net.codinux.log.logger
@@ -8,7 +9,8 @@ import nl.adaptivity.xmlutil.XmlDeclMode
 import nl.adaptivity.xmlutil.serialization.XML
 
 open class EInvoiceXmlCreatorMP(
-    protected val mapper: DomainToCiiMapper = DomainToCiiMapper()
+    protected val mapper: DomainToCiiMapper = DomainToCiiMapper(),
+    protected val calculator: AmountsCalculator = AmountsCalculator(),
 ) {
 
     protected val xml = XML {
@@ -24,6 +26,8 @@ open class EInvoiceXmlCreatorMP(
 
     open fun createFacturXXml(invoice: Invoice): String =
         try {
+            calculator.ensureTotalAmountsIsSet(invoice)
+
             val facturXInvoice = mapper.mapInvoice(invoice)
 
             xml.encodeToString(facturXInvoice)

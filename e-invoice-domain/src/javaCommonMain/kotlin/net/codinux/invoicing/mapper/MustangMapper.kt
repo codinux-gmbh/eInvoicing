@@ -58,10 +58,6 @@ open class MustangMapper(
             adjustments.charges.forEach { this.addCharge(mapCharge(it)) }
             adjustments.allowances.forEach { this.addAllowance(mapAllowance(it)) }
         }
-
-        if (invoice.totals == null) {
-            invoice.totals = calculator.calculateTotalAmounts(this)
-        }
     }
 
     open fun mapParty(party: Party): TradeParty = TradeParty(
@@ -130,9 +126,9 @@ open class MustangMapper(
                 customerReferenceNumber = invoice.referenceNumber,
 
                 amountAdjustments = mapAmountAdjustments(invoice),
-
-                totals = calculator.calculateTotalAmounts(invoice)
-            ),
+            ).apply {
+                this.totals = calculator.calculateTotalAmounts(this)
+            },
             dataErrors
         )
     }

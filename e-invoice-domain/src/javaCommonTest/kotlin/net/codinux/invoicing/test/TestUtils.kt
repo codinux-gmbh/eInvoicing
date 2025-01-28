@@ -1,13 +1,17 @@
 package net.codinux.invoicing.test
 
+import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.testfiles.*
 import org.junit.jupiter.api.Named
 import java.io.InputStream
 import java.nio.file.Path
-import kotlin.io.path.name
-import kotlin.io.path.toPath
+import kotlin.io.path.*
 
 object TestUtils {
+
+    private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
+
 
     fun getTestFileAsStream(filename: String, testFileFolder: String = "files"): InputStream =
         this.javaClass.classLoader.getResourceAsStream("$testFileFolder/$filename")!!
@@ -21,6 +25,18 @@ object TestUtils {
 
     fun getInvalidInvoiceFile(filename: String, testFileFolder: String = "erroneousInvoiceFiles") =
         getTestFile(filename, testFileFolder)
+
+
+
+    fun getInvoiceXml(file: Path): String? =
+        // TODO: improve file detection
+        if (file.extension.lowercase() == "pdf") {
+            pdfAttachmentReader.getFileAttachments(file.inputStream()).invoiceXml
+        } else if (file.extension.lowercase() == "xml") {
+            file.readText()
+        } else {
+            null
+        }
 
 
     val FacturXMinimumProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Minimum) }
