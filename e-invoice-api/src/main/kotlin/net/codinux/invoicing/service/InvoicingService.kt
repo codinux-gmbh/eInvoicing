@@ -111,7 +111,7 @@ class InvoicingService {
 
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =
-        amountsCalculator.calculateTotalAmountsJvm(itemPrices)
+        amountsCalculator.calculateTotalAmounts(itemPrices)
 
 
     private fun createTempPdfFile(): Path =
