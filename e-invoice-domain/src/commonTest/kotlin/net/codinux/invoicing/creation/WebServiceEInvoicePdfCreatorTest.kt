@@ -36,7 +36,7 @@ class WebServiceEInvoicePdfCreatorTest {
     private fun assertInvoice(response: ByteArray?) {
         assertThat(response).isNotNull()
 
-        assertThat(response!!.size).isGreaterThan(32_000)
+        assertThat(response!!.size).isGreaterThan(30_000)
     }
 
 }

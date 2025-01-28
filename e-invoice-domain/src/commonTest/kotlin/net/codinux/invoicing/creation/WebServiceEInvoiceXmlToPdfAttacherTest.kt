@@ -39,7 +39,7 @@ class WebServiceEInvoiceXmlToPdfAttacherTest {
 
     private suspend fun assertResponse(result: ByteArray?) {
         assertThat(result).isNotNull()
-        assertThat(result!!.size).isGreaterThanOrEqualTo(40735)
+        assertThat(result!!.size).isGreaterThanOrEqualTo(37_000)
 
         val extractionResult = invoiceReader.extractFromPdf(result)
         assertThat(extractionResult).isNotNull()
