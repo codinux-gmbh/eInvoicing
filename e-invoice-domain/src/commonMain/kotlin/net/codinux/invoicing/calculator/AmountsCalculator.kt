@@ -23,14 +23,15 @@ open class AmountsCalculator {
         // we don't support charges and allowances yet, therefore the gross price always equals the net price
         val netPrice = grossPrice
 
-        val taxAmount = netPrice.percent(item.vatRate)
+        val lineTotalAmount = netPrice * item.quantity
+        val taxAmount = lineTotalAmount.percent(item.vatRate)
 
         return LineAmounts(
             null,
             netPrice,
             emptyList(),
             emptyList(),
-            netPrice * item.quantity,
+            lineTotalAmount,
             taxAmount
         )
     }
