@@ -80,7 +80,7 @@ CrossIndustryInvoice
 
 ```
 
-### Without ASCII art:
+=== Without ASCII art:
 
 ```
 CrossIndustryInvoice
@@ -157,3 +157,80 @@ CrossIndustryInvoice
             invoiceReferencedDocument (REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG, z. B. fuer Rechnungskorrektur, Schlussrechnung, ...)
             receivableSpecifiedTradeAccountingAccount (Detailinformationen zur Buchungsreferenz)
 ```
+
+
+=== Via List
+
+==== CrossIndustryInvoice
+* ExchangedDocumentContext (ProfileId, maybe PeppolId)
+* ExchangedDocument (InvoiceNumber, InvoiceDate, Type der Rechnung)
+* SupplyChainTradeTransaction (Gruppierung der Informationen zum Geschäftsvorfall)
+** IncludedSupplyChainTradeLineItem (Rechnungspositionen)
+*** DocumentLineDocument
+**** lineId
+*** TradeProduct
+**** name
+**** description
+*** LineTradeAgreement
+**** grossPriceProductTradePrice
+**** netPriceProductTradePrice
+*** LineTradeDelivery
+**** billedQuantity
+*** LineTradeSettlement
+**** TradeTax
+**** SpecifiedPeriod
+**** TradeAllowanceCharge
+**** TradeSettlementLineMonetarySummation
+** HeaderTradeAgreement (Gruppierung der Vertragsangaben)
+*** BuyerReference
+*** SellerTradeParty
+*** BuyerTradeParty
+**** ID (von Unternehmen zugewiesen)
+**** GlobalId (z. B. BIC oder DUNS)
+**** name
+**** description
+**** TradeAddress
+**** URIUniversalCommunication
+**** TaxRegistration
+**** TradeContact
+**** LegalOrganization
+** HeaderTradeDelivery (Gruppierung von Lieferangaben)
+** HeaderTradeSettlement (LASTSCHRIFTVERFAHREN)
+*** invoiceCurrencyCode
+*** taxCurrencyCode
+*** creditorReferenceID
+*** paymentReference
+*** TradeSettlementPaymentMeans (ZAHLUNGSANWEISUNGEN)
+**** payeePartyCreditorFinancialAccount (ÜBERWEISUNG)
+**** payeeSpecifiedCreditorFinancialInstitution (Bankinstitut des Verkäufers)
+**** payerPartyDebtorFinancialAccount (Lastschrift)
+**** applicableTradeSettlementFinancialCard (Informationen über die Karte, die im Falle einer gleichzeitig mit der Rechnungsstellung erfolgenden Zahlung genutzt wird)
+*** TradeTax (UMSATZSTEUERAUFSCHLÜSSELUNG)
+**** basisAmount
+**** rateApplicablePercent
+**** calculatedAmount
+**** TaxTypeCode
+**** exemptionReason
+*** billingSpecifiedPeriod (RECHNUNGSZEITRAUM)
+*** TradePaymentTerms (Detailinformationen zu Zahlungsbedingungen)
+**** description
+**** dueDateDateTime
+**** directDebitMandateID
+*** TradeAllowanceCharge (ABSCHLÄGE AUF DOKUMENTENEBENE)
+**** chargeIndicator
+**** calculationPercent
+**** basisAmount
+**** actualAmount
+**** reasonCode
+*** TradeSettlementHeaderMonetarySummation (GESAMTSUMMEN AUF DOKUMENTENEBENE)
+**** lineTotalAmount
+**** chargeTotalAmount
+**** allowanceTotalAmount
+**** taxBasisTotalAmount
+**** taxTotalAmount
+**** roundingAmount
+**** grandTotalAmount
+**** totalPrepaidAmount
+**** duePayableAmount
+*** invoiceReferencedDocument (REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG, z. B. fuer Rechnungskorrektur, Schlussrechnung, ...)
+*** receivableSpecifiedTradeAccountingAccount (Detailinformationen zur Buchungsreferenz)
