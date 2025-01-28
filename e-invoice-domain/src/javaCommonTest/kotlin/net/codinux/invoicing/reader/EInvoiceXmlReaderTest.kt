@@ -283,7 +283,10 @@ class EInvoiceXmlReaderTest {
                     assertThat(item.name).isNotEqualTo(CiiMapper.TextFallbackValue)
                     assertThat(item.quantity).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
                     assertThat(item.unit).isNotEqualTo(CiiMapper.TextFallbackValue)
-                    if (areAmountsAllowedToBeZero == false) {
+
+                    val isItemWithoutPrice = item.description == "Artikel wie vereinbart ohne Berechnung" // there are some items in test invoices without a price
+                            || item.name == "Lebensgefährte/in zur Privathaftpflicht"
+                    if (areAmountsAllowedToBeZero == false && isItemWithoutPrice != true) {
                         assertThat(item.unitPrice).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
                     }
                     // vatRate may be zero
