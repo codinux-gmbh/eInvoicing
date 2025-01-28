@@ -28,6 +28,9 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
     operator fun unaryMinus(): BigDecimal
 
 
+    fun divide(divisor: BigDecimal, scale: Int = 2): BigDecimal
+
+
     val isNegative: Boolean
 
     fun negated(): BigDecimal

@@ -24,11 +24,14 @@ actual class BigDecimal(private val value: Double) : Comparable<BigDecimal> {
 
     actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
 
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.div(other.value))
+    actual operator fun div(other: BigDecimal): BigDecimal = divide(other, 2)
 
     actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(other))
 
     actual operator fun unaryMinus(): BigDecimal = negated()
+
+
+    actual fun divide(divisor: BigDecimal, scale: Int): BigDecimal = BigDecimal(value.div(divisor.value)).setScale(scale)
 
 
     actual val isNegative: Boolean by lazy { this < Zero }

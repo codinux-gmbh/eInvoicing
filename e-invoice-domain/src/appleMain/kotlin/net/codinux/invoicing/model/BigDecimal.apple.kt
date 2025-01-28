@@ -26,7 +26,7 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
 
     actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByMultiplyingBy(other.value))
 
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByDividingBy(other.value))
+    actual operator fun div(other: BigDecimal): BigDecimal = divide(other, 2)
 
     actual operator fun rem(other: Int): BigDecimal {
         val divisor = NSDecimalNumber(int = other)
@@ -36,6 +36,10 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
     }
 
     actual operator fun unaryMinus(): BigDecimal = this.times(MinusOne)
+
+
+    actual fun divide(divisor: BigDecimal, scale: Int): BigDecimal =
+        BigDecimal(value.decimalNumberByDividingBy(divisor, withBehavior = numberHandler(scale, NSRoundingMode.NSRoundPlain))
 
 
     actual val isNegative: Boolean by lazy { this.compareTo(Zero) < 0 }

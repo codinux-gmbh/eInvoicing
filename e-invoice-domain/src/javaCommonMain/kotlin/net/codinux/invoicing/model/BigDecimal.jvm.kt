@@ -42,12 +42,15 @@ actual class BigDecimal(
     // set scale and roundingMode to avoid ArithmeticException
     actual operator fun div(other: BigDecimal): BigDecimal = divide(other)
 
-    fun divide(divisor: BigDecimal, scale: Int = value.scale() + divisor.value.scale(), roundingMode: RoundingMode = DefaultRoundingMode): BigDecimal =
-        BigDecimal(value.divide(divisor.value, scale, roundingMode))
-
     actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.remainder(java.math.BigDecimal(other)))
 
     actual operator fun unaryMinus(): BigDecimal = negated()
+
+
+    actual fun divide(divisor: BigDecimal, scale: Int): BigDecimal = divide(divisor, scale, DefaultRoundingMode)
+
+    fun divide(divisor: BigDecimal, scale: Int, roundingMode: RoundingMode = DefaultRoundingMode): BigDecimal =
+        BigDecimal(value.divide(divisor.value, scale, roundingMode))
 
 
     @get:JsonIgnore
