@@ -56,10 +56,10 @@ object InvoiceAsserter {
         assertThat(item.name).isEqualTo(name)
 
         assertThat(item.unit).isEqualTo(unit)
-        assertThat(item.quantity.setScale(0)).isEqualTo(quantity)
+        assertThat(item.quantity).isEqualTo(quantity)
 
-        assertThat(item.unitPrice.setScale(0)).isEqualTo(unitPrice)
-        assertThat(item.vatRate.setScale(0)).isEqualTo(vatRate)
+        assertThat(item.unitPrice).isEqualTo(unitPrice)
+        assertThat(item.vatRate).isEqualTo(vatRate)
 
 //        assertThat(item.description).isEqualTo(description)
     }
