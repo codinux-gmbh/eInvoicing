@@ -246,7 +246,10 @@ open class CiiMapper {
             CurrencyFallbackValue
         } else {
             val code = currencyCode.value
-            Currency.entries.first { it.alpha3Code == code }
+            Currency.entries.firstOrNull { it.alpha3Code == code } ?: run {
+                dataErrors.add(InvoiceDataError.invalid(InvoiceField.Currency, code))
+                CurrencyFallbackValue
+            }
         }
 
 
