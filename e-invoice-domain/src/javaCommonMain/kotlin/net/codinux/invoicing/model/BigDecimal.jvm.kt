@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.codinux.invoicing.serialization.BigDecimalSerializer
 import java.math.RoundingMode
+import java.text.DecimalFormat
 
 @Serializable(with = BigDecimalSerializer::class)
 actual class BigDecimal(
@@ -18,6 +19,10 @@ actual class BigDecimal(
 
     actual companion object {
         actual val Zero = BigDecimal(java.math.BigDecimal.ZERO)
+
+        private val roundingMode = RoundingMode.HALF_UP
+
+        private val scale = maxOf(2, DecimalFormat.getCurrencyInstance().maximumFractionDigits) // get user's default scale
     }
 
 
@@ -32,7 +37,8 @@ actual class BigDecimal(
 
     actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
 
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value)) // don't us .div(), it uses the scale of the divisor which may is zero, effectively removing all decimal places then
+    // set scale and roundingMode to avoid ArithmeticException
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value, scale, roundingMode)) // don't us .div(), it uses the scale of the divisor which may is zero, effectively removing all decimal places then
 
     actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(java.math.BigDecimal(other)))
 
