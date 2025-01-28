@@ -2,9 +2,6 @@ package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.mapper.MustangMapper
-import net.codinux.invoicing.model.InvoiceDataError
-import net.codinux.invoicing.model.InvoiceDataErrorType
-import net.codinux.invoicing.model.InvoiceField
 import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
@@ -21,7 +18,8 @@ import kotlin.io.path.extension
 
 actual open class EInvoiceReader(
     protected open val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
-    protected open val mapper: MustangMapper = MustangMapper()
+    protected open val mapper: MustangMapper = MustangMapper(),
+    protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader()
 ) {
 
     actual constructor() : this(JavaPlatform.pdfAttachmentReader, MustangMapper())
@@ -41,31 +39,8 @@ actual open class EInvoiceReader(
     open fun extractFromXmlOrNull(xml: String) = orNull { extractFromXmlJvm(xml) }
 
     // TODO: find a better name
-    open fun extractFromXmlJvm(xml: String): ReadEInvoiceXmlResult {
-        try {
-            val importer = ZUGFeRDInvoiceImporter() // XRechnungImporter only reads properties but not to an Invoice object
-            importer.doIgnoreCalculationErrors() // read XML data, ignore possible calculation errors for now (will be checked in containsCalculationErrors())
-
-            try {
-                importer.fromXML(xml)
-            } catch (e: Throwable) {
-                log.error(e) { "Invoice XML seems not to be a valid XML:\n$xml" }
-                return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
-            }
-
-            var mapInvoiceResult = extractInvoice(importer)
-            if (containsCalculationErrors(xml)) {
-                mapInvoiceResult = MapInvoiceResult(mapInvoiceResult.invoice, mapInvoiceResult.invoiceDataErrors +
-                        InvoiceDataError(InvoiceField.TotalAmount, InvoiceDataErrorType.CalculatedAmountsAreInvalid)) // TODO: specify which amounts contain invalid values
-            }
-
-            val resultType = if (mapInvoiceResult.invoiceDataErrors.isNotEmpty()) ReadEInvoiceXmlResultType.InvalidInvoiceData else ReadEInvoiceXmlResultType.Success
-            return ReadEInvoiceXmlResult(resultType, mapInvoiceResult)
-        } catch (e: Throwable) {
-            log.error(e) { "Could not extract invoice from XML:\n$xml" }
-            return ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidInvoiceData, e)
-        }
-    }
+    open fun extractFromXmlJvm(xml: String): ReadEInvoiceXmlResult =
+        xmlReader.parseInvoiceXml(xml)
 
     actual open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult? =
         extractFromXmlJvm(xml)

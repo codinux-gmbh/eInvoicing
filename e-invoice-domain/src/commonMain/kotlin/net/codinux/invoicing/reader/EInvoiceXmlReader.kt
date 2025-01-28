@@ -41,7 +41,7 @@ open class EInvoiceXmlReader(
                 ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat, null as? Throwable)
             }
         } catch (e: Throwable) {
-            log.error(e) { "Error while parsing invoice: ${invoiceXml.ofMaxLength(250)}" }
+            log.error(e) { "Could not extract invoice from XML:: ${invoiceXml.ofMaxLength(250)}" }
             ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.InvalidXml, e)
         }
 
