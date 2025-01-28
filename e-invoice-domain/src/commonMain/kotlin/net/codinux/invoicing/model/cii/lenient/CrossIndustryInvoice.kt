@@ -9,6 +9,7 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 //   "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:35"
 //   (only "100" changed to "35", that's the only difference, and whoops it fails)
 @Serializable
+@XmlSerialName("CrossIndustryInvoice", "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100", "rsm")
 data class CrossIndustryInvoice(
   @XmlSerialName(
     value = "ExchangedDocumentContext",

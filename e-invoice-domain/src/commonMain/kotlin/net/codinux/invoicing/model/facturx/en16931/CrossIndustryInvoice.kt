@@ -5,6 +5,7 @@ import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
 @Serializable
+@XmlSerialName("CrossIndustryInvoice", "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100", "rsm")
 data class CrossIndustryInvoice(
   @XmlSerialName(
     value = "ExchangedDocumentContext",
