@@ -25,13 +25,15 @@ open class AmountsCalculator {
         // we don't support charges and allowances yet, therefore the gross price always equals the net price
         val netPrice = grossPrice
 
-        val taxAmount = netPrice * item.vatRate / BigDecimal(100)
+        val taxAmount = netPrice.percent(item.vatRate)
 
         return LineMonetarySummation(
             null,
             netPrice,
-            taxAmount,
-            netPrice * item.quantity
+            emptyList(),
+            emptyList(),
+            netPrice * item.quantity,
+            taxAmount
         )
     }
 
@@ -55,11 +57,14 @@ open class AmountsCalculator {
     open fun calculateTotalAmounts(invoice: Invoice): TotalAmounts {
         val lineTotals = invoice.items.map { ensureLineMonetarySummationIsSet(it) }
 
-        val lineTotalAmount = lineTotals.sumOf { it.netPrice }
-        val chargeTotalAmount = invoice.amountAdjustments?.charges?.sumOf { it.actualAmount } ?: BigDecimal.Zero
-        val allowanceTotalAmount = invoice.amountAdjustments?.allowances?.sumOf { it.actualAmount } ?: BigDecimal.Zero
+        val documentLevelCharges = invoice.amountAdjustments?.charges.orEmpty()
+        val documentLevelAllowances = invoice.amountAdjustments?.allowances.orEmpty()
+
+        val lineTotalAmount = lineTotals.sumOf { it.lineTotalAmount }
+        val chargeTotalAmount = documentLevelCharges.sumOf { it.actualAmount }
+        val allowanceTotalAmount = documentLevelAllowances.sumOf { it.actualAmount }
         val taxBasisTotalAmount = lineTotalAmount + chargeTotalAmount - allowanceTotalAmount
-        val taxTotalAmount = lineTotals.sumOf { it.taxAmount }
+        val taxTotalAmount = lineTotals.sumOf { it.lineTotalTaxAmount } + getTaxAmount(documentLevelCharges) - getTaxAmount(documentLevelAllowances)
         val grandTotalAmount = taxBasisTotalAmount + taxTotalAmount
         val totalPrepaidAmount = invoice.amountAdjustments?.prepaidAmounts ?: BigDecimal.Zero
 
@@ -74,5 +79,8 @@ open class AmountsCalculator {
             duePayableAmount = grandTotalAmount - totalPrepaidAmount
         )
     }
+
+    protected open fun getTaxAmount(chargeOrAllowances: List<ChargeOrAllowance>): BigDecimal =
+        chargeOrAllowances.mapNotNull { charge -> charge.taxRateApplicablePercent?.let { charge.actualAmount.percent(it) } }.sum()
 
 }
