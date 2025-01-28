@@ -32,7 +32,7 @@ actual class BigDecimal(
 
     actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
 
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.div(other.value))
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value)) // don't us .div(), it uses the scale of the divisor which may is zero, effectively removing all decimal places then
 
     actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(java.math.BigDecimal(other)))
 
