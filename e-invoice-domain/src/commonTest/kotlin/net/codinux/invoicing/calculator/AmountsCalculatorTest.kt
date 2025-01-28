@@ -24,7 +24,7 @@ class AmountsCalculatorTest {
 
     @Test
     fun calculateTotalAmountsFromInvoiceItemPrices() {
-        val result = underTest.calculateTotalAmountsJvm(WebServiceAmountsCalculatorTest.itemPrices)
+        val result = underTest.calculateTotalAmounts(WebServiceAmountsCalculatorTest.itemPrices)
 
         WebServiceAmountsCalculatorTest.assertTotalAmounts(result)
     }
