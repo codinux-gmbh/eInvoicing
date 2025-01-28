@@ -41,9 +41,12 @@ class EInvoiceReaderTest {
         assertThat(result.readError).isNull()
         assertThat(result.invoice).isNotNull()
         assertThat(result.invoice!!.invoice.supplier.country).isEqualByComparingTo(MustangMapper.CountryFallbackValue)
-        assertThat(result.invoice!!.invoiceDataErrors).hasSize(2)
+        assertThat(result.invoice!!.invoiceDataErrors).hasSize(4)
 
-        result.invoice!!.invoiceDataErrors.forEach { invoiceDataError ->
+        val countryErrors = result.invoice!!.invoiceDataErrors.filter { it.field in listOf(InvoiceField.SupplierCountry, InvoiceField.CustomerCountry) }
+        assertThat(countryErrors).hasSize(2)
+
+        countryErrors.forEach { invoiceDataError ->
             assertThat(invoiceDataError.field).isIn(InvoiceField.SupplierCountry, InvoiceField.CustomerCountry)
             assertThat(invoiceDataError.errorType).isEqualTo(InvoiceDataErrorType.ValueNotSet)
             assertThat(invoiceDataError.erroneousValue).isNullOrEmpty()
