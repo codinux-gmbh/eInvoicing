@@ -21,7 +21,7 @@ open class AmountsCalculator {
         }
 
     open fun calculateLineMonetarySummation(item: InvoiceItem): LineMonetarySummation {
-        val grossPrice = item.unitPrice * item.quantity
+        val grossPrice = item.unitPrice
         // we don't support charges and allowances yet, therefore the gross price always equals the net price
         val netPrice = grossPrice
 
@@ -31,7 +31,7 @@ open class AmountsCalculator {
             null,
             netPrice,
             taxAmount,
-            netPrice + taxAmount
+            netPrice * item.quantity
         )
     }
 
