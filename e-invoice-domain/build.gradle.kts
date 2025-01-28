@@ -286,6 +286,21 @@ kotlin {
 }
 
 
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform() // use JUnit 5, required for @ParameterizedTests
+}
+
+afterEvaluate { // below tasks are only available after evaluation
+    tasks.named<Test>("testDebugUnitTest") {
+        useJUnitPlatform() // use JUnit 5 in Android DebugUnit tests, required for @ParameterizedTests
+    }
+
+    tasks.named<Test>("testReleaseUnitTest") {
+        useJUnitPlatform() // use JUnit 5 in Android ReleaseUnit tests, required for @ParameterizedTests
+    }
+}
+
+
 tasks.register("generateVersionFile") {
     val outputDir = project.projectDir.resolve("src/commonMain/kotlin/net/codinux/invoicing/config")
 
