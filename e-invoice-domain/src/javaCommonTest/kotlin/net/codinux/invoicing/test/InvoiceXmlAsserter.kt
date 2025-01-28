@@ -44,11 +44,10 @@ object InvoiceXmlAsserter {
         asserter.xpathHasValue("$itemXPath/ram:SpecifiedTradeProduct/ram:Name", name)
 
         asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode", unit.code)
-        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity", quantity, 4)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeDelivery/ram:BilledQuantity", quantity,)
 
-        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount", unitPrice, 2)
-        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent",
-            vatRate, 2)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount", unitPrice)
+        asserter.xpathHasValue("$itemXPath/ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent", vatRate)
 
 //        asserter.xpathHasValue("$partyXPath/ram:URIUniversalCommunication/ram:URIID", description)
     }

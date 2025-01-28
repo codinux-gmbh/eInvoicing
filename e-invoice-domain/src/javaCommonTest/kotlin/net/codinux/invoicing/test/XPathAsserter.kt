@@ -1,11 +1,10 @@
 package net.codinux.invoicing.test
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
+import assertk.assertions.isEqualByComparingTo
 import net.codinux.invoicing.model.BigDecimal
 import org.xmlunit.builder.Input
 import org.xmlunit.xpath.JAXPXPathEngine
-import java.math.RoundingMode
 
 class XPathAsserter(
     xml: String
@@ -23,11 +22,14 @@ class XPathAsserter(
 
 
     fun xpathHasValue(xpath: String, value: String) {
-        assertThat(xpathEngine.evaluate(xpath, source)).isEqualTo(value)
+        assertThat(evaluate(xpath)).isEqualByComparingTo(value)
     }
 
-    fun xpathHasValue(xpath: String, value: BigDecimal, countDecimalPlatform: Int = 2) {
-        xpathHasValue(xpath, value.setScale(countDecimalPlatform, RoundingMode.HALF_UP).toString())
+    fun xpathHasValue(xpath: String, value: BigDecimal) {
+        assertThat(BigDecimal(evaluate(xpath))).isEqualByComparingTo(value)
     }
+
+    fun evaluate(xpath: String): String =
+        xpathEngine.evaluate(xpath, source)
 
 }
