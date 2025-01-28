@@ -58,7 +58,7 @@ open class AmountsCalculator {
         val lineTotalAmount = lineTotals.sumOf { it.netPrice }
         val chargeTotalAmount = invoice.amountAdjustments?.charges?.sumOf { it.actualAmount } ?: BigDecimal.Zero
         val allowanceTotalAmount = invoice.amountAdjustments?.allowances?.sumOf { it.actualAmount } ?: BigDecimal.Zero
-        val taxBasisTotalAmount = lineTotalAmount + chargeTotalAmount + allowanceTotalAmount
+        val taxBasisTotalAmount = lineTotalAmount + chargeTotalAmount - allowanceTotalAmount
         val taxTotalAmount = lineTotals.sumOf { it.taxAmount }
         val grandTotalAmount = taxBasisTotalAmount + taxTotalAmount
         val totalPrepaidAmount = invoice.amountAdjustments?.prepaidAmounts ?: BigDecimal.Zero
