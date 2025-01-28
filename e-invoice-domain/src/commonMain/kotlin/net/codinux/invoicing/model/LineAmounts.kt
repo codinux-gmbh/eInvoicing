@@ -3,7 +3,7 @@ package net.codinux.invoicing.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LineMonetarySummation(
+data class LineAmounts(
     /**
      * The unit price, exclusive of VAT, before subtracting Item price discount.
      *

@@ -12,7 +12,7 @@ class InvoiceItem(
     val vatRate: BigDecimal,
     val articleNumber: String? = null,
     val description: String? = null,
-    var monetarySummation: LineMonetarySummation? = null,
+    var amounts: LineAmounts? = null,
 ) {
     override fun toString() = "$name, ${quantity.toPlainString()} x ${unitPrice.toPlainString()}, $vatRate %"
 }

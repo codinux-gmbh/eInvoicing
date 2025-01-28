@@ -175,11 +175,11 @@ open class CiiMapper {
             mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
             mapAmount(price?.chargeAmount, InvoiceField.ItemUnitPrice, dataErrors),
             mapVatRateOrDefault(itemSettlement?.applicableTradeTax),
-            monetarySummation = mapLineAmounts(itemSettlement, agreement)
+            amounts = mapLineAmounts(itemSettlement, agreement)
         )
     }
 
-    protected open fun mapLineAmounts(settlement: LineTradeSettlement?, agreement: LineTradeAgreement?): LineMonetarySummation? =
+    protected open fun mapLineAmounts(settlement: LineTradeSettlement?, agreement: LineTradeAgreement?): LineAmounts? =
         settlement?.let {
             val summation = settlement.specifiedTradeSettlementLineMonetarySummation
             val chargesAndAllowances = settlement.specifiedTradeAllowanceCharge
@@ -189,7 +189,7 @@ open class CiiMapper {
             if (summation == null && chargesAndAllowances.isEmpty()) {
                 null
             } else {
-                LineMonetarySummation(
+                LineAmounts(
                     mapAmountOrDefault(agreement?.grossPriceProductTradePrice?.chargeAmount),
                     mapAmountOrDefault(agreement?.netPriceProductTradePrice?.chargeAmount),
                     mapItemChargeOrAllowances(chargesAndAllowances.filter { isCharge(it) }),

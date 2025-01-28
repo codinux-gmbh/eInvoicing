@@ -138,7 +138,7 @@ open class DomainToCiiMapper {
             // Die Summe des Gesamtnettobetrags der Positionen zuzüglich der Zuschläge abzüglich der Abschläge der
             // Dokumentenebene, für die ein bestimmter Code der Umsatzsteuerkategorie und ein bestimmter
             // Umsatzsteuersatz gelten (falls ein kategoriespezifischer Umsatzsteuersatz gilt).
-            val basisAmount = items.sumOf { it.monetarySummation!!.netPrice }
+            val basisAmount = items.sumOf { it.amounts!!.netPrice }
             val calculatedAmount = basisAmount * percent
 
             TradeTax(mapAmount(calculatedAmount), TaxTypeCode("VAT"), null, mapAmount(basisAmount),

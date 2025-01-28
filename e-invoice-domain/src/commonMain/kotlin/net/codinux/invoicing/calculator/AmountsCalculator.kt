@@ -10,24 +10,22 @@ open class AmountsCalculator {
     private val party by lazy { Party("", "", null, null, "") }
 
 
-    open fun ensureLineMonetarySummationsAreSet(invoice: Invoice) =
-        invoice.items.map { ensureLineMonetarySummationIsSet(it) }
+    open fun ensureLineAmountsAreSet(invoice: Invoice) =
+        invoice.items.map { ensureLineAmountsSet(it) }
 
-    open fun ensureLineMonetarySummationIsSet(item: InvoiceItem): LineMonetarySummation =
-        item.monetarySummation ?: run {
-            val summation = calculateLineMonetarySummation(item)
-            item.monetarySummation = summation
-            summation
+    open fun ensureLineAmountsSet(item: InvoiceItem): LineAmounts =
+        item.amounts ?: calculateLineAmounts(item).also {
+            item.amounts = it
         }
 
-    open fun calculateLineMonetarySummation(item: InvoiceItem): LineMonetarySummation {
+    open fun calculateLineAmounts(item: InvoiceItem): LineAmounts {
         val grossPrice = item.unitPrice
         // we don't support charges and allowances yet, therefore the gross price always equals the net price
         val netPrice = grossPrice
 
         val taxAmount = netPrice.percent(item.vatRate)
 
-        return LineMonetarySummation(
+        return LineAmounts(
             null,
             netPrice,
             emptyList(),
@@ -39,12 +37,10 @@ open class AmountsCalculator {
 
 
     open fun ensureTotalAmountsIsSet(invoice: Invoice): TotalAmounts {
-        ensureLineMonetarySummationsAreSet(invoice)
+        ensureLineAmountsAreSet(invoice)
 
-        return invoice.totals ?: run {
-            val totals = calculateTotalAmounts(invoice)
-            invoice.totals = totals
-            totals
+        return invoice.totals ?: calculateTotalAmounts(invoice).also {
+            invoice.totals = it
         }
     }
 
@@ -55,7 +51,7 @@ open class AmountsCalculator {
         calculateTotalAmounts(Invoice(invoiceDetails, party, party, items))
 
     open fun calculateTotalAmounts(invoice: Invoice): TotalAmounts {
-        val lineTotals = invoice.items.map { ensureLineMonetarySummationIsSet(it) }
+        val lineTotals = invoice.items.map { ensureLineAmountsSet(it) }
 
         val documentLevelCharges = invoice.amountAdjustments?.charges.orEmpty()
         val documentLevelAllowances = invoice.amountAdjustments?.allowances.orEmpty()
