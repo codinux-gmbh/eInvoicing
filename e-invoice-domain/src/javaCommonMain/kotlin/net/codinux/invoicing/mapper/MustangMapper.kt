@@ -159,8 +159,8 @@ open class MustangMapper(
     }
 
     private fun mapChargeOrAllowance(chargeOrAllowance: Charge?) = chargeOrAllowance?.let {
-        ChargeOrAllowance(it.totalAmount.toEInvoicingBigDecimal(), null, null, it.percent.toEInvoicingBigDecimal(),
-            it.reason, it.reasonCode, it.taxPercent.toEInvoicingBigDecimal(), it.categoryCode)
+        ChargeOrAllowance(it.totalAmount.toEInvoicingBigDecimal(), null, null, it.percent?.toEInvoicingBigDecimal(),
+            it.reason, it.reasonCode, it.taxPercent?.toEInvoicingBigDecimal(), it.categoryCode)
     }
 
 
