@@ -80,7 +80,7 @@ open class CiiMapper {
 
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors, mapBankDetails(tradeSettlement)),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
-            items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, tradeSettlement, dataErrors) }).also {
+            items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, dataErrors) }).also {
                 if (it.isEmpty() && profile.isNotMinimumOrBasicWLProfile) {
                     dataErrors.add(InvoiceDataError.missing(InvoiceField.Items))
                 }
@@ -154,26 +154,34 @@ open class CiiMapper {
             BankDetails(account.ibanid!!.value!!, bic, mapNullable(account.accountName)) // TODO: where's the bank name?
         }
 
-    protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, tradeSettlement: HeaderTradeSettlement, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? =
-        item.specifiedLineTradeAgreement?.let { agreement ->
-            // gross: Der Einheitspreis ohne Umsatzsteuer vor Abzug des Nachlass auf den Artikelpreis
-            // net: Der Preis eines Artikels ohne Umsatzsteuer nach Abzug des Nachlass auf den Artikelpreis
-            (agreement.grossPriceProductTradePrice ?: agreement.netPriceProductTradePrice)?.let { price -> // netPrice is mandatory, grossPrice optional
-                // billedQuantity: Die Menge der in der betreffenden Zeile in Rechnung gestellten Einzelartikel (Waren oder Dienstleistungen) (both, specifiedLineTradeDelivery and billedQuantity, are mandatory)
-                item.specifiedLineTradeDelivery?.billedQuantity?.let { quantity ->
-                    InvoiceItem(
-                        mapText(item.specifiedTradeProduct?.name, InvoiceField.ItemName, dataErrors),
-                        mapQuantity(quantity, InvoiceField.ItemQuantity, dataErrors),
-                        mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
-                        mapAmount(price.chargeAmount, InvoiceField.ItemUnitPrice, dataErrors),
-                        mapVatRate(tradeSettlement.applicableTradeTax)
-                    )
-                }
-            }
-        }
+    protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? {
+        val document = item.associatedDocumentLineDocument
+        val product = item.specifiedTradeProduct
+        val agreement = item.specifiedLineTradeAgreement
+        val delivery = item.specifiedLineTradeDelivery
+        val itemSettlement = item.specifiedLineTradeSettlement
+
+        // gross: Der Einheitspreis ohne Umsatzsteuer vor Abzug des Nachlass auf den Artikelpreis
+        // net: Der Preis eines Artikels ohne Umsatzsteuer nach Abzug des Nachlass auf den Artikelpreis
+        val price = agreement?.grossPriceProductTradePrice ?: agreement?.netPriceProductTradePrice  // netPrice is mandatory, grossPrice optional
+        // billedQuantity: Die Menge der in der betreffenden Zeile in Rechnung gestellten Einzelartikel (Waren oder Dienstleistungen) (both, specifiedLineTradeDelivery and billedQuantity, are mandatory)
+        val quantity = delivery?.billedQuantity
+
+        return InvoiceItem(
+            mapText(product?.name, InvoiceField.ItemName, dataErrors),
+            mapQuantity(quantity, InvoiceField.ItemQuantity, dataErrors),
+            mapUnit(quantity, InvoiceField.ItemUnit, dataErrors),
+            mapAmount(price?.chargeAmount, InvoiceField.ItemUnitPrice, dataErrors),
+            mapVatRateOrDefault(itemSettlement?.applicableTradeTax)
+        )
+    }
+
+
+    protected open fun mapVatRateOrDefault(tradeTax: List<TradeTax>?): BigDecimal =
+        tradeTax?.let { mapVatRate(it) } ?: BigDecimal.Zero
 
     protected open fun mapVatRate(tradeTax: List<TradeTax>): BigDecimal =
-        tradeTax.firstOrNull { it.rateApplicablePercent?.value != null && it.calculatedAmount.any { it.value?.toPlainString()?.startsWith("-") == false } }
+        tradeTax.firstOrNull { it.rateApplicablePercent?.value != null && (it.calculatedAmount.isEmpty() || it.calculatedAmount.any { it.value?.toPlainString()?.startsWith("-") == false }) }
             ?.rateApplicablePercent?.value ?: BigDecimalFallbackValue
 
     protected open fun mapText(texts: List<Text>?, invoiceField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): String =
@@ -212,8 +220,8 @@ open class CiiMapper {
     protected open fun mapNullableAmount(amounts: List<Amount>): BigDecimal =
         amounts.firstOrNull()?.value ?: BigDecimalFallbackValue
 
-    protected open fun mapAmount(amounts: List<Amount>, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
-        if (amounts.isEmpty() || amounts.firstOrNull()?.value == null) {
+    protected open fun mapAmount(amounts: List<Amount>?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
+        if (amounts.isNullOrEmpty() || amounts.firstOrNull()?.value == null) {
             dataErrors.add(InvoiceDataError.missing(amountField))
             BigDecimalFallbackValue
         } else {
