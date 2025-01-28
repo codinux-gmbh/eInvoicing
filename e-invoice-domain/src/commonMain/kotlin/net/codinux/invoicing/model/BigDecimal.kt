@@ -11,6 +11,7 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
     }
 
 
+    // initializing with a Double can lead to incorrect results, e.g. BigDecimal(0.1) -> 0.100000000000000005551115123125782707118, so don't offer it
     constructor(value: Int)
 
 

@@ -18,7 +18,6 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
 
     actual constructor(value: String) : this(NSDecimalNumber(string = value))
     actual constructor(value: Int) : this(NSDecimalNumber(int = value))
-    constructor(value: Double) : this(NSDecimalNumber(double = value))
 
 
     actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.decimalNumberByAdding(other.value))
