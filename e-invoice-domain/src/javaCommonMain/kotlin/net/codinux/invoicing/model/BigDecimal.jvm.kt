@@ -20,9 +20,7 @@ actual class BigDecimal(
     actual companion object {
         actual val Zero = BigDecimal(java.math.BigDecimal.ZERO)
 
-        private val roundingMode = RoundingMode.HALF_UP
-
-        private val scale = maxOf(2, DecimalFormat.getCurrencyInstance().maximumFractionDigits) // get user's default scale
+        private val DefaultRoundingMode = RoundingMode.HALF_UP
     }
 
 
@@ -41,7 +39,11 @@ actual class BigDecimal(
 
     actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.multiply(other.value))
 
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value))
+    // set scale and roundingMode to avoid ArithmeticException
+    actual operator fun div(other: BigDecimal): BigDecimal = divide(other)
+
+    fun divide(divisor: BigDecimal, scale: Int = value.scale() + divisor.value.scale(), roundingMode: RoundingMode = DefaultRoundingMode): BigDecimal =
+        BigDecimal(value.divide(divisor.value, scale, roundingMode))
 
     actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.remainder(java.math.BigDecimal(other)))
 
