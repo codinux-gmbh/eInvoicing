@@ -5,6 +5,7 @@ import net.codinux.invoicing.reader.readToNextStartTag
 import net.codinux.invoicing.reader.readToNextText
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.EventType
+import nl.adaptivity.xmlutil.Namespace
 import nl.adaptivity.xmlutil.XmlReader
 import nl.adaptivity.xmlutil.xmlStreaming
 
@@ -20,7 +21,7 @@ open class EInvoiceFormatDetector {
             if (reader.readToNextStartTag() == false) {
                 null
             } else {
-                val standard = detectEInvoiceStandard(reader.localName, reader.namespaceURI)
+                val standard = detectEInvoiceStandard(reader.localName, reader.namespaceURI, reader.namespaceDecls)
 
                 if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
                     detectCiiFormat(reader)
@@ -35,9 +36,12 @@ open class EInvoiceFormatDetector {
             null
         }
 
-    open fun detectEInvoiceStandard(rootElementName: String, rootElementNamespaceUri: String): EInvoicingStandard =
+    open fun detectEInvoiceStandard(rootElementName: String, rootElementNamespaceUri: String, namespaceDecls: List<Namespace> = emptyList()): EInvoicingStandard =
         // TODO: is it possible that it does not end with ":100"?
         if (rootElementNamespaceUri.startsWith("urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:")) {
+            EInvoicingStandard.CII
+        } else if (rootElementName == "CrossIndustryInvoice" &&
+            namespaceDecls.any { it.namespaceURI.startsWith("urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:") }) {
             EInvoicingStandard.CII
         }
         // TODO: is it possible that is does not end with :xsd:Invoice-2? UBL 1?
