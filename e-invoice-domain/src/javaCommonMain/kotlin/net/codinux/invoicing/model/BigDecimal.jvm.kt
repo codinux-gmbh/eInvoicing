@@ -67,9 +67,10 @@ actual class BigDecimal(
         if (this === other) return true
         if (other !is BigDecimal) return false
 
-        if (value != other.value) return false
-
-        return true
+        // One exception is java.math.BigDecimal, whose natural ordering equates BigDecimal objects with equal numerical
+        // values and different representations (such as 4.0 and 4.00). For BigDecimal.equals() to return true, the
+        // representation and numerical value of the two BigDecimal objects must be the same.
+        return compareTo(other) == 0 // -> use compareTo() instead of value.equals(other.value)
     }
 
     override fun hashCode(): Int {
