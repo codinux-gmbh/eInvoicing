@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
+import net.codinux.invoicing.test.JavaTestPlatform
 import net.codinux.invoicing.testfiles.*
 import java.nio.file.Path
 import kotlin.io.path.extension
@@ -13,7 +14,14 @@ import kotlin.io.path.readText
 import kotlin.test.Test
 import kotlin.test.fail
 
-class EInvoiceFormatDetectorTest {
+class EInvoiceFormatDetectorTest { // TODO: use TestUtils to get invoice files (also sets up JavaTestPlatform.initTestEnvironment() then)
+
+    companion object {
+        init {
+            JavaTestPlatform.initTestEnvironment()
+        }
+    }
+
 
     private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 

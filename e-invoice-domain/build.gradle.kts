@@ -112,6 +112,7 @@ kotlin {
     val klfVersion: String by project
 
     val invoiceTestFilesVersion: String by project
+    val mockkVersion: String by project
     val assertKVersion: String by project
     val xunitVersion: String by project
     val jacksonVersion: String by project
@@ -169,6 +170,8 @@ kotlin {
                 implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
                 implementation("org.xmlunit:xmlunit-core:$xunitVersion")
+
+                implementation("io.mockk:mockk:$mockkVersion")
 
                 implementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
             }

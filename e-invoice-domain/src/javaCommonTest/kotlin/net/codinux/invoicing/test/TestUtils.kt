@@ -10,6 +10,11 @@ import kotlin.io.path.*
 
 object TestUtils {
 
+    init {
+        JavaTestPlatform.initTestEnvironment()
+    }
+
+
     private val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 
 
