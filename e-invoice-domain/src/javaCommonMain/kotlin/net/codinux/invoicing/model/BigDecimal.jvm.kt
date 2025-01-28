@@ -31,16 +31,19 @@ actual class BigDecimal(
     actual constructor(value: Int) : this(java.math.BigDecimal(value))
 
 
-    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.plus(other.value))
+    // don't use jvm.BigDecimal's plus(), minus(), times() and div() method as they, depending on method, use either the
+    // scale of the first or the second operand, but not max(firstOperand.scale(), secondOperant.scale()), which leads to
+    // incorrect results. E.g. div(BigDecimal(100)): second operand has no scale -> would remove all decimal places
 
-    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.minus(other.value))
+    actual operator fun plus(other: BigDecimal): BigDecimal = BigDecimal(value.add(other.value))
 
-    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.times(other.value))
+    actual operator fun minus(other: BigDecimal): BigDecimal = BigDecimal(value.subtract(other.value))
 
-    // set scale and roundingMode to avoid ArithmeticException
-    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value, scale, roundingMode)) // don't us .div(), it uses the scale of the divisor which may is zero, effectively removing all decimal places then
+    actual operator fun times(other: BigDecimal): BigDecimal = BigDecimal(value.multiply(other.value))
 
-    actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.rem(java.math.BigDecimal(other)))
+    actual operator fun div(other: BigDecimal): BigDecimal = BigDecimal(value.divide(other.value))
+
+    actual operator fun rem(other: Int): BigDecimal = BigDecimal(value.remainder(java.math.BigDecimal(other)))
 
     actual operator fun unaryMinus(): BigDecimal = negated()
 
