@@ -7,7 +7,8 @@ import net.codinux.invoicing.model.Invoice
 import org.mustangproject.ZUGFeRD.*
 
 actual open class EInvoiceXmlCreator(
-    protected open val mapper: MustangMapper = MustangMapper()
+    protected open val mapper: MustangMapper = MustangMapper(),
+    protected open val xmlCreator: EInvoiceXmlCreatorMP = EInvoiceXmlCreatorMP()
 ) {
 
     actual constructor() : this(MustangMapper())
@@ -36,15 +37,17 @@ actual open class EInvoiceXmlCreator(
     open fun createZugferdXmlJvm(invoice: Invoice) = createFacturXXmlJvm(invoice)
 
     // TODO: find a better name
-    open fun createFacturXXmlJvm(invoice: Invoice) = createInvoiceXmlJvm(invoice, EInvoiceXmlFormat.FacturX)
+    open fun createFacturXXmlJvm(invoice: Invoice) = xmlCreator.createFacturXXml(invoice)
 
     // TODO: find a better name
-    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): String {
-        val exporter = ZUGFeRDExporterFromA3()
-            .setProfile(getProfileNameForFormat(format))
+    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): String =
+        if (format == EInvoiceXmlFormat.FacturX) xmlCreator.createFacturXXml(invoice)
+        else {
+            val exporter = ZUGFeRDExporterFromA3()
+                .setProfile(getProfileNameForFormat(format))
 
-        return createXml(exporter.provider, invoice)
-    }
+            createXml(exporter.provider, invoice)
+        }
 
     protected open fun createXml(provider: IXMLProvider, invoice: Invoice): String {
         val transaction = mapper.mapToTransaction(invoice)
