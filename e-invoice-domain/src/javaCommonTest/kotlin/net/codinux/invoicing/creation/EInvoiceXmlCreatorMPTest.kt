@@ -4,11 +4,13 @@ import assertk.assertThat
 import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
 import net.codinux.invoicing.model.Party
 import net.codinux.invoicing.reader.EInvoiceXmlReader
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResultType
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.EInvoiceFormat
 import net.codinux.invoicing.testfiles.EInvoiceProfile
@@ -231,7 +233,8 @@ class EInvoiceXmlCreatorMPTest {
                 fail("Could not read invoice from invoiceXml: ${readResult.type} ${readResult.readError ?: readResult.invoice?.invoiceDataErrors}")
             }
 
-            val resultXml = underTest.createFacturXXml(originalInvoice)
+            val result = underTest.createFacturXXml(originalInvoice)
+            val resultXml = Asserts.assertSuccess(result)
 
             // it's impossible to compare the XMLs directly due to different XML Decl, whitespaces and the original has more elements like notes
             // -> deserialize created XML and compare Invoice objects

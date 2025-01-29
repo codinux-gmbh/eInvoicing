@@ -1,5 +1,7 @@
 package net.codinux.invoicing.web
 
+import net.codinux.invoicing.model.Result
+
 open class WebClientResponse<T>(
     open val successful: Boolean,
     open val statusCode: Int = -1,
@@ -41,6 +43,9 @@ open class WebClientResponse<T>(
     open val retryAfterSeconds: Int? by lazy {
         getHeaderValue("Retry-After")?.toIntOrNull()
     }
+
+
+    open fun toResult(): Result<T> = Result(error, body)
 
 
     override fun toString(): String {

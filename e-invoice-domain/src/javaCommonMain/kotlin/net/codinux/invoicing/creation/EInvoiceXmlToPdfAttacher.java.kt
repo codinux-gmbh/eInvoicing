@@ -6,6 +6,7 @@ import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.PdfAttachmentWriter
 import net.codinux.invoicing.platform.JavaPlatform
 import java.io.File
@@ -34,8 +35,11 @@ actual open class EInvoiceXmlToPdfAttacher(
     open fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: File, outputFile: File, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX) =
         attachInvoiceXmlToPdf(invoice, pdfFile.readBytes(), outputFile.outputStream(), format)
 
-    open fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, outputFile: OutputStream, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX) =
-        attachInvoiceXmlToPdf(createXml(invoice, format), format, pdfFile, outputFile)
+    open fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, outputFile: OutputStream, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Unit {
+        createXml(invoice, format).value?.let { invoiceXml ->
+            attachInvoiceXmlToPdf(invoiceXml, format, pdfFile, outputFile)
+        }
+    }
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: File, outputFile: File) {
         pdfFile.inputStream().use { inputStream ->
@@ -52,7 +56,7 @@ actual open class EInvoiceXmlToPdfAttacher(
         }
 
 
-    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
+    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
         xmlCreator.createInvoiceXmlJvm(invoice, format)
 
     protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =

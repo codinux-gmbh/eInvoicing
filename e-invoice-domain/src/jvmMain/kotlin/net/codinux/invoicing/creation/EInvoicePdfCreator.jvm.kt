@@ -4,6 +4,7 @@ import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
 import org.mustangproject.ZUGFeRD.*
 import java.io.File
 import java.io.OutputStream
@@ -50,11 +51,10 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: File) {
-        val xml = createXml(invoice, format)
-
-        createPdfWithAttachedXml(xml, format, outputFile)
-    }
+    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: File): Result<Unit> =
+        createXml(invoice, format).ifSuccessful { xml ->
+            Result.success(createPdfWithAttachedXml(xml, format, outputFile))
+        }
 
     open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) =
         createPdfWithAttachedXml(invoiceXml, format, outputFile.outputStream())
@@ -68,11 +68,10 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: Path) {
-        val xml = createXml(invoice, format)
-
-        createPdfWithAttachedXml(xml, format, outputFile)
-    }
+    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: Path): Result<Unit> =
+        createXml(invoice, format).ifSuccessful { xml ->
+            Result.success(createPdfWithAttachedXml(xml, format, outputFile))
+        }
 
     open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: Path) =
         createPdfWithAttachedXml(invoiceXml, format, outputFile.outputStream())
@@ -101,7 +100,7 @@ actual open class EInvoicePdfCreator(
     }
 
 
-    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
+    protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
         xmlCreator.createInvoiceXmlJvm(invoice, format)
 
 }

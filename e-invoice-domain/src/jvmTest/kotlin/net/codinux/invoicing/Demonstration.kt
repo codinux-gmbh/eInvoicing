@@ -76,9 +76,11 @@ class Demonstration {
 
         // or if you already have the invoice XML:
         val xmlCreator = EInvoiceXmlCreator()
-        val invoiceXml = xmlCreator.createXRechnungXmlJvm(invoice) // or creator.createZugferdXml(invoice), ...
+        val createInvoiceResult = xmlCreator.createXRechnungXmlJvm(invoice) // or creator.createZugferdXml(invoice), ...
 
-        attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+        createInvoiceResult.value?.let { invoiceXml ->
+            attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+        }
     }
 
 

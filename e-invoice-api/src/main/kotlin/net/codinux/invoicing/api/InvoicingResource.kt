@@ -7,6 +7,8 @@ import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -34,22 +36,22 @@ class InvoicingResource(
     @POST
     @Operation(summary = "Create an e-invoice XML in format determined by format parameter")
     @Tag(name = "Create")
-    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat): String =
-        service.createInvoiceXml(invoice, format)
+    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat): Response =
+        toResponse(service.createInvoiceXml(invoice, format))
 
     @Path("create/xrechnung")
     @POST
     @Operation(summary = "Create a XRechnung XML")
     @Tag(name = "Create")
-    fun createXRechnung(invoice: Invoice): String =
-        service.createXRechnung(invoice)
+    fun createXRechnung(invoice: Invoice): Response =
+        toResponse(service.createXRechnung(invoice))
 
     @Path("create/facturx/xml")
     @POST
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML (ZUGFeRD is a synonym for Factur-X)")
     @Tag(name = "Create")
-    fun createFacturXXml(invoice: Invoice): String =
-        service.createFacturXXml(invoice)
+    fun createFacturXXml(invoice: Invoice): Response =
+        toResponse(service.createFacturXXml(invoice))
 
     @Path("create/facturx/pdf")
     @POST
@@ -190,6 +192,17 @@ class InvoicingResource(
     ) =
         service.calculateTotalAmounts(itemPrices)
 
+
+    private fun toResponse(result: Result<String>): Response =
+        result.value?.let { Response.ok(it).build() }
+            ?: createErrorResponse(result)
+
+    private fun createPdfFileResponse(result: Result<java.nio.file.Path>, invoice: Invoice): Response =
+        result.value?.let { createPdfFileResponse(it, invoice) }
+            ?: createErrorResponse(result)
+
+    private fun <T> createErrorResponse(result: Result<T>): Response =
+        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.error?.let { SerializableException(it) }).build()
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
         createPdfFileResponse(pdfFile, "${invoice.details.invoiceDate.toString().replace('-', '.')} ${invoice.customer.name} ${invoice.details.invoiceNumber}.pdf")

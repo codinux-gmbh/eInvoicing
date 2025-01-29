@@ -2,9 +2,10 @@ package net.codinux.invoicing.creation
 
 import assertk.assertThat
 import assertk.assertions.isGreaterThan
-import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
 import kotlin.test.Test
 
@@ -44,11 +45,11 @@ class WebServiceEInvoiceXmlCreatorTest {
 
     private fun createInvoice() = DataGenerator.createInvoice()
 
-    private fun assertInvoiceXml(xml: String?) {
+    private fun assertInvoiceXml(result: Result<String>) {
         //InvoiceXmlAsserter.assertInvoiceXml(xml)
 
-        assertThat(xml).isNotNull()
-        assertThat(xml!!.length).isGreaterThan(5800)
+        val xml = Asserts.assertSuccess(result)
+        assertThat(xml.length).isGreaterThan(5800)
     }
 
 }

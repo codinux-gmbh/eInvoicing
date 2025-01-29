@@ -2,6 +2,7 @@ package net.codinux.invoicing.converter
 
 import assertk.assertThat
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotNull
 import net.codinux.invoicing.test.DataGenerator
 import java.io.File
 import kotlin.test.Test
@@ -18,7 +19,7 @@ class EInvoiceConverterTest {
 
         val result = underTest.convertInvoiceToHtml(invoice, testFile)
 
-        assertThat(result).isNotEmpty()
+        assertThat(result.value).isNotNull().isNotEmpty()
     }
 
     @Test
@@ -27,7 +28,7 @@ class EInvoiceConverterTest {
 
         val result = underTest.convertCiiToUbl(invoice)
 
-        assertThat(result).isNotEmpty()
+        assertThat(result.value).isNotNull().isNotEmpty()
     }
 
 

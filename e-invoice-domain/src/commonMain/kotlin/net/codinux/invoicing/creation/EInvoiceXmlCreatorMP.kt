@@ -3,6 +3,7 @@ package net.codinux.invoicing.creation
 import kotlinx.serialization.encodeToString
 import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.model.mapper.DomainToCiiMapper
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.XmlDeclMode
@@ -24,17 +25,16 @@ open class EInvoiceXmlCreatorMP(
     private val log by logger()
 
 
-    open fun createFacturXXml(invoice: Invoice): String =
+    open fun createFacturXXml(invoice: Invoice): Result<String> =
         try {
             calculator.ensureTotalAmountsIsSet(invoice)
 
             val facturXInvoice = mapper.mapInvoice(invoice)
 
-            xml.encodeToString(facturXInvoice)
+            Result.success(xml.encodeToString(facturXInvoice))
         } catch (e: Throwable) {
             log.error(e) { "Could not create Factur-X invoice" }
-            //null // for now ignore exceptions as EInvoiceXmlCreator does
-            throw e
+            Result.error(e)
         }
 
 }

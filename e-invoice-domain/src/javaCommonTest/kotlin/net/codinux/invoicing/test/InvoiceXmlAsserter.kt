@@ -7,6 +7,12 @@ import net.codinux.invoicing.model.codes.UnitOfMeasure
 
 object InvoiceXmlAsserter {
 
+    fun assertInvoiceXml(result: Result<String>) {
+        val xml = Asserts.assertSuccess(result)
+
+        assertInvoiceXml(xml)
+    }
+
     fun assertInvoiceXml(xml: String?) {
         assertThat(xml).isNotNull()
         assertThat(xml!!).isNotEmpty()

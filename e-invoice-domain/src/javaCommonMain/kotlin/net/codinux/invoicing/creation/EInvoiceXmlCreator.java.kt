@@ -4,6 +4,8 @@ import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.mapper.MustangMapper
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
+import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.*
 
 actual open class EInvoiceXmlCreator(
@@ -14,16 +16,19 @@ actual open class EInvoiceXmlCreator(
     actual constructor() : this(MustangMapper())
 
 
-    actual open suspend fun createXRechnungXml(invoice: Invoice): String? =
+    private val log by logger()
+
+
+    actual open suspend fun createXRechnungXml(invoice: Invoice) =
         createXRechnungXmlJvm(invoice)
 
-    actual open suspend fun createZugferdXml(invoice: Invoice): String? =
+    actual open suspend fun createZugferdXml(invoice: Invoice) =
         createZugferdXmlJvm(invoice)
 
-    actual open suspend fun createFacturXXml(invoice: Invoice): String? =
+    actual open suspend fun createFacturXXml(invoice: Invoice) =
         createFacturXXmlJvm(invoice)
 
-    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String? =
+    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat) =
         createInvoiceXmlJvm(invoice, format)
 
 
@@ -40,21 +45,26 @@ actual open class EInvoiceXmlCreator(
     open fun createFacturXXmlJvm(invoice: Invoice) = xmlCreator.createFacturXXml(invoice)
 
     // TODO: find a better name
-    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): String =
+    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
         if (format == EInvoiceXmlFormat.FacturX) xmlCreator.createFacturXXml(invoice)
         else {
-            val exporter = ZUGFeRDExporterFromA3()
-                .setProfile(getProfileNameForFormat(format))
+            try {
+                val exporter = ZUGFeRDExporterFromA3()
+                    .setProfile(getProfileNameForFormat(format))
 
-            createXml(exporter.provider, invoice)
+                createXml(exporter.provider, invoice)
+            } catch (e: Throwable) {
+                log.error(e) { "Could not create Invoice XML" }
+                Result.error(e)
+            }
         }
 
-    protected open fun createXml(provider: IXMLProvider, invoice: Invoice): String {
+    protected open fun createXml(provider: IXMLProvider, invoice: Invoice): Result<String> {
         val transaction = mapper.mapToTransaction(invoice)
 
         provider.generateXML(transaction)
 
-        return String(provider.xml, Charsets.UTF_8)
+        return Result.success(String(provider.xml, Charsets.UTF_8))
     }
 
 

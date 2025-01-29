@@ -9,6 +9,7 @@ import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import net.codinux.invoicing.validation.InvoiceValidationResult
@@ -34,13 +35,13 @@ class InvoicingService {
     private val filesystem = DIJava.Filesystem
 
 
-    fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): String =
+    fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
         xmlCreator.createInvoiceXmlJvm(invoice, format)
 
-    fun createXRechnung(invoice: Invoice): String =
+    fun createXRechnung(invoice: Invoice): Result<String> =
         xmlCreator.createXRechnungXmlJvm(invoice)
 
-    fun createFacturXXml(invoice: Invoice): String =
+    fun createFacturXXml(invoice: Invoice): Result<String> =
         xmlCreator.createFacturXXmlJvm(invoice)
 
     fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Path {
@@ -69,7 +70,9 @@ class InvoicingService {
     }
 
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat) =
-        attachInvoiceXmlToPdf(createInvoiceXml(invoice, format), pdfFile, format)
+        createInvoiceXml(invoice, format).ifSuccessful { xml ->
+            Result.success(attachInvoiceXmlToPdf(xml, pdfFile, format))
+        }
 
     fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: ByteArray, format: EInvoiceXmlFormat): Path {
         val resultFile = createTempPdfFile()
