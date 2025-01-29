@@ -9,6 +9,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.PdfAttachmentWriter
 import net.codinux.invoicing.platform.JavaPlatform
+import net.codinux.log.logger
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -22,13 +23,20 @@ actual open class EInvoiceXmlToPdfAttacher(
     actual constructor() : this(EInvoiceXmlCreator(), JavaPlatform.pdfAttachmentWriter, DIJava.Filesystem)
 
 
-    actual open suspend fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat): ByteArray? {
-        val outputFile = filesystem.createTempPdfFile()
+    private val log by logger()
 
-        attachInvoiceXmlToPdf(invoice, pdfFile, outputFile.outputStream(), format)
 
-        return outputFile.readBytes()
-    }
+    actual open suspend fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat): Result<ByteArray> =
+        try {
+            val outputFile = filesystem.createTempPdfFile()
+
+            attachInvoiceXmlToPdf(invoice, pdfFile, outputFile.outputStream(), format)
+
+            Result.success(outputFile.readBytes())
+        } catch (e: Throwable) {
+            log.error(e) { "Could not attach invoice to PDF" }
+            Result.error(e)
+        }
 
 
     @JvmOverloads
