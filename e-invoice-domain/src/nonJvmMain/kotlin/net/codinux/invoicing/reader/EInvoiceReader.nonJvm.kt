@@ -13,7 +13,7 @@ actual open class EInvoiceReader(
     constructor(webClient: WebClient) : this(WebServiceEInvoiceReader(webClient))
 
 
-    actual open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult? =
+    actual open suspend fun extractFromXml(xml: String) =
         xmlReader.parseInvoiceXml(xml)
 
     actual open suspend fun extractFromPdf(pdfFile: ByteArray) =

@@ -24,6 +24,7 @@ data class ReadEInvoicePdfResult(
  */
 enum class ReadEInvoicePdfResultType {
     // PdfAttachmentExtractionResultType without HasXmlAttachments
+    TechnicalError,
     NotAPdf,
     NoAttachments,
     NoXmlAttachments,

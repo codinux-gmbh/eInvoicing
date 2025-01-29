@@ -42,7 +42,7 @@ actual open class EInvoiceReader(
     open fun extractFromXmlJvm(xml: String): ReadEInvoiceXmlResult =
         xmlReader.parseInvoiceXml(xml)
 
-    actual open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult? =
+    actual open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult =
         extractFromXmlJvm(xml)
 
 
@@ -55,7 +55,7 @@ actual open class EInvoiceReader(
     open fun extractFromPdf(stream: InputStream) =
         extractFromPdfInternal(stream.readAllBytesAndClose())
 
-    actual open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult? =
+    actual open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult =
         extractFromPdfInternal(pdfFile)
 
     protected open fun extractFromPdfInternal(pdfFile: ByteArray): ReadEInvoicePdfResult {
@@ -85,7 +85,7 @@ actual open class EInvoiceReader(
         return pdfAttachmentReader.getFileAttachments(pdfFile)
     }
 
-    actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult? =
+    actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult =
         extractXmlFromPdfJvm(pdfFile)
 
 

@@ -33,8 +33,7 @@ class WebServiceEInvoiceReaderTest {
     fun extractFromPdf() = runTest {
         val result = underTest.extractFromPdf(TestData.FacturXPdf)
 
-        assertThat(result).isNotNull()
-        assertThat(result!!.type).isEqualByComparingTo(ReadEInvoicePdfResultType.Success)
+        assertThat(result.type).isEqualByComparingTo(ReadEInvoicePdfResultType.Success)
 
         assertInvoice(result.invoice)
     }
@@ -44,8 +43,7 @@ class WebServiceEInvoiceReaderTest {
     fun extractXmlFromPdf() = runTest {
         val result = underTest.extractXmlFromPdf(TestData.FacturXPdf)
 
-        assertThat(result).isNotNull()
-        assertThat(result!!.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
+        assertThat(result.type).isEqualByComparingTo(PdfAttachmentExtractionResultType.HasXmlAttachments)
 
         assertThat(result.attachments).hasSize(1)
 

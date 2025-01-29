@@ -6,11 +6,11 @@ import net.codinux.log.Log
 
 expect open class EInvoiceReader constructor() {
 
-    open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult?
+    open suspend fun extractFromXml(xml: String): ReadEInvoiceXmlResult
 
-    open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult?
+    open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult
 
-    open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult?
+    open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult
 
 }
 
