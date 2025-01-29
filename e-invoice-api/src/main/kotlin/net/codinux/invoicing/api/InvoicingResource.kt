@@ -178,7 +178,7 @@ class InvoicingResource(
         // Mustang writes the filename to validation report, so with this parameter user can control the mentioned filename // TODO: remove as soon as switching to own validation
         @QueryParam("invoiceFilename") invoiceFilename: String? = null
     ) =
-        service.validateInvoice(invoice, disableNotices, invoiceFilename)
+        toResponse(service.validateInvoice(invoice, disableNotices, invoiceFilename))
 
 
     @Path("calculateTotalAmounts")
@@ -193,7 +193,7 @@ class InvoicingResource(
         service.calculateTotalAmounts(itemPrices)
 
 
-    private fun toResponse(result: Result<String>): Response =
+    private fun <T> toResponse(result: Result<T>): Response =
         result.value?.let { Response.ok(it).build() }
             ?: createErrorResponse(result)
 

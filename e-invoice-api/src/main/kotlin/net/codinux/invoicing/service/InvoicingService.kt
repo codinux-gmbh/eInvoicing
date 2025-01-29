@@ -93,7 +93,7 @@ class InvoicingService {
         reader.extractXmlFromPdf(pdfFile.toFile())
 
 
-    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): InvoiceValidationResult {
+    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): Result<InvoiceValidationResult> {
         var file = invoiceFile
 
         // Mustang writes the filename to validation report, so set a nice filename for the report

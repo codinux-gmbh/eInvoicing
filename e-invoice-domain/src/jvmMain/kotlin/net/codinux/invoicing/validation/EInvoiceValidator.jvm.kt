@@ -1,6 +1,7 @@
 package net.codinux.invoicing.validation
 
 import kotlinx.coroutines.runBlocking
+import net.codinux.invoicing.model.Result
 import net.codinux.log.logger
 import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
@@ -29,26 +30,30 @@ actual open class EInvoiceValidator {
     actual open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean, invoiceFilename: String?) =
         validateEInvoiceFile(xml.toByteArray(), disableNotices, invoiceFilename)
 
-    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean, invoiceFilename: String?): InvoiceValidationResult? {
-        val validator = object : ZUGFeRDValidator() {
-            fun getContext() = this.context
+    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean, invoiceFilename: String?): Result<InvoiceValidationResult> =
+        try {
+            val validator = object : ZUGFeRDValidator() {
+                fun getContext() = this.context
+            }
+
+            if (disableNotices) {
+                validator.disableNotices()
+            }
+
+            val report = validator.validate(fileContent, invoiceFilename ?: "validation.xml")
+
+            val context = validator.getContext()
+            val isXmlValid = context.isValid
+            val xmlValidationResults = context.results.map { mapValidationResultItem(it) }
+
+            // TODO: currently it's not possible to get PDF validation result as for PDF validation the same context object
+            //  is used and then in a private method before XML validation context.clear() gets called removing all PDF validation results
+
+            Result.success(InvoiceValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report))
+        } catch (e: Throwable) {
+            log.error(e) { "Could not validate EInvoice file" }
+            Result.error(e)
         }
-
-        if (disableNotices) {
-            validator.disableNotices()
-        }
-
-        val report = validator.validate(fileContent, invoiceFilename ?: "validation.xml")
-
-        val context = validator.getContext()
-        val isXmlValid = context.isValid
-        val xmlValidationResults = context.results.map { mapValidationResultItem(it) }
-
-        // TODO: currently it's not possible to get PDF validation result as for PDF validation the same context object
-        //  is used and then in a private method before XML validation context.clear() gets called removing all PDF validation results
-
-        return InvoiceValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report)
-    }
 
     open fun validate(fileToValidate: File, disableNotices: Boolean = false) = runBlocking {
         validateEInvoiceFile(fileToValidate.readBytes(), disableNotices, fileToValidate.name)!!

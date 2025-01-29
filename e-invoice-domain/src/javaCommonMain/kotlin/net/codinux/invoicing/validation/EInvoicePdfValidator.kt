@@ -44,6 +44,7 @@ open class EInvoicePdfValidator {
                 return PdfValidationResult(result.isCompliant, null, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors)
             }
         } catch (e: Throwable) {
+            log.error(e) { "PDF validation failed" }
             return PdfValidationResult(false, SerializableException(e))
         }
     }

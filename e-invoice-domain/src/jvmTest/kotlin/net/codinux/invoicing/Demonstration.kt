@@ -44,8 +44,10 @@ class Demonstration {
 
         val result = validator.validate(invoiceFile)
 
-        println("Is valid? ${result.isValid}")
-        println(result.reportAsXml)
+        result.value?.let {
+            println("Is valid? ${it.isValid}")
+            println(it.reportAsXml)
+        }
     }
 
 

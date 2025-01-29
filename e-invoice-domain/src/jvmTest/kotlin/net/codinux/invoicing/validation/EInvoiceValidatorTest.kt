@@ -2,6 +2,7 @@ package net.codinux.invoicing.validation
 
 import assertk.assertThat
 import assertk.assertions.*
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestUtils
 import kotlin.test.Test
 
@@ -14,8 +15,9 @@ class EInvoiceValidatorTest {
     fun validateXRechnung() {
         val testFile = getTestFile("XRechnung.xml")
 
-        val result = underTest.validate(testFile)
+        val resultHolder = underTest.validate(testFile)
 
+        val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
         assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(3)
@@ -28,9 +30,9 @@ class EInvoiceValidatorTest {
     fun validateZugferdPdf() {
         val testFile = getTestFile("ZUGFeRD.pdf")
 
-        val result = underTest.validate(testFile)
+        val resultHolder = underTest.validate(testFile)
 
-
+        val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
         assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(5)
@@ -43,8 +45,9 @@ class EInvoiceValidatorTest {
     fun validateZugferdXml() {
         val testFile = getTestFile("ZUGFeRD.xml")
 
-        val result = underTest.validate(testFile)
+        val resultHolder = underTest.validate(testFile)
 
+        val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
         assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(5)
