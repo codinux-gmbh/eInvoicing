@@ -2,9 +2,10 @@ package net.codinux.invoicing.creation
 
 import assertk.assertThat
 import assertk.assertions.isGreaterThan
-import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestData
 import kotlin.test.Test
@@ -33,10 +34,10 @@ class WebServiceEInvoicePdfCreatorTest {
 
     private fun createInvoice() = DataGenerator.createInvoice()
 
-    private fun assertInvoice(response: ByteArray?) {
-        assertThat(response).isNotNull()
+    private fun assertInvoice(result: Result<ByteArray>) {
+        val response = Asserts.assertSuccess(result)
 
-        assertThat(response!!.size).isGreaterThan(30_000)
+        assertThat(response.size).isGreaterThan(30_000)
     }
 
 }

@@ -5,6 +5,7 @@ import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
+import net.codinux.log.logger
 import org.mustangproject.ZUGFeRD.*
 import java.io.File
 import java.io.OutputStream
@@ -19,26 +20,30 @@ actual open class EInvoicePdfCreator(
 
     actual constructor() : this(EInvoiceXmlToPdfAttacher(), EInvoiceXmlCreator())
 
+
+    private val log by logger()
+
+
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): ByteArray? {
+    actual open suspend fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Result<ByteArray> {
         val destinationFile = filesystem.createTempPdfFile()
 
         createPdfWithAttachedXml(invoice, format, destinationFile)
 
-        return destinationFile.readBytes()
+        return Result.success(destinationFile.readBytes())
     }
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): ByteArray? {
+    actual open suspend fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Result<ByteArray> {
         val destinationFile = filesystem.createTempPdfFile()
 
         createPdfWithAttachedXml(invoiceXml, format, destinationFile)
 
-        return destinationFile.readBytes()
+        return Result.success(destinationFile.readBytes())
     }
 
 
@@ -53,7 +58,7 @@ actual open class EInvoicePdfCreator(
      */
     open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: File): Result<Unit> =
         createXml(invoice, format).ifSuccessful { xml ->
-            Result.success(createPdfWithAttachedXml(xml, format, outputFile))
+            createPdfWithAttachedXml(xml, format, outputFile)
         }
 
     open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) =
@@ -70,7 +75,7 @@ actual open class EInvoicePdfCreator(
      */
     open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: Path): Result<Unit> =
         createXml(invoice, format).ifSuccessful { xml ->
-            Result.success(createPdfWithAttachedXml(xml, format, outputFile))
+            createPdfWithAttachedXml(xml, format, outputFile)
         }
 
     open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: Path) =
@@ -81,23 +86,29 @@ actual open class EInvoicePdfCreator(
      *
      * Closes the OutputStream of parameter [outputFile].
      */
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream) {
-        val xmlFile = File.createTempFile("${format.name}-invoice", ".xml")
-            .also { it.writeText(invoiceXml) }
-        val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
+    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream): Result<Unit> =
+        try {
+            val xmlFile = File.createTempFile("${format.name}-invoice", ".xml")
+                .also { it.writeText(invoiceXml) }
+            val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
 
-        val visualizer = ZUGFeRDVisualizer()
-        visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
+            val visualizer = ZUGFeRDVisualizer()
+            visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
 
-        pdfFile.inputStream().use { inputStream ->
-            attacher.attachInvoiceXmlToPdf(invoiceXml, format, inputStream, outputFile)
+            pdfFile.inputStream().use { inputStream ->
+                attacher.attachInvoiceXmlToPdf(invoiceXml, format, inputStream, outputFile)
+            }
+
+            outputFile.close()
+
+            xmlFile.delete()
+            pdfFile.delete()
+
+            Result.success(Unit)
+        } catch (e: Throwable) {
+            log.error(e) { "Could not create PDF with attached xml: $invoiceXml" }
+            Result.error(e)
         }
-
-        outputFile.close()
-
-        xmlFile.delete()
-        pdfFile.delete()
-    }
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
