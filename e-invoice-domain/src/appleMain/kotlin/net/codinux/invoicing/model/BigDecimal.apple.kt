@@ -39,7 +39,7 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
 
 
     actual fun divide(divisor: BigDecimal, scale: Int): BigDecimal =
-        BigDecimal(value.decimalNumberByDividingBy(divisor, withBehavior = numberHandler(scale, NSRoundingMode.NSRoundPlain))
+        BigDecimal(value.decimalNumberByDividingBy(divisor.value, withBehavior = numberHandler(scale, NSRoundingMode.NSRoundPlain)))
 
 
     actual val isNegative: Boolean by lazy { this.compareTo(Zero) < 0 }
