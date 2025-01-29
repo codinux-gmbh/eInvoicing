@@ -152,7 +152,7 @@ open class MustangMapper(
         }
 
         return AmountAdjustments(
-            invoice.totalPrepaidAmount.toEInvoicingBigDecimal(),
+            invoice.totalPrepaidAmount?.toEInvoicingBigDecimal() ?: net.codinux.invoicing.model.BigDecimal.Zero,
             invoice.zfCharges.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Charge) },
             invoice.zfAllowances.orEmpty().mapNotNull { mapChargeOrAllowance(it as? Allowance ?: it as? Charge) }
         )
