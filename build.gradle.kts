@@ -23,6 +23,11 @@ allprojects {
 
     ext["projectDescription"] = "Tools to work with eInvoices according to EU standard EN 16931"
 
+    // disable Apache 2 license that is added by Gradle Scripts. I never put the library under Apache 2, but Gradle
+    // Scripts set it in release pom
+    ext["licenseName"] = ""
+    ext["licenseUrl"] = ""
+
 
     repositories {
         mavenCentral()
