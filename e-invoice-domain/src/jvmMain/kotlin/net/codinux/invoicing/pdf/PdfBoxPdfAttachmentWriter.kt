@@ -66,7 +66,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
 
 
     // builds the structure outlined in Factur-X 1.0.07 DE.pdf p. 28
-    protected open fun addInvoiceXmlToAssociatedFiles(document: PDDocument, xml: String, attachmentName: String): PDComplexFileSpecification {
+    open fun addInvoiceXmlToAssociatedFiles(document: PDDocument, xml: String, attachmentName: String, mimeType: String = "application/xml"): PDComplexFileSpecification {
         // Key Fields in /AF
         //    /F: The file name of the embedded file.
         //    /UF: The file name in Unicode, allowing non-ASCII characters.
@@ -80,7 +80,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
 
         val xmlBytes = xml.encodeToByteArray()
         fileSpecificationDictionary.embeddedFile = PDEmbeddedFile(document, ByteArrayInputStream(xmlBytes)).apply {
-            subtype = "application/xml" // according to spec "text/xml", but "application/text" is recommended by RFC 7303
+            subtype = mimeType // according to spec "text/xml", but "application/text" is recommended by RFC 7303
             size = xmlBytes.size
             creationDate = Calendar.getInstance()
             modDate = Calendar.getInstance()
