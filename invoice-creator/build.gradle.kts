@@ -9,6 +9,7 @@ kotlin {
 
 
 val openHtmlToPdfVersion: String by project
+val playwrightVersion: String by project
 
 val jsoupVersion: String by project
 
@@ -22,6 +23,8 @@ dependencies {
 
     implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:$openHtmlToPdfVersion")
     implementation("io.github.openhtmltopdf:openhtmltopdf-slf4j:$openHtmlToPdfVersion")
+
+    implementation("com.microsoft.playwright:playwright:$playwrightVersion")
 
     implementation("org.jsoup:jsoup:$jsoupVersion")
 
