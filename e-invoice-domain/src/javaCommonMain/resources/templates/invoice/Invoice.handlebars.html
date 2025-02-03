@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice {{details.invoiceNumber}}</title>
+  <style>
+      @page {
+          size: A4;
+          margin: 20mm;
+          @top-center {
+              content: element(header);
+          }
+          @bottom-center {
+              content: element(footer);
+          }
+      }
+
+      body {
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          color: rgb(63 63 70);
+          margin: 0;
+          padding: 0;
+      }
+
+      .container {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+      }
+      .container-item {
+          display: table-cell;
+      }
+
+      #header, #footer {
+          width: 100%;
+          position: running(header);
+      }
+
+      #header {
+          height: 15mm;
+          width: 100%;
+      }
+      #header img {
+          height: 15mm;
+          float: right;
+      }
+      /* .header-company-logo {
+        float: right;
+        height: 15mm;
+        width: 50%;
+      max-height: 10mm;
+      background: violet;
+      }
+      .header-company-logo img {
+          height: 15mm;
+      }
+      .header-company-address {
+          width: 50%;
+          margin-top: 0px;
+          padding-top: 0px;
+          max-height: 10mm;
+          text-align: right;
+          background: orange;
+      } */
+
+      #footer {
+          position: running(footer);
+          font-size: 10px;
+          text-align: center;
+      }
+
+      .footer-columns {
+          text-align: center;
+          padding-bottom: 5px;
+      }
+
+      .footer-columns div {
+          display: table-cell;
+      }
+
+      .page-number {
+          text-align: center;
+          font-size: 10px;
+          border-top: 1px solid #000;
+          padding-top: 5px;
+      }
+
+      .invoice-header {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+          margin-top: 20px;
+      }
+
+      .recipient-info {
+
+      }
+      .company-address-overline {
+          display: table;
+          color: rgb(63 63 70);
+          font-size: 10px;
+          border-bottom: 1px solid rgb(63 63 70);
+      }
+
+      .company-contact {
+          text-align: right;
+          margin-top: 1rem;
+      }
+      .invoice-details {
+          margin-top: 1rem;
+      }
+
+      .invoice-title {
+          font-size: 18px;
+          font-weight: bold;
+          margin-top: 20px;
+      }
+
+      .invoice-description {
+          margin-top: 10px;
+      }
+
+      table {
+          border-collapse: collapse;
+      }
+      th {
+          background-color: #f0f0f0;
+          font-weight: bold;
+      }
+
+      table.line-items {
+          width: 100%;
+          margin-top: 10px;
+      }
+      .line-items th, .line-items td {
+          border: 1px solid #000;
+          padding: 5px;
+      }
+      .line-items th {
+          text-align: center;
+      }
+
+      .summary-left-space {
+          width: 110mm;
+      }
+      .summary table {
+          text-align: right;
+          float: right;
+          margin-top: 8px;
+      }
+      .summary-amount {
+          text-align: right;
+          width: 22mm;
+      }
+      .summary-start {
+          border-top: 1px solid rgb(63 63 70);
+          padding-top: 4px;
+      }
+      .summary-end {
+          border-bottom: 2px double rgb(63 63 70);
+          padding-bottom: 4px;
+      }
+      .total-amount {
+          padding-top: 4px;
+      }
+
+      .thank-you {
+          margin-top: 32px;
+      }
+
+      .bold {
+          font-weight: bold;
+      }
+      .right-aligned {
+          text-align: right;
+      }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  {{#if supplier.logoUrl}}
+  <img src="{{supplier.logoUrl}}" alt="Company Logo">
+  {{/if}}
+  <!-- <div class="container">
+    <div class="header-company-logo container-item">
+      <img src="https://codinux.net/images/favicons/favicon-96x96.png" alt="Company Logo">
+     </div>
+    <div class="header-company-address container-item">
+      Hochwürdiger Leistungserbringer<br />
+      Fun Street 1<br/>
+      12345 Glückstadt
+    </div>
+  </div> -->
+</div>
+
+<div class="invoice-header container">
+  <div class="recipient-info container-item">
+    <div class="company-address-overline">{{{supplier.name}}} | {{supplier.address}} | {{supplier.postalCode}} {{supplier.city}}</div>
+
+    <div>
+      <strong>{{{customer.name}}}</strong><br>
+      {{customer.address}}<br>
+      {{customer.postalCode}} {{customer.city}}<br>
+      {{customer.country}}
+    </div>
+  </div>
+
+  <div class="company-contact container-item">
+    <div>
+      <strong>Phone:</strong> {{supplier.phone}}<br>
+      <strong>Email:</strong> {{supplier.email}}<br>
+    </div>
+    <div class="invoice-details">
+      <strong>Invoice No:</strong> {{details.invoiceNumber}}<br>
+      <strong>Date:</strong> {{formatDate details.invoiceDate}}<br>
+      {{#if supplier.vatId}}
+      <strong>VAT ID:</strong> {{supplier.vatId}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<div class="invoice-title">Invoice {{details.invoiceNumber}}</div>
+
+<div class="invoice-description">
+  For the services rendered from 01.10.2015 to 31.10.2015, I hereby invoice you for the following:
+</div>
+
+<table class="line-items">
+  <tr>
+    <th>Pos.</th>
+    <th>Article Number</th>
+    <th>Article</th>
+    <th>Quantity</th>
+    <th>Unit</th>
+    <th>Unit Price</th>
+    <th>VAT %</th>
+  </tr>
+  {{#each items}}
+  <tr>
+    <td class="right-aligned">{{@index}}</td>
+    <td>{{articleNumber}}</td>
+    <td>{{name}}</td>
+    <td class="right-aligned">{{quantity}}</td>
+    <td>{{formatUnit unit}}</td>
+    <td class="right-aligned">{{formatCurrency unitPrice ../details.currency}}</td>
+    <td class="right-aligned">{{formatPercent vatRate}}</td>
+  </tr>
+  {{/each}}
+</table>
+
+<div class="summary container">
+  <div class="summary-left-space container-item">
+  </div>
+  <div class="container-item">
+    <table>
+      <tbody>
+      <tr>
+        <td class="bold summary-start">Net Amount:</td>
+        <td class="summary-amount summary-start">{{formatCurrency totals.taxBasisTotalAmount details.currency}}</td>
+      </tr>
+      <tr>
+        <td class="bold summary-end">Tax Amount:</td>
+        <td class="summary-amount summary-end">{{formatCurrency totals.taxTotalAmount details.currency}}</td>
+      </tr>
+      <tr>
+        <td class="bold total-amount">Total Amount Due:</td>
+        <td class="summary-amount total-amount">{{formatCurrency totals.duePayableAmount details.currency}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="thank-you">
+  Thank you for your order, Knuddelbärli! Bleib geschmeidig.
+</div>
+
+<div id="footer">
+  <div class="footer-columns container">
+    <div>
+      <strong>Company Address</strong><br>
+      {{supplier.name}}<br />
+      {{supplier.address}}<br />
+      {{supplier.postalCode}} {{supplier.city}}
+    </div>
+    <div>
+      <strong>Contact</strong><br>
+      Email: {{supplier.email}}<br>
+      Phone: {{supplier.phone}}
+    </div>
+    {{#if supplier.bankDetails}}
+    <div>
+      <strong>Bank Details</strong><br>
+      {{#if supplier.bankDetails.financialInstitutionName}}
+      {{supplier.bankDetails.financialInstitutionName}}<br />
+      {{/if}}
+      IBAN: {{supplier.bankDetails.accountNumber}}<br />
+      BIC: {{supplier.bankDetails.bankCode}}
+    </div>
+    {{/if}}
+  </div>
+  <div class="page-number">Page <span class="pageNumber"></span>1 / 1<span class="totalPages"></span></div>
+</div>
+
+</body>
+</html>

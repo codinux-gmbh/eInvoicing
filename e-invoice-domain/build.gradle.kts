@@ -96,6 +96,8 @@ kotlin {
 
     val mustangVersion: String by project
 
+    val handlebarsVersion: String by project
+
     val textInfoExtractorVersion: String by project
     val textExtractorVersion: String by project
     val pdfBoxAndroidVersion: String by project
@@ -147,6 +149,8 @@ kotlin {
 
             dependencies {
                 implementation("org.mustangproject:library:$mustangVersion")
+
+                implementation("com.github.jknack:handlebars:$handlebarsVersion")
 
                 // pdf invoice data extraction
                 api("net.dankito.text.extraction:text-info-extractor:$textInfoExtractorVersion")
