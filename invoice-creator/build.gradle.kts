@@ -18,6 +18,8 @@ val assertKVersion: String by project
 val logbackVersion: String by project
 
 dependencies {
+    api(project(":e-invoice-model"))
+
     implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:$openHtmlToPdfVersion")
     implementation("io.github.openhtmltopdf:openhtmltopdf-slf4j:$openHtmlToPdfVersion")
 

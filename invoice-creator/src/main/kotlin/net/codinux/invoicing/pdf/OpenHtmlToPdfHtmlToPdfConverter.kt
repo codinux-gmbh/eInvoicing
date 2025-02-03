@@ -1,25 +1,27 @@
 package net.codinux.invoicing.pdf
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
+import net.codinux.invoicing.model.Pdf
 import org.jsoup.Jsoup
 import org.jsoup.helper.W3CDom
 import org.jsoup.nodes.Document
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.FileSystems
 
 
 open class OpenHtmlToPdfHtmlToPdfConverter {
 
-    open fun renderHtml(htmlFile: File, outputFile: File) =
-        renderHtml(htmlFile.readText(), outputFile)
+    open fun renderHtml(htmlFile: File): Pdf =
+        renderHtml(htmlFile.readText())
 
-    open fun renderHtml(html: String, outputFile: File) {
+    open fun renderHtml(html: String): Pdf {
         val doc = createWellFormedHtml(html)
-        xhtmlToPdf(doc, outputFile)
+        return xhtmlToPdf(doc)
     }
 
-    protected open fun xhtmlToPdf(doc: Document, outputPdf: File) {
-        outputPdf.outputStream().use { output ->
+    protected open fun xhtmlToPdf(doc: Document): Pdf {
+        val pdfBytes = ByteArrayOutputStream().also { it.use { output ->
             val baseUri = FileSystems.getDefault().getPath("/src/main/resources")
                 .toUri().toString()
 
@@ -29,7 +31,9 @@ open class OpenHtmlToPdfHtmlToPdfConverter {
             builder.toStream(output)
             builder.withW3cDocument(W3CDom().fromJsoup(doc), baseUri)
             builder.run()
-        }
+        } }.toByteArray()
+
+        return Pdf(pdfBytes)
     }
 
     protected open fun createWellFormedHtml(html: String): Document =
