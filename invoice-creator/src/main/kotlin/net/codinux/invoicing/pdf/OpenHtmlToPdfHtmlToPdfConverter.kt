@@ -11,17 +11,13 @@ import org.jsoup.Jsoup
 import org.jsoup.helper.W3CDom
 import org.jsoup.nodes.Document
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.nio.file.FileSystems
 import java.util.*
 
 
-open class OpenHtmlToPdfHtmlToPdfConverter {
+open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
 
-    open fun renderHtml(htmlFile: File): Pdf =
-        renderHtml(htmlFile.readText())
-
-    open fun renderHtml(html: String): Pdf {
+    override fun createPdf(html: String): Pdf {
         val doc = createWellFormedHtml(html)
         return xhtmlToPdf(doc)
     }
