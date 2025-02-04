@@ -103,9 +103,11 @@ actual open class EInvoicePdfCreator(
                 val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice)
                 val pdf = htmlToPdfConverter.createPdf(html)
 
-                attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes, outputFile)
-
-                Result.success(Unit)
+                val result = attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes)
+                result.ifSuccessful {
+                    outputFile.write(it.bytes)
+                    Result.success(Unit)
+                }
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not create PDF with attached xml: $invoiceXml" }

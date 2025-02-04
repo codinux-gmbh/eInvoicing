@@ -68,20 +68,23 @@ class Demonstration {
         val xRechnung = xmlCreator.createXRechnungXmlJvm(invoice)
     }
 
-    fun attachInvoiceXmlToPdf() {
+    suspend fun attachInvoiceXmlToPdf() {
         val invoice: Invoice = createInvoice()
         val existingPdf = File("Invoice.pdf")
         val output = File("Zugferd.pdf")
 
         val attacher = EInvoiceXmlToPdfAttacher()
-        attacher.attachInvoiceXmlToPdf(invoice, existingPdf, output)
+        val pdf = attacher.attachInvoiceXmlToPdf(invoice, existingPdf.readBytes())
 
         // or if you already have the invoice XML:
         val xmlCreator = EInvoiceXmlCreator()
         val createInvoiceResult = xmlCreator.createXRechnungXmlJvm(invoice) // or creator.createZugferdXml(invoice), ...
 
         createInvoiceResult.value?.let { invoiceXml ->
-            attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
+            val result = attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf.inputStream())
+            result.value?.let { createdPdf ->
+                output.writeBytes(createdPdf.bytes)
+            }
         }
     }
 
