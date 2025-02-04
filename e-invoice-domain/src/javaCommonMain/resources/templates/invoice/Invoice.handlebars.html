@@ -32,49 +32,39 @@
           display: table-cell;
       }
 
-      #header, #footer {
-          width: 100%;
-          position: running(header);
-      }
-
       #header {
+          position: running(header);
           height: 15mm;
           width: 100%;
+          margin-top: 15mm;
       }
-      #header img {
-          height: 15mm;
-          float: right;
+      #header table {
+          table-layout: fixed;
+          width: 100%;
       }
-      /* .header-company-logo {
-        float: right;
-        height: 15mm;
-        width: 50%;
-      max-height: 10mm;
-      background: violet;
-      }
-      .header-company-logo img {
+      #header .header-company-logo {
           height: 15mm;
       }
       .header-company-address {
-          width: 50%;
-          margin-top: 0px;
-          padding-top: 0px;
-          max-height: 10mm;
           text-align: right;
-          background: orange;
-      } */
+      }
+
+      #content {
+          margin-top: 15mm;
+          margin-bottom: 20mm;
+      }
 
       #footer {
           position: running(footer);
+          width: 100%;
           font-size: 10px;
           text-align: center;
+          margin-top: -20mm;
       }
-
       .footer-columns {
           text-align: center;
           padding-bottom: 5px;
       }
-
       .footer-columns div {
           display: table-cell;
       }
@@ -90,20 +80,18 @@
           display: table;
           width: 100%;
           table-layout: fixed;
-          margin-top: 20px;
       }
 
-      .recipient-info {
-
-      }
       .company-address-overline {
           display: table;
           color: rgb(63 63 70);
           font-size: 10px;
           border-bottom: 1px solid rgb(63 63 70);
+          margin-bottom: 10px;
       }
 
       .company-contact {
+          width: 40%;
           text-align: right;
           margin-top: 1rem;
       }
@@ -114,11 +102,12 @@
       .invoice-title {
           font-size: 18px;
           font-weight: bold;
-          margin-top: 20px;
+          margin-top: 24px;
       }
 
       .invoice-description {
-          margin-top: 10px;
+          margin-top: 4mm;
+          margin-bottom: 4mm;
       }
 
       table {
@@ -180,110 +169,115 @@
 <body>
 
 <div id="header">
-  {{#if supplier.logoUrl}}
-  <img src="{{supplier.logoUrl}}" alt="Company Logo">
-  {{/if}}
-  <!-- <div class="container">
-    <div class="header-company-logo container-item">
-      <img src="https://codinux.net/images/favicons/favicon-96x96.png" alt="Company Logo">
-     </div>
-    <div class="header-company-address container-item">
-      Hochwürdiger Leistungserbringer<br />
-      Fun Street 1<br/>
-      12345 Glückstadt
-    </div>
-  </div> -->
+  <table>
+    <tbody>
+    <tr>
+      <td>
+        {{#if supplier.logoUrl}}
+        <img class="header-company-logo" src="{{supplier.logoUrl}}" alt="Company Logo">
+        {{/if}}
+      </td>
+      <td class="header-company-address">
+        {{{supplier.name}}}<br />
+        {{supplier.address}}<br/>
+        {{supplier.postalCode}} {{supplier.city}}
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>
 
-<div class="invoice-header container">
-  <div class="recipient-info container-item">
-    <div class="company-address-overline">{{{supplier.name}}} | {{supplier.address}} | {{supplier.postalCode}} {{supplier.city}}</div>
+<div id="content">
+  <div class="invoice-header container">
+    <div class="recipient-info container-item">
+      <div class="company-address-overline">{{{supplier.name}}} | {{supplier.address}} | {{supplier.postalCode}} {{supplier.city}}</div>
 
-    <div>
-      <strong>{{{customer.name}}}</strong><br>
-      {{customer.address}}<br>
-      {{customer.postalCode}} {{customer.city}}<br>
-      {{customer.country}}
+      <div>
+        <strong>{{{customer.name}}}</strong><br>
+        {{customer.address}}<br>
+        {{customer.postalCode}} {{customer.city}}<br>
+        {{customer.country}}
+      </div>
+    </div>
+
+    <div class="company-contact container-item">
+      <div>
+        <strong>{{i18n "Phone" "Tel."}}:</strong> {{supplier.phone}}<br>
+        <strong>{{i18n "Email" "E-Mail"}}:</strong> {{supplier.email}}<br>
+      </div>
+      <div class="invoice-details">
+        <strong>{{i18n "Invoice No" "Rechnungsnr."}}:</strong> {{details.invoiceNumber}}<br>
+        <strong>{{i18n "Invoice date" "Rechnungsdatum"}}:</strong> {{formatDate details.invoiceDate}}<br>
+        {{#if supplier.vatId}}
+        <strong>{{i18n "VAT ID" "Ust-IdNr."}}:</strong> {{supplier.vatId}}
+        {{/if}}
+      </div>
     </div>
   </div>
 
-  <div class="company-contact container-item">
-    <div>
-      <strong>{{i18n "Phone" "Tel."}}:</strong> {{supplier.phone}}<br>
-      <strong>{{i18n "Email" "E-Mail"}}:</strong> {{supplier.email}}<br>
-    </div>
-    <div class="invoice-details">
-      <strong>{{i18n "Invoice No" "Rechnungsnr."}}:</strong> {{details.invoiceNumber}}<br>
-      <strong>{{i18n "Invoice date" "Rechnungsdatum"}}:</strong> {{formatDate details.invoiceDate}}<br>
-      {{#if supplier.vatId}}
-      <strong>{{i18n "VAT ID" "Ust-IdNr."}}:</strong> {{supplier.vatId}}
-      {{/if}}
-    </div>
-  </div>
-</div>
+  <div class="invoice-title">{{i18n "Invoice" "Rechnung"}} {{details.invoiceNumber}}</div>
 
-<div class="invoice-title">{{i18n "Invoice" "Rechnung"}} {{details.invoiceNumber}}</div>
-
-<div class="invoice-description">
-  {{#if details.serviceDate.endDate}}
+  <div class="invoice-description">
+    {{#if details.serviceDate.endDate}}
     {{i18nArgs "For the services rendered from %s to %s, I hereby invoice you for the following"
     "Für die im Zeitraum %s – %s erbrachten Leistungen erlaube ich mir in Rechnung zu stellen"
     (formatDate details.serviceDate.startDate) (formatDate details.serviceDate.endDate) }}
-  {{else}}
+    {{else}}
     {{i18nArgs "For the goods delivered on %s, I hereby invoice you for the following"
     "Für die am %s gelieferten Güter erlaube ich mir in Rechnung zu stellen"
     (formatDate details.serviceDate.deliveryDate) }}
-  {{/if}}:
-</div>
-
-<table class="line-items">
-  <tr>
-    <th>{{i18n "Pos." "Nr."}}</th>
-    <th>{{i18n "Article Number" "Artikelnr."}}</th>
-    <th>{{i18n "Article" "Artikel"}}</th>
-    <th>{{i18n "Quantity" "Menge"}}</th>
-    <th>{{i18n "Unit" "Einheit"}}</th>
-    <th>{{i18n "Unit Price" "Einzelpreis"}}</th>
-    <th>{{i18n "VAT %" "Mwst. %"}}</th>
-  </tr>
-  {{#each items}}
-  <tr>
-    <td class="right-aligned">{{formatItemPosition position @index}}</td>
-    <td>{{articleNumber}}</td>
-    <td>{{name}}</td>
-    <td class="right-aligned">{{quantity}}</td>
-    <td>{{formatUnit unit}}</td>
-    <td class="right-aligned">{{formatCurrency unitPrice ../details.currency}}</td>
-    <td class="right-aligned">{{formatPercent vatRate}}</td>
-  </tr>
-  {{/each}}
-</table>
-
-<div class="summary container">
-  <div class="summary-left-space container-item">
+    {{/if}}:
   </div>
-  <div class="container-item">
-    <table>
-      <tbody>
-      <tr>
-        <td class="bold summary-start">{{i18n "Net Amount" "Netto"}}:</td>
-        <td class="summary-amount summary-start">{{formatCurrency totals.taxBasisTotalAmount details.currency}}</td>
-      </tr>
-      <tr>
-        <td class="bold summary-end">{{i18n "Tax Amount" "Umsatzsteuer"}}:</td>
-        <td class="summary-amount summary-end">{{formatCurrency totals.taxTotalAmount details.currency}}</td>
-      </tr>
-      <tr>
-        <td class="bold total-amount">{{i18n "Total Amount Due" "Rechnungsbetrag"}}:</td>
-        <td class="summary-amount total-amount">{{formatCurrency totals.duePayableAmount details.currency}}</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
-<div class="thank-you">
-  {{i18n "Thank you for your order!" "Herzlichen Dank für Ihren Auftrag!"}}
+  <table class="line-items">
+    <tr>
+      <th>{{i18n "Pos." "Nr."}}</th>
+      <th>{{i18n "Article Number" "Artikelnr."}}</th>
+      <th>{{i18n "Article" "Artikel"}}</th>
+      <th>{{i18n "Quantity" "Menge"}}</th>
+      <th>{{i18n "Unit" "Einheit"}}</th>
+      <th>{{i18n "Unit Price" "Einzelpreis"}}</th>
+      <th>{{i18n "VAT %" "Mwst. %"}}</th>
+    </tr>
+    {{#each items}}
+    <tr>
+      <td class="right-aligned">{{formatItemPosition position @index}}</td>
+      <td>{{articleNumber}}</td>
+      <td>{{name}}</td>
+      <td class="right-aligned">{{quantity}}</td>
+      <td>{{formatUnit unit}}</td>
+      <td class="right-aligned">{{formatCurrency unitPrice ../details.currency}}</td>
+      <td class="right-aligned">{{formatPercent vatRate}}</td>
+    </tr>
+    {{/each}}
+  </table>
+
+  <div class="summary container">
+    <div class="summary-left-space container-item">
+    </div>
+    <div class="container-item">
+      <table>
+        <tbody>
+        <tr>
+          <td class="bold summary-start">{{i18n "Net Amount" "Netto"}}:</td>
+          <td class="summary-amount summary-start">{{formatCurrency totals.taxBasisTotalAmount details.currency}}</td>
+        </tr>
+        <tr>
+          <td class="bold summary-end">{{i18n "Tax Amount" "Umsatzsteuer"}}:</td>
+          <td class="summary-amount summary-end">{{formatCurrency totals.taxTotalAmount details.currency}}</td>
+        </tr>
+        <tr>
+          <td class="bold total-amount">{{i18n "Total Amount Due" "Rechnungsbetrag"}}:</td>
+          <td class="summary-amount total-amount">{{formatCurrency totals.duePayableAmount details.currency}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="thank-you">
+    {{i18n "Thank you for your order!" "Herzlichen Dank für Ihren Auftrag!"}}
+  </div>
 </div>
 
 <div id="footer">
