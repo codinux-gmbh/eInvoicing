@@ -235,13 +235,16 @@
 
   <div class="invoice-description">
     {{#if details.serviceDate.endDate}}
-    {{i18nArgs "For the services rendered from %s to %s, I hereby invoice you for the following"
-    "Für die im Zeitraum %s – %s erbrachten Leistungen erlaube ich mir in Rechnung zu stellen"
-    (formatDate details.serviceDate.startDate) (formatDate details.serviceDate.endDate) }}
+      {{i18nArgs "For the services rendered from %s to %s, I hereby invoice you for the following"
+      "Für die im Zeitraum %s – %s erbrachten Leistungen erlaube ich mir in Rechnung zu stellen"
+      (formatDate details.serviceDate.startDate) (formatDate details.serviceDate.endDate) }}
+    {{else if details.serviceDate.deliveryDate}}
+      {{i18nArgs "For the goods delivered on %s, I hereby invoice you for the following"
+      "Für die am %s gelieferten Güter erlaube ich mir in Rechnung zu stellen"
+      (formatDate details.serviceDate.deliveryDate) }}
     {{else}}
-    {{i18nArgs "For the goods delivered on %s, I hereby invoice you for the following"
-    "Für die am %s gelieferten Güter erlaube ich mir in Rechnung zu stellen"
-    (formatDate details.serviceDate.deliveryDate) }}
+      {{i18nArgs "For the services rendered, I hereby invoice you for the following"
+      "Für die erbrachten Leistungen erlaube ich mir in Rechnung zu stellen"}}
     {{/if}}:
   </div>
 
