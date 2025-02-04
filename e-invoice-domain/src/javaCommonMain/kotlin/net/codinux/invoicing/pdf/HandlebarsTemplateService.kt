@@ -44,9 +44,10 @@ open class HandlebarsTemplateService : TemplateService {
 
         open fun formatPercent(percent: BigDecimal): String = percentFormat.format(percent.toJvmBigDecimal())
 
-        open fun formatCurrency(amount: BigDecimal, currency: Currency): String = currencyFormat
-            .apply { this.currency = java.util.Currency.getInstance(currency.alpha3Code) }
-            .format(amount.toJvmBigDecimal())
+        open fun formatCurrency(amount: BigDecimal?, currency: Currency): String = amount?.let {
+            currencyFormat.apply { this.currency = java.util.Currency.getInstance(currency.alpha3Code) }
+                .format(amount.toJvmBigDecimal())
+        } ?: ""
 
         open fun formatUnit(unit: UnitOfMeasure): String = unit.symbol ?: unit.englishName // TODO
 
