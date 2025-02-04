@@ -1,6 +1,7 @@
 package net.codinux.invoicing.model
 
 import kotlinx.serialization.Serializable
+import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
 class Invoice(
@@ -35,6 +36,9 @@ class Invoice(
      */
     var totals: TotalAmounts? = null
 ) {
+    @get:JsonIgnore // used e.g. for filename to save invoice
+    val shortDescription by lazy { "${details.invoiceDate.toDotSeparatedIsoDate()} ${details.invoiceNumber} ${customer.name}" }
+
     fun copy(details: InvoiceDetails = this.details, supplier: Party = this.supplier, customer: Party = this.customer,
              items: List<InvoiceItem> = this.items, customerReferenceNumber: String? = this.customerReferenceNumber,
              amountAdjustments: AmountAdjustments? = this.amountAdjustments, totals: TotalAmounts? = this.totals) =

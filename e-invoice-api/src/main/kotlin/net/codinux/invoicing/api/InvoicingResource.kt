@@ -205,7 +205,7 @@ class InvoicingResource(
         Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.error?.let { SerializableException(it) }).build()
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
-        createPdfFileResponse(pdfFile, "${invoice.details.invoiceDate.toString().replace('-', '.')} ${invoice.customer.name} ${invoice.details.invoiceNumber}.pdf")
+        createPdfFileResponse(pdfFile, "${invoice.shortDescription}.pdf")
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, filename: String): Response =
         Response.ok(pdfFile)
