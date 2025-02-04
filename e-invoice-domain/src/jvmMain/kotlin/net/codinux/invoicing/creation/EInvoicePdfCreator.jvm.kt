@@ -5,21 +5,27 @@ import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.*
+import net.codinux.invoicing.reader.EInvoiceXmlReader
 import net.codinux.log.logger
-import org.mustangproject.ZUGFeRD.*
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
 import kotlin.io.path.outputStream
 
 actual open class EInvoicePdfCreator(
+    protected val templateService: TemplateService = HandlebarsTemplateService(),
+    protected open val htmlToPdfConverter: HtmlToPdfConverter = OpenHtmlToPdfHtmlToPdfConverter(),
     protected open val attacher: EInvoiceXmlToPdfAttacher = EInvoiceXmlToPdfAttacher(),
     protected open val xmlCreator: EInvoiceXmlCreator = EInvoiceXmlCreator(),
+    protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader(), // TODO: make smarter
     protected open val filesystem: FilesystemService = DIJava.Filesystem
 ) {
 
-    actual constructor() : this(EInvoiceXmlToPdfAttacher(), EInvoiceXmlCreator())
+    actual constructor() : this(HandlebarsTemplateService(), OpenHtmlToPdfHtmlToPdfConverter(), EInvoiceXmlToPdfAttacher(), EInvoiceXmlCreator())
 
+
+    protected val invoiceHtmlTemplate by lazy { ResourceUtil.getResourceAsText("templates/invoice/Invoice.handlebars.html") }
 
     private val log by logger()
 
@@ -88,23 +94,19 @@ actual open class EInvoicePdfCreator(
      */
     open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream): Result<Unit> =
         try {
-            val xmlFile = File.createTempFile("${format.name}-invoice", ".xml")
-                .also { it.writeText(invoiceXml) }
-            val pdfFile = File(xmlFile.parentFile, xmlFile.nameWithoutExtension + ".pdf")
+            val readXmlResult = xmlReader.parseInvoiceXml(invoiceXml) // TODO: make smarter
+            val invoice = readXmlResult.invoice?.invoice
 
-            val visualizer = ZUGFeRDVisualizer()
-            visualizer.toPDF(xmlFile.absolutePath, pdfFile.absolutePath)
+            if (invoice == null) {
+                readXmlResult.readError?.originalException?.let { Result.error(it) } ?: Result(null, null)
+            } else {
+                val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice)
+                val pdf = htmlToPdfConverter.createPdf(html)
 
-            pdfFile.inputStream().use { inputStream ->
-                attacher.attachInvoiceXmlToPdf(invoiceXml, format, inputStream, outputFile)
+                attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes, outputFile)
+
+                Result.success(Unit)
             }
-
-            outputFile.close()
-
-            xmlFile.delete()
-            pdfFile.delete()
-
-            Result.success(Unit)
         } catch (e: Throwable) {
             log.error(e) { "Could not create PDF with attached xml: $invoiceXml" }
             Result.error(e)

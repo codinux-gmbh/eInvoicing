@@ -148,6 +148,8 @@ kotlin {
             dependsOn(commonMain.get())
 
             dependencies {
+                implementation(project(":invoice-creator"))
+
                 implementation("org.mustangproject:library:$mustangVersion")
 
                 implementation("com.github.jknack:handlebars:$handlebarsVersion")

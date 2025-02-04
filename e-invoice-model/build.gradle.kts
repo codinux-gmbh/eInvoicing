@@ -78,4 +78,4 @@ kotlin {
 
 ext["customArtifactId"] = "e-invoice-model"
 
-//apply(from = "../gradle/scripts/publish-codinux.gradle.kts")
+apply(from = "../gradle/scripts/publish-codinux.gradle.kts")
