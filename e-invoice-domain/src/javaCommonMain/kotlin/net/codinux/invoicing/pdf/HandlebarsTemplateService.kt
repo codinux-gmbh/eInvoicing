@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-open class HandlebarsTemplateService {
+open class HandlebarsTemplateService : TemplateService {
 
     protected val handlebarsByLanguage = mapOf(
         InvoiceLanguage.English to Handlebars().registerHelpers(HelperSource(InvoiceLanguage.English)),
@@ -20,7 +20,7 @@ open class HandlebarsTemplateService {
     )
 
 
-    open fun renderTemplate(template: String, invoice: Invoice, language: InvoiceLanguage? = null): String {
+    override fun renderTemplate(template: String, invoice: Invoice, language: InvoiceLanguage?): String {
         val handlebars = handlebarsByLanguage[language ?: InvoiceLanguage.English]!!
 
         val compiledTemplate = handlebars.compileInline(template) // TODO: cache invoice template
