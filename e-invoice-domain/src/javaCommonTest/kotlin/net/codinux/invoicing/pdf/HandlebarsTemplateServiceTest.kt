@@ -3,6 +3,8 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import net.codinux.invoicing.model.LocalDate
+import net.codinux.invoicing.model.ServiceDate
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestUtils
 import java.text.DecimalFormat
@@ -56,6 +58,42 @@ class HandlebarsTemplateServiceTest {
         val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
 
         assertThat(result).doesNotContain("Tel.")
+    }
+
+    @Test
+    fun serviceDateNotSet_English() { // in an earlier version if serviceDate was not set, applying template crashed
+        val invoice = invoice.copy(details = invoice.details.copy(serviceDate = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+
+        assertThat(result).contains("For the services rendered, I hereby invoice you for the following:")
+    }
+
+    @Test
+    fun serviceDateNotSet_German() { // in an earlier version if serviceDate was not set, applying template crashed
+        val invoice = invoice.copy(details = invoice.details.copy(serviceDate = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+
+        assertThat(result).contains("Für die erbrachten Leistungen erlaube ich mir in Rechnung zu stellen:")
+    }
+
+    @Test
+    fun deliveryDateSet_English() {
+        val invoice = invoice.copy(details = invoice.details.copy(serviceDate = ServiceDate.DeliveryDate(LocalDate(2015, 10, 21))))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+
+        assertThat(result).contains("For the goods delivered on 10/21/15, I hereby invoice you for the following:")
+    }
+
+    @Test
+    fun deliveryDateSet_German() {
+        val invoice = invoice.copy(details = invoice.details.copy(serviceDate = ServiceDate.DeliveryDate(LocalDate(2015, 10, 21))))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+
+        assertThat(result).contains("Für die am 21.10.2015 gelieferten Güter erlaube ich mir in Rechnung zu stellen:")
     }
 
 
