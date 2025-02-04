@@ -45,7 +45,9 @@ class HandlebarsTemplateServiceTest {
 
         // invoice description
         assertThat(result).contains("Invoice ${invoice.details.invoiceNumber}")
-        assertThat(result).contains("For the services rendered, I hereby invoice you for the following")
+        val startDate = dateFormat.format(invoice.details.serviceDate!!.asServicePeriod()!!.startDate.toJvmDate())
+        val endDate = dateFormat.format(invoice.details.serviceDate!!.asServicePeriod()!!.endDate.toJvmDate())
+        assertThat(result).contains("For the services rendered from $startDate to $endDate, I hereby invoice you for the following")
 
         // totals
         assertThat(result).contains("Net Amount:")
@@ -101,7 +103,9 @@ class HandlebarsTemplateServiceTest {
 
         // invoice description
         assertThat(result).contains("Rechnung ${invoice.details.invoiceNumber}")
-        assertThat(result).contains("Für die erbrachten Leistungen erlaube ich mir in Rechnung zu stellen")
+        val startDate = dateFormat.format(invoice.details.serviceDate!!.asServicePeriod()!!.startDate.toJvmDate())
+        val endDate = dateFormat.format(invoice.details.serviceDate!!.asServicePeriod()!!.endDate.toJvmDate())
+        assertThat(result).contains("Für die im Zeitraum $startDate – $endDate erbrachten Leistungen erlaube ich mir in Rechnung zu stellen")
 
         // totals
         assertThat(result).contains("Netto:")

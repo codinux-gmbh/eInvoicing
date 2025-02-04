@@ -1,6 +1,7 @@
 package net.codinux.invoicing.pdf
 
 import com.github.jknack.handlebars.Handlebars
+import com.github.jknack.handlebars.Options
 import net.codinux.invoicing.model.BigDecimal
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.LocalDate
@@ -52,6 +53,12 @@ open class HandlebarsTemplateService {
         open fun formatItemPosition(itemPosition: String?, itemIndex: Int): String = itemPosition ?: (itemIndex + 1).toString()
 
         open fun i18n(english: String, german: String): String = if (language == InvoiceLanguage.German) german else english
+
+        open fun i18nArgs(english: String, german: String, args: Options): String {
+            val stringTemplate = i18n(english, german)
+
+            return String.format(stringTemplate, *args.params.drop(1).toTypedArray())
+        }
 
     }
 
