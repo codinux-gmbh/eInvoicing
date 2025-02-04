@@ -24,6 +24,10 @@ actual open class EInvoiceXmlToPdfAttacher(
 
 
     actual open suspend fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat): Result<ByteArray> =
+        attachInvoiceXmlToPdfJvm(invoice, pdfFile, format)
+
+    // TODO: find a better name
+    open fun attachInvoiceXmlToPdfJvm(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Result<ByteArray> =
         try {
             createXml(invoice, format).value?.let { invoiceXml ->
                 val result = attachInvoiceXmlToPdf(invoiceXml, format, pdfFile)
