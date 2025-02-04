@@ -33,5 +33,12 @@ class Party(
      */
     val logoUrl: String? = null,
 ) {
+    fun copy(name: String = this.name, address: String = this.address, additionalAddressLine: String? = this.additionalAddressLine,
+             postalCode: String? = this.postalCode, city: String = this.city, country: Country = this.country,
+             vatId: String? = this.vatId,
+             email: String? = this.email, phone: String? = this.phone, fax: String? = this.fax, contactName: String? = this.contactName,
+             bankDetails: BankDetails? = this.bankDetails) =
+        Party(name, address, additionalAddressLine, postalCode, city, country, vatId, email, phone, fax, contactName, bankDetails)
+
     override fun toString() = "$name, $city"
 }

@@ -35,5 +35,10 @@ class Invoice(
      */
     var totals: TotalAmounts? = null
 ) {
+    fun copy(details: InvoiceDetails = this.details, supplier: Party = this.supplier, customer: Party = this.customer,
+             items: List<InvoiceItem> = this.items, customerReferenceNumber: String? = this.customerReferenceNumber,
+             amountAdjustments: AmountAdjustments? = this.amountAdjustments, totals: TotalAmounts? = this.totals) =
+        Invoice(details, supplier, customer, items, customerReferenceNumber, amountAdjustments, totals)
+
     override fun toString() = "$details to $customer ${totals?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }
