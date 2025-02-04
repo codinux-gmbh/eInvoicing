@@ -2,6 +2,7 @@ package net.codinux.invoicing.pdf
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestUtils
 import java.text.DecimalFormat
@@ -19,6 +20,43 @@ class HandlebarsTemplateServiceTest {
     private val template by lazy { TestUtils.getTestFile("Invoice.handlebars.html", "templates/invoice").readText() }
 
     private val underTest = HandlebarsTemplateService()
+
+
+    @Test
+    fun emailNotSet_English() {
+        val invoice = invoice.copy(supplier = invoice.supplier.copy(email = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+
+        assertThat(result).doesNotContain("Email")
+    }
+
+    @Test
+    fun emailNotSet_German() {
+        val invoice = invoice.copy(supplier = invoice.supplier.copy(email = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+
+        assertThat(result).doesNotContain("E-Mail")
+    }
+
+    @Test
+    fun phoneNotSet_English() {
+        val invoice = invoice.copy(supplier = invoice.supplier.copy(phone = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+
+        assertThat(result).doesNotContain("Phone")
+    }
+
+    @Test
+    fun phoneNotSet_German() {
+        val invoice = invoice.copy(supplier = invoice.supplier.copy(phone = null))
+
+        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+
+        assertThat(result).doesNotContain("Tel.")
+    }
 
 
     @Test

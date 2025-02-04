@@ -205,7 +205,7 @@
 
     <div class="company-contact container-item">
       <div>
-        {{i18n "Phone" "Tel."}}: {{supplier.phone}}<br>
+        {{#if supplier.phone}}{{i18n "Phone" "Tel."}}: {{supplier.phone}}{{/if}}<br>
         {{supplier.email}}<br>
       </div>
       <div class="invoice-details">
@@ -309,8 +309,8 @@
     </div>
     <div>
       <strong>{{i18n "Contact" "Kontakt"}}</strong><br>
-      Email: {{supplier.email}}<br>
-      Phone: {{supplier.phone}}
+      {{#if supplier.email}}{{i18n "Email" "E-Mail"}}: {{supplier.email}}{{/if}}<br>
+      {{#if supplier.phone}}{{i18n "Phone" "Tel."}}: {{supplier.phone}}{{/if}}
     </div>
     {{#if supplier.bankDetails}}
     <div>
