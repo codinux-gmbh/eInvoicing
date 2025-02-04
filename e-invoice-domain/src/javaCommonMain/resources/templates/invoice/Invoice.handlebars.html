@@ -209,38 +209,38 @@
 
   <div class="company-contact container-item">
     <div>
-      <strong>Phone:</strong> {{supplier.phone}}<br>
-      <strong>Email:</strong> {{supplier.email}}<br>
+      <strong>{{i18n "Phone" "Tel."}}:</strong> {{supplier.phone}}<br>
+      <strong>{{i18n "Email" "E-Mail"}}:</strong> {{supplier.email}}<br>
     </div>
     <div class="invoice-details">
-      <strong>Invoice No:</strong> {{details.invoiceNumber}}<br>
-      <strong>Date:</strong> {{formatDate details.invoiceDate}}<br>
+      <strong>{{i18n "Invoice No" "Rechnungsnr."}}:</strong> {{details.invoiceNumber}}<br>
+      <strong>{{i18n "Invoice date" "Rechnungsdatum"}}:</strong> {{formatDate details.invoiceDate}}<br>
       {{#if supplier.vatId}}
-      <strong>VAT ID:</strong> {{supplier.vatId}}
+      <strong>{{i18n "VAT ID" "Ust-IdNr."}}:</strong> {{supplier.vatId}}
       {{/if}}
     </div>
   </div>
 </div>
 
-<div class="invoice-title">Invoice {{details.invoiceNumber}}</div>
+<div class="invoice-title">{{i18n "Invoice" "Rechnung"}} {{details.invoiceNumber}}</div>
 
 <div class="invoice-description">
-  For the services rendered from 01.10.2015 to 31.10.2015, I hereby invoice you for the following:
+  {{i18n "For the services rendered, I hereby invoice you for the following" "Für die erbrachten Leistungen erlaube ich mir in Rechnung zu stellen" }}:
 </div>
 
 <table class="line-items">
   <tr>
-    <th>Pos.</th>
-    <th>Article Number</th>
-    <th>Article</th>
-    <th>Quantity</th>
-    <th>Unit</th>
-    <th>Unit Price</th>
-    <th>VAT %</th>
+    <th>{{i18n "Pos." "Nr."}}</th>
+    <th>{{i18n "Article Number" "Artikelnr."}}</th>
+    <th>{{i18n "Article" "Artikel"}}</th>
+    <th>{{i18n "Quantity" "Menge"}}</th>
+    <th>{{i18n "Unit" "Einheit"}}</th>
+    <th>{{i18n "Unit Price" "Einzelpreis"}}</th>
+    <th>{{i18n "VAT %" "Mwst. %"}}</th>
   </tr>
   {{#each items}}
   <tr>
-    <td class="right-aligned">{{@index}}</td>
+    <td class="right-aligned">{{formatItemPosition position @index}}</td>
     <td>{{articleNumber}}</td>
     <td>{{name}}</td>
     <td class="right-aligned">{{quantity}}</td>
@@ -258,15 +258,15 @@
     <table>
       <tbody>
       <tr>
-        <td class="bold summary-start">Net Amount:</td>
+        <td class="bold summary-start">{{i18n "Net Amount" "Netto"}}:</td>
         <td class="summary-amount summary-start">{{formatCurrency totals.taxBasisTotalAmount details.currency}}</td>
       </tr>
       <tr>
-        <td class="bold summary-end">Tax Amount:</td>
+        <td class="bold summary-end">{{i18n "Tax Amount" "Umsatzsteuer"}}:</td>
         <td class="summary-amount summary-end">{{formatCurrency totals.taxTotalAmount details.currency}}</td>
       </tr>
       <tr>
-        <td class="bold total-amount">Total Amount Due:</td>
+        <td class="bold total-amount">{{i18n "Total Amount Due" "Rechnungsbetrag"}}:</td>
         <td class="summary-amount total-amount">{{formatCurrency totals.duePayableAmount details.currency}}</td>
       </tr>
       </tbody>
@@ -275,25 +275,25 @@
 </div>
 
 <div class="thank-you">
-  Thank you for your order, Knuddelbärli! Bleib geschmeidig.
+  {{i18n "Thank you for your order!" "Herzlichen Dank für Ihren Auftrag!"}}
 </div>
 
 <div id="footer">
   <div class="footer-columns container">
     <div>
-      <strong>Company Address</strong><br>
+      <strong>{{i18n "Company Address" "Anschrift"}}</strong><br>
       {{supplier.name}}<br />
       {{supplier.address}}<br />
       {{supplier.postalCode}} {{supplier.city}}
     </div>
     <div>
-      <strong>Contact</strong><br>
+      <strong>{{i18n "Contact" "Kontakt"}}</strong><br>
       Email: {{supplier.email}}<br>
       Phone: {{supplier.phone}}
     </div>
     {{#if supplier.bankDetails}}
     <div>
-      <strong>Bank Details</strong><br>
+      <strong>{{i18n "Bank Details" "Bankverbindung"}}</strong><br>
       {{#if supplier.bankDetails.financialInstitutionName}}
       {{supplier.bankDetails.financialInstitutionName}}<br />
       {{/if}}
@@ -302,7 +302,7 @@
     </div>
     {{/if}}
   </div>
-  <div class="page-number">Page <span class="pageNumber"></span>1 / 1<span class="totalPages"></span></div>
+  <div class="page-number">{{i18n "Page" "Seite"}} <span class="pageNumber"></span>1 / 1<span class="totalPages"></span></div>
 </div>
 
 </body>

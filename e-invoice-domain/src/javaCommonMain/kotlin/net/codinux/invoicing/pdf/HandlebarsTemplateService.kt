@@ -9,27 +9,34 @@ import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Locale
 
 open class HandlebarsTemplateService {
 
-    protected val handlebars = Handlebars().apply {
-        registerHelpers(HelperSource())
-    }
+    protected val handlebarsByLanguage = mapOf(
+        InvoiceLanguage.English to Handlebars().registerHelpers(HelperSource(InvoiceLanguage.English)),
+        InvoiceLanguage.German to Handlebars().registerHelpers(HelperSource(InvoiceLanguage.German))
+    )
 
 
-    open fun renderTemplate(template: String, invoice: Invoice): String {
+    open fun renderTemplate(template: String, invoice: Invoice, language: InvoiceLanguage? = null): String {
+        val handlebars = handlebarsByLanguage[language ?: InvoiceLanguage.English]!!
+
         val compiledTemplate = handlebars.compileInline(template) // TODO: cache invoice template
 
         return compiledTemplate.apply(invoice)
     }
 
-    open class HelperSource {
+    open class HelperSource(protected val language: InvoiceLanguage) {
 
-        protected open val dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        protected val locale = if (language == InvoiceLanguage.German) Locale.GERMAN else Locale.ENGLISH
 
-        protected open val percentFormat = DecimalFormat.getPercentInstance()
+        protected open val dateFormat = DateTimeFormatter.ofLocalizedDate(if (language == InvoiceLanguage.German) FormatStyle.MEDIUM else FormatStyle.SHORT)
+            .localizedBy(locale)
 
-        protected open val currencyFormat = DecimalFormat.getCurrencyInstance()
+        protected open val percentFormat = DecimalFormat.getPercentInstance(locale)
+
+        protected open val currencyFormat = DecimalFormat.getCurrencyInstance(locale)
 
 
         open fun formatDate(date: LocalDate): String = dateFormat.format(date.toJvmDate())
@@ -43,6 +50,8 @@ open class HandlebarsTemplateService {
         open fun formatUnit(unit: UnitOfMeasure): String = unit.symbol ?: unit.englishName // TODO
 
         open fun formatItemPosition(itemPosition: String?, itemIndex: Int): String = itemPosition ?: (itemIndex + 1).toString()
+
+        open fun i18n(english: String, german: String): String = if (language == InvoiceLanguage.German) german else english
 
     }
 
