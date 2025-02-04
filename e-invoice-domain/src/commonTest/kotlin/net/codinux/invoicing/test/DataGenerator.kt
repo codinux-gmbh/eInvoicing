@@ -10,6 +10,8 @@ object DataGenerator {
 
     const val InvoiceNumber = "12345"
     val InvoiceDate = LocalDate(2015, 10, 21)
+    val ServicePeriodStart = LocalDate(2015, 10, 1)
+    val ServicePeriodEnd = LocalDate(2015, 10, 31)
     val DueDate = LocalDate(2016, 6, 15)
 
     const val SupplierName = "Hochwürdiger Leistungserbringer"
@@ -56,9 +58,10 @@ object DataGenerator {
             CustomerVatId, CustomerEmail, CustomerPhone, CustomerFax, bankDetails = CustomerBankDetails),
         items: List<InvoiceItem> = listOf(createItem()),
         currency: Currency = Currency.Euro,
+        serviceDate: ServiceDate = ServiceDate.ServicePeriod(ServicePeriodStart, ServicePeriodEnd),
         dueDate: LocalDate? = DueDate,
         paymentDescription: String? = dueDate?.let { "Zahlbar ohne Abzug bis ${dueDate.dayOfMonth}.${dueDate.month}.${dueDate.year}}" },
-    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, dueDate, paymentDescription), supplier, customer, items).apply {
+    ) = Invoice(InvoiceDetails(invoiceNumber, invoiceDate, currency, serviceDate, dueDate, paymentDescription), supplier, customer, items).apply {
         this.totals = AmountsCalculator().ensureTotalAmountsIsSet(this)
     }
 

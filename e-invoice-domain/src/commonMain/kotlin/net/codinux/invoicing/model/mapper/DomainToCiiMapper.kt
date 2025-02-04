@@ -106,11 +106,16 @@ open class DomainToCiiMapper {
 
 
     protected open fun mapHeaderTradeDelivery(invoice: Invoice) = HeaderTradeDelivery(
-
+        actualDeliverySupplyChainEvent = invoice.details.serviceDate?.asDeliveryDate()?.let {
+            SupplyChainEvent(mapDate(it.deliveryDate))
+        }
     )
 
     protected open fun mapHeaderTradeSettlement(invoice: Invoice) = HeaderTradeSettlement(
         invoiceCurrencyCode = CurrencyCode(invoice.details.currency.alpha3Code),
+        billingSpecifiedPeriod = invoice.details.serviceDate?.asServicePeriod()?.let {
+            SpecifiedPeriod(mapDate(it.startDate), mapDate(it.endDate))
+        },
         paymentReference = mapText(invoice.details.invoiceNumber), // TODO: make paymentReference configurable
         applicableTradeTax = mapTradeTax(invoice),
         specifiedTradeSettlementHeaderMonetarySummation = mapMonetarySummation(invoice),

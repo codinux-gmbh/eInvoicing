@@ -48,6 +48,10 @@ open class MustangMapper(
 
         this.setZFItems(ArrayList(invoice.items.map { mapInvoiceItem(it) }))
 
+        this.deliveryDate = invoice.details.serviceDate?.asDeliveryDate()?.let { map(it.deliveryDate) }
+        invoice.details.serviceDate?.asServicePeriod()?.let {
+            this.setDetailedDeliveryPeriod(map(it.startDate), map(it.endDate))
+        }
         this.dueDate = map(invoice.details.dueDate)
         this.paymentTermDescription = invoice.details.paymentDescription
 
@@ -117,7 +121,8 @@ open class MustangMapper(
 
         return MapInvoiceResult(
             net.codinux.invoicing.model.Invoice(
-                details = InvoiceDetails(invoice.number, map(invoice.issueDate), mapCurrency(invoice.currency, dataErrors), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
+                details = InvoiceDetails(invoice.number, map(invoice.issueDate), mapCurrency(invoice.currency, dataErrors),
+                    mapServiceDate(invoice), map(invoice.dueDate ?: invoice.paymentTerms?.dueDate), invoice.paymentTermDescription ?: invoice.paymentTerms?.description),
 
                 supplier = mapParty(invoice.sender, true, dataErrors),
                 customer = mapParty(invoice.recipient, false, dataErrors),
@@ -132,6 +137,15 @@ open class MustangMapper(
             dataErrors
         )
     }
+
+    protected open fun mapServiceDate(invoice: Invoice): ServiceDate? =
+        if (invoice.deliveryDate != null) {
+            ServiceDate.DeliveryDate(map(invoice.deliveryDate))
+        } else if (invoice.detailedDeliveryPeriodTo != null && invoice.detailedDeliveryPeriodFrom != null) {
+            ServiceDate.ServicePeriod(map(invoice.detailedDeliveryPeriodTo), map(invoice.detailedDeliveryPeriodFrom))
+        } else {
+            null
+        }
 
     open fun mapParty(party: TradeParty, isSupplier: Boolean, dataErrors: MutableList<InvoiceDataError>) = Party(
         party.name, party.street, party.additionalAddress, party.zip, party.location,

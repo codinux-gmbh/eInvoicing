@@ -75,8 +75,10 @@ open class CiiMapper {
                            exchangedDocument: ExchangedDocument, tradeTransaction: SupplyChainTradeTransaction,
                            tradeAgreement: HeaderTradeAgreement, tradeSettlement: HeaderTradeSettlement): Invoice {
 
+        val delivery = tradeTransaction.applicableHeaderTradeDelivery
+
         return Invoice(
-            details = mapInvoiceDetails(exchangedDocument, tradeSettlement, dataErrors),
+            details = mapInvoiceDetails(exchangedDocument, tradeSettlement, delivery, dataErrors),
 
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors, mapBankDetails(tradeSettlement)),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
@@ -99,14 +101,23 @@ open class CiiMapper {
     protected open fun mapInvoiceDetails(
         exchangedDocument: ExchangedDocument,
         tradeSettlement: HeaderTradeSettlement,
+        delivery: HeaderTradeDelivery?,
         dataErrors: MutableList<InvoiceDataError>
     ): InvoiceDetails {
         val paymentTerms = tradeSettlement.specifiedTradePaymentTerms.firstOrNull()
+
+        // deliveryDate oder billingSpecifiedPeriod sind in Deutschland auf Dokumentenebene verpflichtend anzugeben
+        val deliveryDate = delivery?.actualDeliverySupplyChainEvent?.occurrenceDateTime // im Extended Profile kann es optional noch auf LineItem Ebene angegeben werden
+        val (startDate, endDate) = tradeSettlement.billingSpecifiedPeriod?.let { it.startDateTime to it.endDateTime } ?: (null to null) // kann optional noch auf LineItem Ebene angegeben werden
+        val serviceDate = if (deliveryDate != null) ServiceDate.DeliveryDate(mapDate(deliveryDate))
+                        else if (startDate != null && endDate != null) ServiceDate.ServicePeriod(mapDate(startDate), mapDate(endDate))
+                        else null
 
         return InvoiceDetails(
             mapId(exchangedDocument.id, InvoiceField.InvoiceNumber, dataErrors),
             mapDate(exchangedDocument.issueDateTime, InvoiceField.InvoiceDate, dataErrors),
             mapCurrency(tradeSettlement.invoiceCurrencyCode, dataErrors),
+            serviceDate,
             mapDateOrNull(/*invoice.dueDate ?:*/ paymentTerms?.dueDateDateTime), mapNullableText(/*invoice.paymentTermDescription ?:*/ paymentTerms?.description)
         )
     }

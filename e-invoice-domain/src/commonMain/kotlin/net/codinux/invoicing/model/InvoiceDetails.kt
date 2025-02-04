@@ -17,6 +17,8 @@ class InvoiceDetails(
 
     val currency: Currency = Currency.Euro,
 
+    val serviceDate: ServiceDate? = null,
+
 //    val orderNumber: String? = null,
 //    val orderDate: LocalDate? = null,
 
