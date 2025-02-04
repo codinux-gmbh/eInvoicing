@@ -36,12 +36,15 @@ class HandlebarsTemplateServiceTest {
         assertCommonText(result)
 
         // first block right side
-        assertThat(result).contains("<strong>Phone:</strong> ${invoice.supplier.phone}")
-        assertThat(result).contains("<strong>Email:</strong> ${invoice.supplier.email}")
+        assertThat(result).contains("Phone: ${invoice.supplier.phone}")
+        assertThat(result).contains(invoice.supplier.email!!)
 
-        assertThat(result).contains("<strong>Invoice No:</strong> ${invoice.details.invoiceNumber}")
-        assertThat(result).contains("<strong>Invoice date:</strong> ${dateFormat.format(invoice.details.invoiceDate.toJvmDate())}")
-        assertThat(result).contains("<strong>VAT ID:</strong> ${invoice.supplier.vatId}")
+        assertThat(result).contains("<td class=\"bold\">Invoice No:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${invoice.details.invoiceNumber}</td>")
+        assertThat(result).contains("<td class=\"bold\">Invoice date:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${dateFormat.format(invoice.details.invoiceDate.toJvmDate())}</td>")
+        assertThat(result).contains("<td class=\"bold\">VAT ID:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${invoice.supplier.vatId}</td>")
 
         // invoice description
         assertThat(result).contains("Invoice ${invoice.details.invoiceNumber}")
@@ -94,12 +97,15 @@ class HandlebarsTemplateServiceTest {
         assertCommonText(result)
 
         // first block right side
-        assertThat(result).contains("<strong>Tel.:</strong> ${invoice.supplier.phone}")
-        assertThat(result).contains("<strong>E-Mail:</strong> ${invoice.supplier.email}")
+        assertThat(result).contains("Tel.: ${invoice.supplier.phone}")
+        assertThat(result).contains(invoice.supplier.email!!)
 
-        assertThat(result).contains("<strong>Rechnungsnr.:</strong> ${invoice.details.invoiceNumber}")
-        assertThat(result).contains("<strong>Rechnungsdatum:</strong> ${dateFormat.format(invoice.details.invoiceDate.toJvmDate())}")
-        assertThat(result).contains("<strong>Ust-IdNr.:</strong> ${invoice.supplier.vatId}")
+        assertThat(result).contains("<td class=\"bold\">Rechnungsnr.:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${invoice.details.invoiceNumber}</td>")
+        assertThat(result).contains("<td class=\"bold\">Rechnungsdatum:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${dateFormat.format(invoice.details.invoiceDate.toJvmDate())}</td>")
+        assertThat(result).contains("<td class=\"bold\">Ust-IdNr.:</td>")
+        assertThat(result).contains("<td class=\"right-aligned\">${invoice.supplier.vatId}</td>")
 
         // invoice description
         assertThat(result).contains("Rechnung ${invoice.details.invoiceNumber}")

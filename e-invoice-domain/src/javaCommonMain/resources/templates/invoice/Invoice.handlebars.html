@@ -98,6 +98,9 @@
       .invoice-details {
           margin-top: 1rem;
       }
+      .invoice-details table {
+          width: 100%;
+      }
 
       .invoice-title {
           font-size: 18px;
@@ -202,15 +205,28 @@
 
     <div class="company-contact container-item">
       <div>
-        <strong>{{i18n "Phone" "Tel."}}:</strong> {{supplier.phone}}<br>
-        <strong>{{i18n "Email" "E-Mail"}}:</strong> {{supplier.email}}<br>
+        {{i18n "Phone" "Tel."}}: {{supplier.phone}}<br>
+        {{supplier.email}}<br>
       </div>
       <div class="invoice-details">
-        <strong>{{i18n "Invoice No" "Rechnungsnr."}}:</strong> {{details.invoiceNumber}}<br>
-        <strong>{{i18n "Invoice date" "Rechnungsdatum"}}:</strong> {{formatDate details.invoiceDate}}<br>
-        {{#if supplier.vatId}}
-        <strong>{{i18n "VAT ID" "Ust-IdNr."}}:</strong> {{supplier.vatId}}
-        {{/if}}
+        <table>
+          <tbody>
+          <tr>
+            <td class="bold">{{i18n "Invoice No" "Rechnungsnr."}}:</td>
+            <td class="right-aligned">{{details.invoiceNumber}}</td>
+          </tr>
+          <tr>
+            <td class="bold">{{i18n "Invoice date" "Rechnungsdatum"}}:</td>
+            <td class="right-aligned">{{formatDate details.invoiceDate}}</td>
+          </tr>
+          {{#if supplier.vatId}}
+          <tr>
+            <td class="bold">{{i18n "VAT ID" "Ust-IdNr."}}:</td>
+            <td class="right-aligned">{{supplier.vatId}}</td>
+          </tr>
+          {{/if}}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
