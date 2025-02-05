@@ -7,6 +7,7 @@ import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.service.InvoicingService
@@ -101,7 +102,7 @@ class InvoicingResource(
     ): Response {
         val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile(), format)
 
-        return createPdfFileResponse(pdfFile, invoice)
+        return createPdfFileResponseForPdfBytes(pdfFile, invoice)
     }
 
     @Path("attach")
@@ -197,12 +198,11 @@ class InvoicingResource(
         result.value?.let { Response.ok(it).build() }
             ?: createErrorResponse(result)
 
-    private fun createPdfFileResponse(result: Result<java.nio.file.Path>, invoice: Invoice): Response =
-        result.value?.let { createPdfFileResponse(it, invoice) }
-            ?: createErrorResponse(result)
-
     private fun <T> createErrorResponse(result: Result<T>): Response =
-        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.error?.let { SerializableException(it) }).build()
+        createErrorResponse(result.error)
+
+    private fun createErrorResponse(error: Throwable?): Response =
+        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error?.let { SerializableException(it) }).build()
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
         createPdfFileResponse(pdfFile, "${invoice.shortDescription}.pdf")
@@ -211,5 +211,20 @@ class InvoicingResource(
         Response.ok(pdfFile)
             .header("Content-Disposition", "attachment;filename=\"$filename\"")
             .build()
+
+    private fun createPdfFileResponse(pdfFile: Result<Pdf>, invoice: Invoice): Response =
+        createPdfFileResponse(pdfFile.value?.bytes, pdfFile.error, invoice)
+
+    private fun createPdfFileResponseForPdfBytes(pdfFile: Result<ByteArray>, invoice: Invoice): Response =
+        createPdfFileResponse(pdfFile.value, pdfFile.error, invoice)
+
+    private fun createPdfFileResponse(pdfBytes: ByteArray?, error: Throwable?, invoice: Invoice): Response =
+        if (pdfBytes != null) {
+            Response.ok(pdfBytes)
+                .header("Content-Disposition", "attachment;filename=\"${invoice.shortDescription}.pdf\"")
+                .build()
+        } else {
+            createErrorResponse(error)
+        }
 
 }

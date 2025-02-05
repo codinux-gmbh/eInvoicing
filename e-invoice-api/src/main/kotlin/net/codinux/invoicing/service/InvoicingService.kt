@@ -9,6 +9,7 @@ import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
@@ -61,26 +62,16 @@ class InvoicingService {
     }
 
 
-    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Path {
-        val resultFile = createTempPdfFile()
-
-        attacher.attachInvoiceXmlToPdf(invoice, pdf.toFile(), resultFile.toFile(), format)
-
-        return resultFile
-    }
+    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Result<ByteArray> =
+        attacher.attachInvoiceXmlToPdfJvm(invoice, pdf.readBytes(), format) // TODO: also return Result<Pdf>
 
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat) =
         createInvoiceXml(invoice, format).ifSuccessful { xml ->
-            Result.success(attachInvoiceXmlToPdf(xml, pdfFile, format))
+            attachInvoiceXmlToPdf(xml, pdfFile, format)
         }
 
-    fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: ByteArray, format: EInvoiceXmlFormat): Path {
-        val resultFile = createTempPdfFile()
-
-        attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdfFile, resultFile.outputStream())
-
-        return resultFile
-    }
+    fun attachInvoiceXmlToPdf(invoiceXml: String, pdfFile: ByteArray, format: EInvoiceXmlFormat): Result<Pdf> =
+        attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdfFile)
 
 
     fun extractInvoiceDataFromPdf(invoiceFile: Path) =
