@@ -89,6 +89,19 @@ class InvoicingResource(
     }
 
 
+    @Path("create/pdf")
+    @POST
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaTypePdf)
+    @Operation(summary = "Create a PDF from supplied HTML")
+    @Tag(name = "Create")
+    fun createPdfFromHtml(html: String): ByteArray {
+        val pdf = service.createPdfFromHtml(html)
+
+        return pdf.bytes
+    }
+
+
     @Path("attach")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)

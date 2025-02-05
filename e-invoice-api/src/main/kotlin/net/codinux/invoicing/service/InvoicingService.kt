@@ -11,6 +11,7 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.OpenHtmlToPdfHtmlToPdfConverter
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoiceValidator
 import net.codinux.invoicing.validation.InvoiceValidationResult
@@ -32,6 +33,8 @@ class InvoicingService {
     private val validator = EInvoiceValidator()
 
     private val amountsCalculator = AmountsCalculator()
+
+    private val htmlToPdfConverter = OpenHtmlToPdfHtmlToPdfConverter()
 
     private val filesystem = DIJava.Filesystem
 
@@ -60,6 +63,10 @@ class InvoicingService {
 
         return resultFile
     }
+
+
+    fun createPdfFromHtml(html: String): Pdf =
+        htmlToPdfConverter.createPdf(html)
 
 
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Result<ByteArray> =
