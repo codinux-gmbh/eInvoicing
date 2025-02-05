@@ -124,13 +124,13 @@ open class DomainToCiiMapper {
     )
 
     protected open fun mapBankDetails(invoice: Invoice): TradeSettlementPaymentMeans? =
-        invoice.supplier.bankDetails?.let {
+        invoice.supplier.bankDetails?.let { details ->
             TradeSettlementPaymentMeans(
                 // TODO: there are also other means of payment then credit transfer: direct debit and financial card
                 typeCode = PaymentMeansCode(net.codinux.invoicing.model.codes.PaymentMeansCode._58.code),
                 information = mapText(net.codinux.invoicing.model.codes.PaymentMeansCode._58.meaning),
-                payeePartyCreditorFinancialAccount = CreditorFinancialAccount(ID(it.accountNumber), mapNullableText(it.accountHolderName)),
-                payeeSpecifiedCreditorFinancialInstitution = it.bankCode?.let { CreditorFinancialInstitution(ID(it)) },
+                payeePartyCreditorFinancialAccount = CreditorFinancialAccount(ID(details.accountNumber), mapNullableText(details.accountHolderName)),
+                payeeSpecifiedCreditorFinancialInstitution = details.bankCode?.let { CreditorFinancialInstitution(ID(it), mapNullableText(details.financialInstitutionName)) },
                 payerPartyDebtorFinancialAccount = null, // in case of direct debit
                 applicableTradeSettlementFinancialCard = null, // in case of card payment
             )

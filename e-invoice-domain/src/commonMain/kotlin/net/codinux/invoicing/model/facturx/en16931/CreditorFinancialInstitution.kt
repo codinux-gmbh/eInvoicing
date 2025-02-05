@@ -20,5 +20,15 @@ data class CreditorFinancialInstitution(
   @XmlElement(value = true)
   val bicid: ID,
 
-  // TODO: CII also has a name field for the name of the financial institution
+  /**
+   * Financial institution name. But be aware that this field is neither in Factur-X nor in XRechnung, so most
+   * applications won't be able to read this field.
+   */
+  @XmlSerialName(
+    value = "Name",
+    prefix = "ram",
+    namespace = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+  )
+  @XmlElement(value = true)
+  val name: Text? = null,
 )
