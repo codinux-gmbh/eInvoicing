@@ -3,6 +3,6 @@ package net.codinux.invoicing.config
 
 object Version {
 
-    const val ProjectVersion = "0.7.3-SNAPSHOT"
+    const val ProjectVersion = "0.7.3"
     
 }
