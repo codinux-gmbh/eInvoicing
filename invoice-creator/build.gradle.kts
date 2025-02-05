@@ -47,4 +47,4 @@ tasks.test {
 
 ext["customArtifactId"] = "invoice-creator"
 
-apply(from = "../gradle/scripts/publish-codinux-repo.gradle.kts")
+//apply(from = "../gradle/scripts/publish-codinux-repo.gradle.kts")

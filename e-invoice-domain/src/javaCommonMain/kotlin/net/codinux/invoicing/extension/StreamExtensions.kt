@@ -1,4 +1,4 @@
-package net.codinux.invoicing.extensions
+package net.codinux.invoicing.extension
 
 import java.io.ByteArrayOutputStream
 

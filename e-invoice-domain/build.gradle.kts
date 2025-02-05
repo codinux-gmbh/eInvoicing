@@ -97,6 +97,8 @@ kotlin {
     val mustangVersion: String by project
 
     val handlebarsVersion: String by project
+    val openHtmlToPdfVersion: String by project
+    val jsoupVersion: String by project
 
     val textInfoExtractorVersion: String by project
     val textExtractorVersion: String by project
@@ -148,7 +150,7 @@ kotlin {
             dependsOn(commonMain.get())
 
             dependencies {
-                implementation(project(":invoice-creator"))
+//                implementation(project(":invoice-creator"))
 
                 implementation("org.mustangproject:library:$mustangVersion")
 
@@ -187,6 +189,11 @@ kotlin {
             dependsOn(javaCommonMain)
 
             dependencies {
+                implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:$openHtmlToPdfVersion")
+                implementation("io.github.openhtmltopdf:openhtmltopdf-slf4j:$openHtmlToPdfVersion")
+
+                implementation("org.jsoup:jsoup:$jsoupVersion")
+
                 implementation("org.mustangproject:validator:$mustangVersion")
             }
         }

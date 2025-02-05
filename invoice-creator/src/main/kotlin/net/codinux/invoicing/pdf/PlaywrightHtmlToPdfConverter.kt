@@ -5,9 +5,8 @@ import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.Margin
-import net.codinux.invoicing.model.Pdf
 
-class PlaywrightHtmlToPdfConverter : HtmlToPdfConverter {
+class PlaywrightHtmlToPdfConverter {
 
     companion object {
         private val PlaywrightCreateOptions = Playwright.CreateOptions()
@@ -20,7 +19,7 @@ class PlaywrightHtmlToPdfConverter : HtmlToPdfConverter {
     }
 
 
-    override fun createPdf(html: String): Pdf =
+    fun createPdf(html: String): ByteArray =
         // TODO: playwright and browser should be created only once per app lifecycle - but they aren't thread safe, so create them once per Thread
         Playwright.create(PlaywrightCreateOptions).use { playwright ->
             playwright.chromium().launch(BrowserLaunchOptions).use { browser ->
@@ -34,7 +33,7 @@ class PlaywrightHtmlToPdfConverter : HtmlToPdfConverter {
                     // but the running header and footer element of @page seems to be ignored, they remain in the normal page flow, therefore:
                     // TODO: set header- and footer template
 
-                    Pdf(pdfBytes)
+                    pdfBytes
                 }
             }
         }

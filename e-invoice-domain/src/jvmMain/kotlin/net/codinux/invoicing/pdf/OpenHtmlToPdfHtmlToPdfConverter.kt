@@ -1,7 +1,7 @@
 package net.codinux.invoicing.pdf
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
-import net.codinux.invoicing.extensions.useAndGet
+import net.codinux.invoicing.extension.useAndGet
 import net.codinux.invoicing.model.Pdf
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.common.PDMetadata
@@ -13,7 +13,6 @@ import org.jsoup.nodes.Document
 import java.io.ByteArrayOutputStream
 import java.nio.file.FileSystems
 import java.util.*
-
 
 open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
 
