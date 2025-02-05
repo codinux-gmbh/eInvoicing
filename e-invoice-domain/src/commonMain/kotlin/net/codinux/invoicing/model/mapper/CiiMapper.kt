@@ -157,14 +157,18 @@ open class CiiMapper {
         }
 
     protected open fun mapBankDetails(settlement: HeaderTradeSettlement): BankDetails? =
-        // TODO: der paymentMeans.PaymentMeansCodeType gibt an, um welche Art von Zahlungsmethode es sich handelt wie Bank card, Direct debit, SEPA direct debit, ...
-        // even in Extended profile there's only at max one payeePartyCreditorFinancialAccount and payerPartyDebtorFinancialAccount
-        // (but there can be of course multiple specifiedTradeSettlementPaymentMeans)
-        // payerSpecifiedDebtorFinancialInstitution does not exist in Factur-X
-        settlement.specifiedTradeSettlementPaymentMeans.firstNotNullOfOrNull { it.payeePartyCreditorFinancialAccount.firstOrNull { it.ibanid?.value != null } }?.let { account ->
-            // Nutzen Sie die IBANID bei SEPA-Zahlungen, sonst die ProprietaryID - but in Factur-X there is no ProprietaryID
-            val bic = settlement.specifiedTradeSettlementPaymentMeans.firstNotNullOfOrNull { it.payeeSpecifiedCreditorFinancialInstitution }?.let { it.bicid }?.value
-            BankDetails(account.ibanid!!.value!!, bic, mapNullable(account.accountName)) // TODO: where's the bank name?
+        settlement.specifiedTradeSettlementPaymentMeans.let { paymentMeans ->
+            // TODO: der paymentMeans.PaymentMeansCodeType gibt an, um welche Art von Zahlungsmethode es sich handelt wie Bank card, Direct debit, SEPA direct debit, ...
+            // even in Extended profile there's only at max one payeePartyCreditorFinancialAccount and payerPartyDebtorFinancialAccount
+            // (but there can be of course multiple specifiedTradeSettlementPaymentMeans)
+            // payerSpecifiedDebtorFinancialInstitution does not exist in Factur-X
+            paymentMeans.firstNotNullOfOrNull { it.payeePartyCreditorFinancialAccount.firstOrNull { it.ibanid?.value != null } }?.let { account ->
+                val financialInstitution = paymentMeans.firstNotNullOfOrNull { it.payeeSpecifiedCreditorFinancialInstitution }
+                // Nutzen Sie die IBANID bei SEPA-Zahlungen, sonst die ProprietaryID - but in Factur-X there is no ProprietaryID
+                val bic = financialInstitution?.bicid?.value
+                val bankName = financialInstitution?.name?.value
+                BankDetails(account.ibanid!!.value!!, bic, mapNullable(account.accountName), bankName)
+            }
         }
 
     protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? {
