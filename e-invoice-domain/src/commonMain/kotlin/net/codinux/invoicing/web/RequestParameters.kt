@@ -10,7 +10,10 @@ open class RequestParameters<T : Any>(
     open val accept: String? = null,
     open val headers: Map<String, String> = mutableMapOf(),
     open val queryParameters: Map<String, Any> = mapOf(),
-    open val userAgent: String? = null
+    open val userAgent: String? = null,
+    open val connectTimeoutMillis: Long = 5_000, // to have a faster response / result when connecting is not possible
+    open val socketTimeoutMillis: Long? = null,
+    open val requestTimeoutMillis: Long = 15_000 // in slow environments give request some time to complete (but shouldn't be necessary, we only have small response bodies)
 ) {
 
     companion object {
