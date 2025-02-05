@@ -71,7 +71,7 @@ open class KtorWebClient(
             mapHttResponse(method, parameters, httpResponse)
         } catch (e: Throwable) {
             log.error(e) { "Error during request to ${method.value} ${parameters.url}" }
-            WebClientResponse(false, error = e)
+            WebClientResponse(false, error = WebClientException(-1, emptyMap(), e.message ?: "", e))
         }
     }
 
