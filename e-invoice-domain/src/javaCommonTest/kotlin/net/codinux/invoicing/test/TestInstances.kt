@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.json.Json
+import net.codinux.invoicing.model.ServiceDate
+import net.codinux.invoicing.serialization.ServiceDateMixin
 
 object TestInstances {
 
     val objectMapper by lazy {
         ObjectMapper().apply {
             findAndRegisterModules()
+
+            addMixIn(ServiceDate::class.java, ServiceDateMixin::class.java)
 
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 

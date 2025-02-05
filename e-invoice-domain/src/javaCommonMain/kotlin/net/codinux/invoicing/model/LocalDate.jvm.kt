@@ -2,6 +2,7 @@ package net.codinux.invoicing.model
 
 import kotlinx.serialization.Serializable
 import net.codinux.invoicing.serialization.LocalDateSerializer
+import net.codinux.kotlin.annotation.JsonIgnore
 import java.time.Instant
 import java.time.ZoneId
 
@@ -13,6 +14,7 @@ actual class LocalDate actual constructor(actual val year: Int, actual val month
     }
 
 
+    @JsonIgnore
     // 1 = Monday, ..., 7 = Sunday
     actual val dayOfWeek: Int? = java.time.LocalDate.of(year, month, dayOfMonth).dayOfWeek.value - 1
 
