@@ -63,7 +63,7 @@ open class CiiMapper {
 
             return ReadEInvoiceXmlResult(
                 if (dataErrors.isEmpty()) ReadEInvoiceXmlResultType.Success else ReadEInvoiceXmlResultType.InvalidInvoiceData,
-                MapInvoiceResult(invoice, dataErrors)
+                MapInvoiceResult(invoice, dataErrors), profile
             )
         } catch (e: Throwable) {
             log.error(e) { "Could not read CII invoice" }
