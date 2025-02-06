@@ -11,6 +11,7 @@ kotlin {
 val phGenericodeVersion: String by project
 
 val apachePoiVersion: String by project
+val jsoupVersion: String by project
 val kI18nVersion: String by project
 
 val klfVersion: String by project
@@ -24,6 +25,8 @@ dependencies {
     implementation("com.helger:ph-genericode:$phGenericodeVersion")
 
     implementation("org.apache.poi:poi-ooxml:$apachePoiVersion")
+
+    implementation("org.jsoup:jsoup:$jsoupVersion")
 
     implementation("net.codinux.i18n:k-i18n:$kI18nVersion")
 
