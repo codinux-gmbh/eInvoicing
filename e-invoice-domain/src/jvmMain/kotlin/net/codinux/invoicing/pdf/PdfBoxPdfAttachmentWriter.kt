@@ -1,6 +1,5 @@
 package net.codinux.invoicing.pdf
 
-import net.codinux.invoicing.model.EInvoiceProfile
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.log.logger
 import org.apache.pdfbox.Loader
@@ -44,22 +43,21 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
     override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
         try {
             Loader.loadPDF(pdfFile).use { document ->
-                val profile = if (format == EInvoiceXmlFormat.XRechnung) EInvoiceProfile.XRechnung else EInvoiceProfile.EN16931
-                attachInvoiceXmlToPdf(document, profile, xml, output)
+                attachInvoiceXmlToPdf(document, format, xml, output)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not add invoice XML file attachments to PDF" }
         }
     }
 
-    protected open fun attachInvoiceXmlToPdf(document: PDDocument, profile: EInvoiceProfile, xml: String, output: OutputStream) {
-        val attachmentName = if (profile == EInvoiceProfile.XRechnung) "xrechnung.xml" else "factur-x.xml"
+    protected open fun attachInvoiceXmlToPdf(document: PDDocument, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
+        val attachmentName = if (format == EInvoiceXmlFormat.XRechnung) "xrechnung.xml" else "factur-x.xml"
 
         val fileSpec = addInvoiceXmlToAssociatedFiles(document, xml, attachmentName)
 
         addInvoiceXmlToEmbeddedFilesDictionary(document, fileSpec)
 
-        addFacturXXmp(document, profile)
+        addFacturXXmp(document, format)
 
         document.save(output)
     }
@@ -133,7 +131,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         embeddedFiles.names = fileMap
     }
 
-    protected open fun addFacturXXmp(document: PDDocument, profile: EInvoiceProfile) {
+    protected open fun addFacturXXmp(document: PDDocument, format: EInvoiceXmlFormat) {
         val catalog = document.documentCatalog
         val metadata = catalog.metadata ?: PDMetadata(document).also { catalog.metadata = it }
 
@@ -157,7 +155,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             setTextPropertyValue("DocumentType", "INVOICE")
             setTextPropertyValue("DocumentFileName", "factur-x.xml")
             setTextPropertyValue("Version", "1.0")
-            setTextPropertyValue("ConformanceLevel", getConformanceLevelForProfile(profile))
+            setTextPropertyValue("ConformanceLevel", getConformanceLevelForProfile(format))
         })
 
         // add the extension schema for above schema - simply use the example XMP from Factur-X distribution
@@ -184,13 +182,20 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             }
         }
 
-    protected open fun getConformanceLevelForProfile(profile: EInvoiceProfile): String = when (profile) {
-        EInvoiceProfile.Minimum -> "MINIMUM"
-        EInvoiceProfile.BasicWL -> "BASIC WL"
-        EInvoiceProfile.Basic -> "BASIC"
-        EInvoiceProfile.EN16931 -> "EN 16931"
-        EInvoiceProfile.Extended -> "EXTENDED"
-        EInvoiceProfile.XRechnung -> "XRECHNUNG"
+    protected open fun getConformanceLevelForProfile(format: EInvoiceXmlFormat): String = when (format) {
+        EInvoiceXmlFormat.FacturX -> "EN 16931"
+        EInvoiceXmlFormat.XRechnung -> "XRECHNUNG"
+
+        // there also exist:
+        // "MINIMUM", "BASIC WL", "BASIC", "EXTENDED", "COMFORT" (synonym for "EN 16931")
+
+        // "CIUS" // i think COMFORT is a synonym for BASIC, but what is CIUS? // beim Pruefen, ob die XMP Daten valide sind, auf jeden Fall auch diese Werte beruecksichtigen
+
+        // valid filenames:
+        // "factur-x.xml", "ZUGFeRD-invoice.xml", "zugferd-invoice.xml", "xrechnung.xml", "order-x.xml"
+
+        // valid versions:
+        // "1.0", "2p0", "1.2", "2.0", "2.1", "2.2", "2.3", "3.0"}; //1.2, 2.0, 2.1, 2.2, 2.3 and 3.0 are for xrechnung 1.2, 2p0 can be ZF 2.0, 2.1, 2.1.1
     }
 
 
