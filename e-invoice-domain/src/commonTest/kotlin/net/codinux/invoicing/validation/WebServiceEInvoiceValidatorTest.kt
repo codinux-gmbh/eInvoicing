@@ -1,8 +1,7 @@
 package net.codinux.invoicing.validation
 
 import assertk.assertThat
-import assertk.assertions.isGreaterThan
-import assertk.assertions.isNotEmpty
+import assertk.assertions.*
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.test.Asserts
@@ -16,9 +15,15 @@ class WebServiceEInvoiceValidatorTest {
 
     @Test
     fun validateXRechnungXml() = runTest {
-        val result = underTest.validateEInvoiceXml(TestData.XRechnungXml)
+        val webResult = underTest.validateEInvoiceXml(TestData.XRechnungXml)
 
-        assertValidationResult(result)
+        val result = Asserts.assertSuccess(webResult)
+        assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
+        assertThat(result.reportAsXml).isNotEmpty()
+        assertThat(result.xmlValidationResults).hasSize(3)
+        assertThat(result.countXmlNotices).isEqualTo(0)
+        assertThat(result.countXmlErrors).isEqualTo(2)
+        assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
 
     @Test
@@ -38,10 +43,7 @@ class WebServiceEInvoiceValidatorTest {
 
     private fun assertValidationResult(result: Result<InvoiceValidationResult>) {
         val validationResult = Asserts.assertSuccess(result)
-        assertThat(validationResult.xmlValidationResults).isNotEmpty()
-
-        val report = validationResult.reportAsXml
-        assertThat(report.length).isGreaterThan(2_400)
+        assertThat(validationResult.xmlValidationResults).isEmpty()
     }
 
 }

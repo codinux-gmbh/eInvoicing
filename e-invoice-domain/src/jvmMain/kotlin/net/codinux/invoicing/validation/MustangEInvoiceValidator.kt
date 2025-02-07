@@ -10,9 +10,7 @@ import java.lang.reflect.Field
 open class MustangEInvoiceValidator {
 
     companion object {
-        private val SectionField = getPrivateField("section")
         private val CriterionField = getPrivateField("criterion")
-        private val StacktraceField = getPrivateField("stacktrace")
 
         private val log by logger()
 
@@ -28,9 +26,15 @@ open class MustangEInvoiceValidator {
 
 
     open suspend fun validateEInvoiceXml(xml: String) =
-        validateEInvoiceFile(xml.toByteArray())
+        validateEInvoiceXmlJvm(xml)
+
+    open fun validateEInvoiceXmlJvm(xml: String) =
+        validateEInvoiceFileJvm(xml.toByteArray())
 
     open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
+        validateEInvoiceFileJvm(fileContent)
+
+    open fun validateEInvoiceFileJvm(fileContent: ByteArray): Result<InvoiceValidationResult> =
         try {
             val validator = object : ZUGFeRDValidator() {
                 fun getContext() = this.context
@@ -66,7 +70,7 @@ open class MustangEInvoiceValidator {
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
-        ValidationResultItem(mapSeverity(item), item.message, item.location, SectionField?.get(item) as? Int, CriterionField?.get(item) as? String, StacktraceField?.get(item) as? String)
+        ValidationResultItem(mapSeverity(item), item.message, item.location, CriterionField?.get(item) as? String)
 
     protected open fun mapSeverity(item: org.mustangproject.validator.ValidationResultItem): ValidationResultSeverity {
         var name = item.severity.name

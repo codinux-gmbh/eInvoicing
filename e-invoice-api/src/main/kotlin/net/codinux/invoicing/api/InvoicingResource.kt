@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
@@ -37,7 +38,7 @@ class InvoicingResource(
     @POST
     @Operation(summary = "Create an e-invoice XML in format determined by format parameter")
     @Tag(name = "Create")
-    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat): Response =
+    fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceFormat): Response =
         toResponse(service.createInvoiceXml(invoice, format))
 
     @Path("create/xrechnung")

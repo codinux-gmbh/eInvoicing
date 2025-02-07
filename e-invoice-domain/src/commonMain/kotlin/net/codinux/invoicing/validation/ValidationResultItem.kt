@@ -7,9 +7,7 @@ class ValidationResultItem(
     val severity: ValidationResultSeverity,
     val message: String,
     val location: String?,
-    val section: Int?,
-    val criterion: String?,
-    val stacktrace: String? = null
+    val criterion: String?
 ) {
     override fun toString() = "$severity: $message"
 }

@@ -7,6 +7,7 @@ import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
@@ -39,7 +40,7 @@ class InvoicingService {
     private val filesystem = DIJava.Filesystem
 
 
-    fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
+    fun createInvoiceXml(invoice: Invoice, format: EInvoiceFormat): Result<String> =
         xmlCreator.createInvoiceXmlJvm(invoice, format)
 
     fun createXRechnung(invoice: Invoice): Result<String> =
@@ -73,7 +74,7 @@ class InvoicingService {
         attacher.attachInvoiceXmlToPdfJvm(invoice, pdf.readBytes(), format) // TODO: also return Result<Pdf>
 
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat) =
-        createInvoiceXml(invoice, format).ifSuccessful { xml ->
+        createInvoiceXml(invoice, EInvoiceFormat.valueOf(format.name)).ifSuccessful { xml ->
             attachInvoiceXmlToPdf(xml, pdfFile, format)
         }
 
@@ -92,7 +93,7 @@ class InvoicingService {
 
 
     fun validateInvoice(invoiceFile: Path): Result<InvoiceValidationResult> =
-        validator.validate(invoiceFile.toFile())
+        validator.validateEInvoiceFileJvm(invoiceFile.readBytes())
 
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =
