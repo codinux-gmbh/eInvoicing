@@ -1,35 +1,23 @@
 package net.codinux.invoicing.validation
 
-import net.codinux.invoicing.extension.childNodesList
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
 import net.codinux.invoicing.format.EInvoiceFormatDetector
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.ResourceUtil
 import net.codinux.log.logger
-import org.w3c.dom.Node
-import org.xml.sax.ErrorHandler
-import org.xml.sax.SAXParseException
+import net.sf.saxon.s9api.Processor
+import net.sf.saxon.s9api.XdmDestination
+import net.sf.saxon.s9api.XdmNode
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.io.StringWriter
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.ErrorListener
-import javax.xml.transform.TransformerException
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMResult
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
 
 actual open class EInvoiceValidator(
     protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector(),
     protected val mustangValidator: MustangEInvoiceValidator = MustangEInvoiceValidator()
 ) {
-
-    private val transformerFactory = TransformerFactory.newInstance()
-
-    private val documentBuilderFactory = DocumentBuilderFactory.newInstance()
 
     private val log by logger()
 
@@ -74,54 +62,36 @@ actual open class EInvoiceValidator(
 
     open fun validate(xslt: InputStream, xml: String): Result<InvoiceValidationResult> =
         try {
-            val xmlDocumentBuilder = documentBuilderFactory.newDocumentBuilder().apply {
-                this.setErrorHandler(object : ErrorHandler {
-                    override fun warning(e: SAXParseException?) {
-                        log.warn(e) { "XML parser warning" }
+            // we have to use Saxon anyway as the JVM transformer only supports XSLT 1.0, but Factur-X stylesheets use XSLT 2.0
+
+            // A stylesheet can be compiled once and then executed several times with different source documents.
+            // The Xslt30Transformer object is serially reusable, but not thread-safe.
+            // The Serializer object is also serially reusable.
+            val processor = Processor(false)
+            val compiler = processor.newXsltCompiler().apply {
+                isJustInTimeCompilation = false // to do static compilation only once and to be informed of stylesheet errors upfront, not during transformation
+                setErrorReporter { error ->
+                    log.error(error.cause) {
+                        "XSLT contains${if (error.terminationMessage != null) " fatal" else ""} error: " +
+                                "${error.errorCode} ${error.path ?: error.location}" +
+                                "${error.failingExpression?.let { " (failing expression: $it)" } ?: ""}: ${error.message}"
                     }
-
-                    override fun error(e: SAXParseException?) {
-                        log.error(e) { "XML parser error" }
-                    }
-
-                    override fun fatalError(e: SAXParseException?) {
-                        log.error(e) { "XML parser fatal error" }
-                    }
-
-                })
-            }
-            val xmlDocument =  xmlDocumentBuilder.parse(ByteArrayInputStream(xml.encodeToByteArray()))
-
-            val xsltSource = StreamSource(xslt)
-            val xmlSource = DOMSource(xmlDocument)
-            val result = StringWriter()
-            val resultDocument = documentBuilderFactory.newDocumentBuilder().newDocument()
-
-            val transformer = transformerFactory.newTransformer(xsltSource)
-            transformer.errorListener = object : ErrorListener {
-                override fun warning(e: TransformerException?) {
-                    log.warn(e) { "XSLT Transformer warning" }
                 }
-
-                override fun error(e: TransformerException?) {
-                    log.error(e) { "XSLT Transformer error" }
-                }
-
-                override fun fatalError(e: TransformerException?) {
-                    log.error(e) { "XSLT Transformer fatal error" }
-                }
-
             }
 
-//            transformer.transform(xmlSource, StreamResult(result))
-            transformer.transform(xmlSource, DOMResult(resultDocument))
+            val xsltExecutable = compiler.compile(StreamSource(xslt))
+            val trans = xsltExecutable.load30()
 
-            val resultXml = result.toString()
-            val resultNodes = resultDocument.documentElement.childNodesList
+            val destination = XdmDestination()
+            trans.transform(sourceFor(xml), destination)
+            val resultNode = destination.xdmNode
+            val root = resultNode.outermostElement
 
-            val failedAsserts = resultNodes.filter { it.nodeName == "svrl:failed-assert" }
-            val firedRules = resultNodes.filter { it.nodeName == "svrl:fired-rule" }
-            val activePatterns = resultNodes.filter { it.nodeName == "svrl:active-pattern" }
+            // iterating over children and specifying the namespace URI turned out to be the fastest way (twice as fast
+            // as leaving the ns URI away and 50 % faster than root.children { node -> } )
+            val failedAsserts = root.children("http://purl.oclc.org/dsdl/svrl", "failed-assert")
+//            val firedRules = root.children("http://purl.oclc.org/dsdl/svrl", "fired-rule")
+//            val activePatterns = root.children("http://purl.oclc.org/dsdl/svrl", "active-pattern")
             val validationErrors = mapValidationErrors(failedAsserts)
             val isValid = validationErrors.isEmpty()
 
@@ -133,6 +103,9 @@ actual open class EInvoiceValidator(
             Result.error(e)
         }
 
+    private fun sourceFor(string: String): Source =
+        StreamSource(ByteArrayInputStream(string.encodeToByteArray()))
+
 //    private fun mapValidationErrors(failedAsserts: List<Node>) = failedAsserts.map {
 //        ValidationError(
 //            ValidationErrorSeverity.Error,
@@ -141,12 +114,12 @@ actual open class EInvoiceValidator(
 //            it.childNodesList.filter { it.localName == "text" }.map { it.textContent.trim() })
 //    }
 
-    private fun mapValidationErrors(failedAsserts: List<Node>) = failedAsserts.map {
+    private fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
         ValidationResultItem(
             ValidationResultSeverity.Error,
-            it.childNodesList.filter { it.localName == "text" }.map { it.textContent.trim() }.firstOrNull() ?: "",
-            it.attributes.getNamedItem("location")?.nodeValue,
-            it.attributes.getNamedItem("test")?.nodeValue,
+            it.children { it.nodeName?.localName == "text" }.map { it.stringValue.trim() }.firstOrNull() ?: "",
+            it.attribute("location"),
+            it.attribute("test"),
         )
     }
 

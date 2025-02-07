@@ -96,6 +96,7 @@ kotlin {
 
     val mustangVersion: String by project
 
+    val saxonVersion: String by project
     val handlebarsVersion: String by project
     val openHtmlToPdfVersion: String by project
     val jsoupVersion: String by project
@@ -153,6 +154,8 @@ kotlin {
 //                implementation(project(":invoice-creator"))
 
                 implementation("org.mustangproject:library:$mustangVersion")
+
+                implementation("net.sf.saxon:Saxon-HE:$saxonVersion")
 
                 implementation("com.github.jknack:handlebars:$handlebarsVersion")
 
