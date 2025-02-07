@@ -7,7 +7,7 @@ import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
 import java.lang.reflect.Field
 
-actual open class EInvoiceValidator {
+open class MustangEInvoiceValidator {
 
     companion object {
         private val SectionField = getPrivateField("section")
@@ -27,10 +27,10 @@ actual open class EInvoiceValidator {
     }
 
 
-    actual open suspend fun validateEInvoiceXml(xml: String) =
+    open suspend fun validateEInvoiceXml(xml: String) =
         validateEInvoiceFile(xml.toByteArray())
 
-    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
+    open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
         try {
             val validator = object : ZUGFeRDValidator() {
                 fun getContext() = this.context

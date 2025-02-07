@@ -7,9 +7,9 @@ import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestUtils
 import kotlin.test.Test
 
-class EInvoiceValidatorTest {
+class MustangEInvoiceValidatorTest {
 
-    private val underTest = EInvoiceValidator()
+    private val underTest = MustangEInvoiceValidator()
 
 
     @Test
