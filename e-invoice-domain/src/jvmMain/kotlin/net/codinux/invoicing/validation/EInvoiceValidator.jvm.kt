@@ -3,6 +3,7 @@ package net.codinux.invoicing.validation
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
 import net.codinux.invoicing.format.EInvoiceFormatDetector
+import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.ResourceUtil
 import net.codinux.log.logger
@@ -126,7 +127,11 @@ actual open class EInvoiceValidator(
 
     protected open fun getXsltFile(profile: EInvoiceFormatDetectionResult): InputStream? =
         profile.profile?.let {
-            ResourceUtil.getResourceAsStream("facturx/schematron/$it.xslt")
+            if (it != FacturXProfile.XRechnung) {
+                ResourceUtil.getResourceAsStream("facturx/schematron/$it.xslt")
+            } else {
+                null
+            }
         }
 
 }
