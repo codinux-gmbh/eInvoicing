@@ -125,3 +125,21 @@ val invoiceXml = xmlCreator.createXRechnungXml(invoice) // or creator.createZugf
 
 attacher.attachInvoiceXmlToPdf(invoiceXml, EInvoiceXmlFormat.XRechnung, existingPdf, output)
 ```
+
+
+## System support
+
+| Feature                                |        JVM         |        Android         |     iOS, macOS, ..     |         Linux          |        Windows         |       JavaScript       |      WebAssembly       |   |
+|----------------------------------------|:------------------:|:----------------------:|:----------------------:|:----------------------:|:----------------------:|:----------------------:|:----------------------:|---|
+| Read e-invoice XML                     | :heavy_check_mark: |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   |
+| Extract e-invoice data from PDF        | :heavy_check_mark: |   :heavy_check_mark:   | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+| Create e-invoice XML                   | :heavy_check_mark: |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   :heavy_check_mark:   |   |
+| Attach e-invoice XML to existing PDF   | :heavy_check_mark: |   :heavy_check_mark:   | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+| Create PDF with attached e-invoice XML | :heavy_check_mark: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+| Validate e-invoice XML                 | :heavy_check_mark: |   :heavy_check_mark:   | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+| Validate e-invoice PDF                 | :heavy_check_mark: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+| Fetch e-invoices from emails           | :heavy_check_mark: |   :heavy_check_mark:   | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: | :globe_with_meridians: |   |
+
+Legend:
+- :heavy_check_mark: = Supported natively / directly on device
+- :globe_with_meridians: = Supported via webservice
