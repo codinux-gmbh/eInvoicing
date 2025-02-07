@@ -3,7 +3,8 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.config.Constants
-import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.format.EInvoiceFormat
+import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.validation.EInvoicePdfValidator
@@ -24,7 +25,7 @@ class PdfBoxPdfAttachmentWriterTest {
 
     @Test
     fun addFileAttachment() {
-        val format = EInvoiceXmlFormat.FacturX
+        val format = EInvoiceFormat.FacturX
         val xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rsm:CrossIndustryInvoice" // to trick Mustang's simple validation
         val destination = TestUtils.getInvalidInvoiceFile("NoAttachments.pdf").parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
         destination.deleteIfExists()
@@ -45,7 +46,7 @@ class PdfBoxPdfAttachmentWriterTest {
 
     @Test
     fun addFileAttachment_PdfIsValid() {
-        val format = EInvoiceXmlFormat.FacturX
+        val format = EInvoiceFormat.FacturX
         val xmlContent = TestData.FacturXXml
         val pdfBytes = underTest.createEmptyPdfA3()
 

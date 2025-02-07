@@ -7,7 +7,7 @@ import com.tom_roush.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode
 import com.tom_roush.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification
 import com.tom_roush.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile
 import net.codinux.invoicing.config.Constants
-import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.log.logger
 import java.io.OutputStream
 
@@ -16,7 +16,7 @@ class PdfBoxAndroidPdfAttachmentWriter : PdfAttachmentWriter {
     private val log by logger()
 
 
-    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
+    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceFormat, xml: String, output: OutputStream) {
         try {
             PDDocument.load(pdfFile).use { document ->
                 val names = PDDocumentNameDictionary(document.documentCatalog)

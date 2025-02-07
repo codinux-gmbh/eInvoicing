@@ -1,7 +1,7 @@
 package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.config.DI
-import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.web.WebClient
@@ -25,8 +25,8 @@ actual open class EInvoiceXmlCreator(
     actual open suspend fun createFacturXXml(invoice: Invoice) =
         xmlCreator.createFacturXXml(invoice)
 
-    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
-        if (format == EInvoiceXmlFormat.FacturX) createFacturXXml(invoice)
+    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceFormat): Result<String> =
+        if (format == EInvoiceFormat.FacturX) createFacturXXml(invoice)
         else webServiceXmlCreator.createInvoiceXml(invoice, format)
 
 }

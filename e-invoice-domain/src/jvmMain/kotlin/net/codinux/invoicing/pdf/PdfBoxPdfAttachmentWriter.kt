@@ -1,6 +1,6 @@
 package net.codinux.invoicing.pdf
 
-import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.log.logger
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.cos.COSArray
@@ -40,7 +40,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
     private val log by logger()
 
 
-    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
+    override fun addFileAttachment(pdfFile: ByteArray, format: EInvoiceFormat, xml: String, output: OutputStream) {
         try {
             Loader.loadPDF(pdfFile).use { document ->
                 attachInvoiceXmlToPdf(document, format, xml, output)
@@ -50,8 +50,8 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         }
     }
 
-    protected open fun attachInvoiceXmlToPdf(document: PDDocument, format: EInvoiceXmlFormat, xml: String, output: OutputStream) {
-        val attachmentName = if (format == EInvoiceXmlFormat.XRechnung) "xrechnung.xml" else "factur-x.xml"
+    protected open fun attachInvoiceXmlToPdf(document: PDDocument, format: EInvoiceFormat, xml: String, output: OutputStream) {
+        val attachmentName = if (format == EInvoiceFormat.XRechnung) "xrechnung.xml" else "factur-x.xml"
 
         val fileSpec = addInvoiceXmlToAssociatedFiles(document, xml, attachmentName)
 
@@ -131,7 +131,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         embeddedFiles.names = fileMap
     }
 
-    protected open fun addFacturXXmp(document: PDDocument, format: EInvoiceXmlFormat) {
+    protected open fun addFacturXXmp(document: PDDocument, format: EInvoiceFormat) {
         val catalog = document.documentCatalog
         val metadata = catalog.metadata ?: PDMetadata(document).also { catalog.metadata = it }
 
@@ -155,7 +155,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             setTextPropertyValue("DocumentType", "INVOICE")
             setTextPropertyValue("DocumentFileName", "factur-x.xml")
             setTextPropertyValue("Version", "1.0")
-            setTextPropertyValue("ConformanceLevel", getConformanceLevelForProfile(format))
+            setTextPropertyValue("ConformanceLevel", getConformanceLevelForFormat(format))
         })
 
         // add the extension schema for above schema - simply use the example XMP from Factur-X distribution
@@ -182,9 +182,9 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             }
         }
 
-    protected open fun getConformanceLevelForProfile(format: EInvoiceXmlFormat): String = when (format) {
-        EInvoiceXmlFormat.FacturX -> "EN 16931"
-        EInvoiceXmlFormat.XRechnung -> "XRECHNUNG"
+    protected open fun getConformanceLevelForFormat(format: EInvoiceFormat): String = when (format) {
+        EInvoiceFormat.FacturX, EInvoiceFormat.Zugferd -> "EN 16931"
+        EInvoiceFormat.XRechnung -> "XRECHNUNG"
 
         // there also exist:
         // "MINIMUM", "BASIC WL", "BASIC", "EXTENDED", "COMFORT" (synonym for "EN 16931")

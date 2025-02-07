@@ -2,6 +2,7 @@ package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.filesystem.FilesystemService
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
@@ -116,6 +117,6 @@ actual open class EInvoicePdfCreator(
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
-        xmlCreator.createInvoiceXmlJvm(invoice, format)
+        xmlCreator.createInvoiceXmlJvm(invoice, EInvoiceFormat.valueOf(format.name))
 
 }

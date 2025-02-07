@@ -1,7 +1,7 @@
 package net.codinux.invoicing.creation
 
-import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.extension.readAllBytesAndClose
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
@@ -45,16 +45,13 @@ actual open class EInvoiceXmlToPdfAttacher(
 
     open fun attachInvoiceXmlToPdf(invoiceXml: String, format: EInvoiceXmlFormat, pdfFile: ByteArray): Result<Pdf> =
         ByteArrayOutputStream().use { outputStream ->
-            attachmentWriter.addFileAttachment(pdfFile, format, invoiceXml, outputStream)
+            attachmentWriter.addFileAttachment(pdfFile, EInvoiceFormat.valueOf(format.name), invoiceXml, outputStream)
 
             Result.success(Pdf(outputStream.toByteArray()))
         }
 
 
     protected open fun createXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
-        xmlCreator.createInvoiceXmlJvm(invoice, format)
-
-    protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =
-        Constants.getProfileNameForFormat(format)
+        xmlCreator.createInvoiceXmlJvm(invoice, EInvoiceFormat.valueOf(format.name))
 
 }

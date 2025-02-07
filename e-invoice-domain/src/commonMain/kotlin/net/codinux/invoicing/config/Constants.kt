@@ -1,7 +1,6 @@
 package net.codinux.invoicing.config
 
-import net.codinux.invoicing.model.EInvoiceXmlFormat
-import net.codinux.invoicing.web.KtorWebClient
+import net.codinux.invoicing.format.EInvoiceFormat
 
 object Constants {
 
@@ -21,14 +20,14 @@ object Constants {
     )
 
 
-    fun getProfileNameForFormat(format: EInvoiceXmlFormat) = when (format) {
-        EInvoiceXmlFormat.FacturX -> FacturXProfileName
-        EInvoiceXmlFormat.XRechnung -> XRechnungProfileName
+    fun getProfileNameForFormat(format: EInvoiceFormat) = when (format) {
+        EInvoiceFormat.FacturX, EInvoiceFormat.Zugferd -> FacturXProfileName
+        EInvoiceFormat.XRechnung -> XRechnungProfileName
     }
 
-    fun getFilenameForFormat(format: EInvoiceXmlFormat) = when (format) {
-        EInvoiceXmlFormat.FacturX -> FacturXFilename
-        EInvoiceXmlFormat.XRechnung -> XRechnungFilename
+    fun getFilenameForFormat(format: EInvoiceFormat) = when (format) {
+        EInvoiceFormat.FacturX, EInvoiceFormat.Zugferd -> FacturXFilename // as this method is only used for adding attachments, we don't support Zugferd attachment name, use that of Factur-X
+        EInvoiceFormat.XRechnung -> XRechnungFilename
         // other available values: "zugferd-invoice.xml" (ZF v2), "ZUGFeRD-invoice.xml" (ZF v1) ("order-x.xml", "cida.xml")
     }
 

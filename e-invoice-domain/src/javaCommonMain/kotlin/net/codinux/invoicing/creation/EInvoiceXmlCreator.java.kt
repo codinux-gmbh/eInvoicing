@@ -1,8 +1,8 @@
 package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.config.Constants
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.mapper.MustangMapper
-import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Result
 import net.codinux.log.logger
@@ -28,12 +28,12 @@ actual open class EInvoiceXmlCreator(
     actual open suspend fun createFacturXXml(invoice: Invoice) =
         createFacturXXmlJvm(invoice)
 
-    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceXmlFormat) =
+    actual open suspend fun createInvoiceXml(invoice: Invoice, format: EInvoiceFormat) =
         createInvoiceXmlJvm(invoice, format)
 
 
     // TODO: find a better name
-    open fun createXRechnungXmlJvm(invoice: Invoice) = createInvoiceXmlJvm(invoice, EInvoiceXmlFormat.XRechnung)
+    open fun createXRechnungXmlJvm(invoice: Invoice) = createInvoiceXmlJvm(invoice, EInvoiceFormat.XRechnung)
 
     /**
      * Synonym for [createFacturXXmlJvm] (ZUGFeRD 2 is a synonym for Factur-X).
@@ -45,8 +45,8 @@ actual open class EInvoiceXmlCreator(
     open fun createFacturXXmlJvm(invoice: Invoice) = xmlCreator.createFacturXXml(invoice)
 
     // TODO: find a better name
-    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceXmlFormat): Result<String> =
-        if (format == EInvoiceXmlFormat.FacturX) xmlCreator.createFacturXXml(invoice)
+    open fun createInvoiceXmlJvm(invoice: Invoice, format: EInvoiceFormat): Result<String> =
+        if (format == EInvoiceFormat.FacturX) xmlCreator.createFacturXXml(invoice)
         else {
             try {
                 val exporter = ZUGFeRDExporterFromA3()
@@ -68,7 +68,7 @@ actual open class EInvoiceXmlCreator(
     }
 
 
-    protected open fun getProfileNameForFormat(format: EInvoiceXmlFormat) =
+    protected open fun getProfileNameForFormat(format: EInvoiceFormat) =
         Constants.getProfileNameForFormat(format)
 
 }

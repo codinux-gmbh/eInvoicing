@@ -3,7 +3,7 @@ package net.codinux.invoicing.creation
 import assertk.assertThat
 import assertk.assertions.isGreaterThan
 import kotlinx.coroutines.test.runTest
-import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
@@ -37,7 +37,7 @@ class WebServiceEInvoiceXmlCreatorTest {
     fun createInvoiceXml() = runTest {
         val invoice = createInvoice()
 
-        val result = underTest.createInvoiceXml(invoice, EInvoiceXmlFormat.FacturX)
+        val result = underTest.createInvoiceXml(invoice, EInvoiceFormat.FacturX)
 
         assertInvoiceXml(result)
     }
