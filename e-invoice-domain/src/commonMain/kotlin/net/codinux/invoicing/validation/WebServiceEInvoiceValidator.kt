@@ -10,12 +10,16 @@ open class WebServiceEInvoiceValidator(
     protected open val webClient: WebClient = DI.DefaultWebClient,
 ) {
 
-    open suspend fun validateEInvoiceXml(xml: String) =
-        validateEInvoiceFile(xml.encodeToByteArray())
+    open suspend fun validateEInvoiceXml(xml: String): Result<InvoiceValidationResult> {
+        val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, xml,
+            ContentTypes.XML, ContentTypes.JSON, requestTimeoutMillis = 5 * 60_000))
+
+        return response.toResult()
+    }
 
     open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> {
         val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, fileContent,
-            ContentTypes.OCTET_STREAM, ContentTypes.JSON))
+            ContentTypes.OCTET_STREAM, ContentTypes.JSON, requestTimeoutMillis = 5 * 60_000))
 
         return response.toResult()
     }

@@ -92,6 +92,9 @@ class InvoicingService {
         reader.extractXmlFromPdf(pdfFile.toFile())
 
 
+    fun validateInvoice(invoiceXml: String): Result<InvoiceValidationResult> =
+        validator.validateEInvoiceXmlJvm(invoiceXml)
+
     fun validateInvoice(invoiceFile: Path): Result<InvoiceValidationResult> =
         validator.validateEInvoiceFileJvm(invoiceFile.readBytes())
 

@@ -183,6 +183,15 @@ class InvoicingResource(
 
     @Path("validate")
     @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung XML")
+    @Tag(name = "Validate")
+    fun validateInvoiceXml(invoiceXml: String) =
+        toResponse(service.validateInvoice(invoiceXml))
+
+    @Path("validate")
+    @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
