@@ -27,18 +27,16 @@ actual open class EInvoiceValidator {
     }
 
 
-    actual open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean, invoiceFilename: String?) =
-        validateEInvoiceFile(xml.toByteArray(), disableNotices, invoiceFilename)
+    actual open suspend fun validateEInvoiceXml(xml: String) =
+        validateEInvoiceFile(xml.toByteArray())
 
-    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean, invoiceFilename: String?): Result<InvoiceValidationResult> =
+    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
         try {
             val validator = object : ZUGFeRDValidator() {
                 fun getContext() = this.context
             }
 
-            if (disableNotices) {
-                validator.disableNotices() // bedeutet letztlich, dass Nicht-XRechnungsdateien gegen das XRechnungs-Schematron validiert werden
-            }
+            validator.disableNotices() // bedeutet letztlich, dass Nicht-XRechnungsdateien gegen das XRechnungs-Schematron validiert werden
 
             // - validiert zuerst das XSD Schema
             // - danach das Profil spezifische Schematron, z.B. /xslt/ZF_232/FACTUR-X_EN16931.xslt
@@ -48,7 +46,7 @@ actual open class EInvoiceValidator {
             //     There are also XSLT, XSD and Schematron files for UBL and EDIFACT in this repo
             // - Falls disableNotices = false oder XrechnungSeverity > notice, dann ruft er noch validateXR() auf - auch fuer Basic und EN16931 -
             //     mit der Datei "/xslt/XR_30/XRechnung-CII-validation.xslt". Begruendung: "This is the default check which is also run on en16931 files to generate notices"
-            val report = validator.validate(fileContent, invoiceFilename ?: "validation.xml")
+            val report = validator.validate(fileContent, "validation.xml")
 
             val context = validator.getContext()
             val isXmlValid = context.isValid
@@ -63,8 +61,8 @@ actual open class EInvoiceValidator {
             Result.error(e)
         }
 
-    open fun validate(fileToValidate: File, disableNotices: Boolean = true) = runBlocking {
-        validateEInvoiceFile(fileToValidate.readBytes(), disableNotices, fileToValidate.name)!!
+    open fun validate(fileToValidate: File) = runBlocking {
+        validateEInvoiceFile(fileToValidate.readBytes())
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =

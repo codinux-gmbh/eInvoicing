@@ -9,10 +9,10 @@ actual open class EInvoiceValidator(
     constructor(webClient: WebClient) : this(WebServiceEInvoiceValidator(webClient))
 
 
-    actual open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean, invoiceFilename: String?) =
-        validator.validateEInvoiceXml(xml, disableNotices, invoiceFilename)
+    actual open suspend fun validateEInvoiceXml(xml: String) =
+        validator.validateEInvoiceXml(xml)
 
-    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean, invoiceFilename: String?) =
-        validator.validateEInvoiceFile(fileContent, disableNotices, invoiceFilename)
+    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray) =
+        validator.validateEInvoiceFile(fileContent)
 
 }

@@ -10,21 +10,12 @@ open class WebServiceEInvoiceValidator(
     protected open val webClient: WebClient = DI.DefaultWebClient,
 ) {
 
-    open suspend fun validateEInvoiceXml(xml: String, disableNotices: Boolean = false, invoiceFilename: String? = null) =
-        validateEInvoiceFile(xml.encodeToByteArray(), disableNotices, invoiceFilename)
+    open suspend fun validateEInvoiceXml(xml: String) =
+        validateEInvoiceFile(xml.encodeToByteArray())
 
-    open suspend fun validateEInvoiceFile(fileContent: ByteArray, disableNotices: Boolean = false, invoiceFilename: String? = null): Result<InvoiceValidationResult> {
-        val queryParams = buildMap {
-            if (disableNotices) {
-                put("disableNotices", disableNotices)
-            }
-            if (invoiceFilename != null) {
-                put("invoiceFilename", invoiceFilename)
-            }
-        }
-
+    open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> {
         val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, fileContent,
-            ContentTypes.OCTET_STREAM, ContentTypes.JSON, queryParameters = queryParams))
+            ContentTypes.OCTET_STREAM, ContentTypes.JSON))
 
         return response.toResult()
     }

@@ -186,13 +186,8 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Validate")
-    fun validateInvoice(
-        invoice: java.nio.file.Path,
-        @QueryParam("disableNotices") disableNotices: Boolean = false,
-        // Mustang writes the filename to validation report, so with this parameter user can control the mentioned filename // TODO: remove as soon as switching to own validation
-        @QueryParam("invoiceFilename") invoiceFilename: String? = null
-    ) =
-        toResponse(service.validateInvoice(invoice, disableNotices, invoiceFilename))
+    fun validateInvoice(invoice: java.nio.file.Path) =
+        toResponse(service.validateInvoice(invoice))
 
 
     @Path("calculateTotalAmounts")

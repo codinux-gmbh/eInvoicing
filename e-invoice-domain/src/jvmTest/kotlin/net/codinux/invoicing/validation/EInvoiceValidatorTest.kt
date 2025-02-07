@@ -31,13 +31,13 @@ class EInvoiceValidatorTest {
     fun validateZugferdPdf() {
         val testFile = getTestFile("ZUGFeRD.pdf")
 
-        val resultHolder = underTest.validate(testFile, disableNotices = false)
+        val resultHolder = underTest.validate(testFile)
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
         assertThat(result.reportAsXml).isNotEmpty()
-        assertThat(result.xmlValidationResults).hasSize(5)
-        assertThat(result.countXmlNotices).isEqualTo(5)
+        assertThat(result.xmlValidationResults).hasSize(0)
+        assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(0)
         assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
@@ -46,13 +46,13 @@ class EInvoiceValidatorTest {
     fun validateZugferdXml() {
         val testFile = getTestFile("ZUGFeRD.xml")
 
-        val resultHolder = underTest.validate(testFile, disableNotices = false)
+        val resultHolder = underTest.validate(testFile)
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
         assertThat(result.reportAsXml).isNotEmpty()
-        assertThat(result.xmlValidationResults).hasSize(5)
-        assertThat(result.countXmlNotices).isEqualTo(5)
+        assertThat(result.xmlValidationResults).hasSize(0)
+        assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(0)
         assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }

@@ -91,24 +91,8 @@ class InvoicingService {
         reader.extractXmlFromPdf(pdfFile.toFile())
 
 
-    fun validateInvoice(invoiceFile: Path, disableNotices: Boolean = false, invoiceFilename: String? = null): Result<InvoiceValidationResult> {
-        var file = invoiceFile
-
-        // Mustang writes the filename to validation report, so set a nice filename for the report
-        if (invoiceFilename != null) {
-            val destination = invoiceFile.parent.resolve(invoiceFile.name + "_folder").resolve(invoiceFilename)
-            Files.createDirectories(destination.parent)
-            file = invoiceFile.moveTo(destination, true)
-        }
-
-        return validator.validate(file.toFile(), disableNotices).also {
-            // clean moved file
-            file.deleteExisting()
-            if (invoiceFilename != null) { // delete created folder
-                file.parent.deleteExisting()
-            }
-        }
-    }
+    fun validateInvoice(invoiceFile: Path): Result<InvoiceValidationResult> =
+        validator.validate(invoiceFile.toFile())
 
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =

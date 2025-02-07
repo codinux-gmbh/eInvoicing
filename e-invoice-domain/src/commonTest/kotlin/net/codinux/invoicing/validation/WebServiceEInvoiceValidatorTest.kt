@@ -16,21 +16,21 @@ class WebServiceEInvoiceValidatorTest {
 
     @Test
     fun validateXRechnungXml() = runTest {
-        val result = underTest.validateEInvoiceXml(TestData.XRechnungXml, invoiceFilename = "XRechnung.xml")
+        val result = underTest.validateEInvoiceXml(TestData.XRechnungXml)
 
         assertValidationResult(result)
     }
 
     @Test
     fun validateFacturXXml() = runTest {
-        val result = underTest.validateEInvoiceXml(TestData.FacturXXml, invoiceFilename = "Factur-X.xml")
+        val result = underTest.validateEInvoiceXml(TestData.FacturXXml)
 
         assertValidationResult(result)
     }
 
     @Test
     fun validateFacturXPdf() = runTest {
-        val result = underTest.validateEInvoiceFile(TestData.FacturXPdf, invoiceFilename = "Factur-X.pdf")
+        val result = underTest.validateEInvoiceFile(TestData.FacturXPdf)
 
         assertValidationResult(result)
     }
