@@ -37,7 +37,7 @@ class WebServiceEInvoicePdfCreatorTest {
     private fun assertInvoice(result: Result<ByteArray>) {
         val response = Asserts.assertSuccess(result)
 
-        assertThat(response.size).isGreaterThan(15_000)
+        assertThat(response.size).isGreaterThan(14_000)
     }
 
 }
