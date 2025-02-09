@@ -5,6 +5,7 @@ import assertk.assertions.isGreaterThan
 import kotlinx.coroutines.test.runTest
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.InvoicePdfConfig
 import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestData
@@ -26,7 +27,7 @@ class WebServiceEInvoicePdfCreatorTest {
 
     @Test
     fun createFacturXPdfFromXml() = runTest {
-        val result = underTest.createFacturXPdf(TestData.FacturXXml, EInvoiceXmlFormat.FacturX)
+        val result = underTest.createFacturXPdf(TestData.FacturXXml, InvoicePdfConfig(EInvoiceXmlFormat.FacturX))
 
         assertInvoice(result)
     }

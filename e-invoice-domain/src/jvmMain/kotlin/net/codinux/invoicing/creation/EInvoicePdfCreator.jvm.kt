@@ -34,10 +34,10 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Result<ByteArray> {
+    actual open suspend fun createFacturXPdf(invoice: Invoice, config: InvoicePdfConfig): Result<ByteArray> {
         val destinationFile = filesystem.createTempPdfFile()
 
-        createPdfWithAttachedXml(invoice, format, destinationFile)
+        createPdfWithAttachedXml(invoice, config.format, destinationFile)
 
         return Result.success(destinationFile.readBytes())
     }
@@ -45,10 +45,10 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Result<ByteArray> {
+    actual open suspend fun createFacturXPdf(invoiceXml: String, config: InvoicePdfConfig): Result<ByteArray> {
         val destinationFile = filesystem.createTempPdfFile()
 
-        createPdfWithAttachedXml(invoiceXml, format, destinationFile)
+        createPdfWithAttachedXml(invoiceXml, config.format, destinationFile)
 
         return Result.success(destinationFile.readBytes())
     }

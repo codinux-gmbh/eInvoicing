@@ -3,14 +3,9 @@ package net.codinux.invoicing.pdf
 import net.codinux.invoicing.config.Constants
 import net.codinux.log.logger
 import org.apache.pdfbox.Loader
-import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary
-import org.apache.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode
 import org.apache.pdfbox.pdmodel.common.PDNameTreeNode
 import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification
-import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile
-import java.io.InputStream
-import java.io.OutputStream
 import kotlin.io.path.Path
 import kotlin.io.path.extension
 
