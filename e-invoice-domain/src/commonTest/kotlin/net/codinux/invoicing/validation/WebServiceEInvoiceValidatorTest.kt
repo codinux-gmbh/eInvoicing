@@ -41,7 +41,7 @@ class WebServiceEInvoiceValidatorTest {
     }
 
 
-    private fun assertXmlValidationResult(result: Result<InvoiceValidationResult>) {
+    private fun assertXmlValidationResult(result: Result<InvoiceXmlValidationResult>) {
         val validationResult = Asserts.assertSuccess(result)
 
         assertThat(validationResult.isValid).isTrue()

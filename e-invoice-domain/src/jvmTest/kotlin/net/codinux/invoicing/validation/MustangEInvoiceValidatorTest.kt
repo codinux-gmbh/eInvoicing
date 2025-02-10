@@ -73,7 +73,7 @@ class MustangEInvoiceValidatorTest {
     }
 
 
-    private fun assertValidationFailed(resultHolder: Result<InvoiceValidationResult>, countValidationErrors: Int) {
+    private fun assertValidationFailed(resultHolder: Result<InvoiceXmlValidationResult>, countValidationErrors: Int) {
         val result = Asserts.assertSuccess(resultHolder)
 
         assertThat(result.isValid).isFalse()

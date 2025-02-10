@@ -27,7 +27,7 @@ actual open class EInvoiceXmlValidator(
         validateEInvoiceXmlJvm(xml)
 
 
-    open fun validateEInvoiceXmlJvm(xml: String, format: EInvoiceFormatDetectionResult? = null): Result<InvoiceValidationResult> =
+    open fun validateEInvoiceXmlJvm(xml: String, format: EInvoiceFormatDetectionResult? = null): Result<InvoiceXmlValidationResult> =
         try {
             val detectedFormat = format ?: formatDetector.detectFormat(xml)
             val xslt = detectedFormat?.let { getXsltFile(it) }
@@ -44,7 +44,7 @@ actual open class EInvoiceXmlValidator(
             Result.error(e)
         }
 
-    open fun validate(xslt: InputStream, xml: String): Result<InvoiceValidationResult> =
+    open fun validate(xslt: InputStream, xml: String): Result<InvoiceXmlValidationResult> =
         try {
             // we have to use Saxon anyway as the JVM transformer only supports XSLT 1.0, but Factur-X stylesheets use XSLT 2.0
 
@@ -81,7 +81,7 @@ actual open class EInvoiceXmlValidator(
 
 //            ValidationResult(failedAsserts.isEmpty(), firedRules.size, activePatterns.size, validationErrors)
 
-            Result.success(InvoiceValidationResult(isValid, isValid, validationErrors, ""))
+            Result.success(InvoiceXmlValidationResult(isValid, isValid, validationErrors, ""))
         } catch (e: Throwable) {
             log.warn(e) { "Validation with Xslt failed for XML file ${xml.substring(0, 250)}" }
             Result.error(e)

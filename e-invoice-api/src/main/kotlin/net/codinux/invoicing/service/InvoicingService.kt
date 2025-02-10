@@ -16,7 +16,7 @@ import net.codinux.invoicing.pdf.OpenHtmlToPdfHtmlToPdfConverter
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoicePdfValidator
 import net.codinux.invoicing.validation.EInvoiceXmlValidator
-import net.codinux.invoicing.validation.InvoiceValidationResult
+import net.codinux.invoicing.validation.InvoiceXmlValidationResult
 import net.codinux.invoicing.validation.PdfValidationResult
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -95,7 +95,7 @@ class InvoicingService {
         reader.extractXmlFromPdf(pdfFile.toFile())
 
 
-    fun validateInvoiceXml(invoiceXml: String): Result<InvoiceValidationResult> =
+    fun validateInvoiceXml(invoiceXml: String): Result<InvoiceXmlValidationResult> =
         xmlValidator.validateEInvoiceXmlJvm(invoiceXml)
 
     fun validateInvoicePdf(pdfBytes: ByteArray): Result<PdfValidationResult> =

@@ -31,7 +31,7 @@ open class MustangEInvoiceValidator {
     open fun validateEInvoiceXmlJvm(xml: String) =
         validateEInvoicePdf(xml.toByteArray())
 
-    open fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceValidationResult> =
+    open fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceXmlValidationResult> =
         try {
             val validator = object : ZUGFeRDValidator() {
                 fun getContext() = this.context
@@ -56,7 +56,7 @@ open class MustangEInvoiceValidator {
             // TODO: currently it's not possible to get PDF validation result as for PDF validation the same context object
             //  is used and then in a private method before XML validation context.clear() gets called removing all PDF validation results
 
-            Result.success(InvoiceValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report))
+            Result.success(InvoiceXmlValidationResult(validator.wasCompletelyValid(), isXmlValid, xmlValidationResults, report))
         } catch (e: Throwable) {
             log.error(e) { "Could not validate EInvoice file" }
             Result.error(e)

@@ -3,7 +3,7 @@ package net.codinux.invoicing.validation
 import kotlinx.serialization.Serializable
 
 @Serializable
-class InvoiceValidationResult(
+class InvoiceXmlValidationResult(
     /**
      * If XML and, if supplied, PDF is valid.
      */

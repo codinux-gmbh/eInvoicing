@@ -62,7 +62,7 @@ class EInvoiceXmlValidatorTest {
     private fun getInvalidTestFile(filename: String) = TestUtils.getInvalidInvoiceFile(filename).readText()
 
 
-    private fun assertValidationSucceeded(result: Result<InvoiceValidationResult>) {
+    private fun assertValidationSucceeded(result: Result<InvoiceXmlValidationResult>) {
         val result = Asserts.assertSuccess(result)
 
         assertThat(result.isValid).isTrue()
@@ -73,7 +73,7 @@ class EInvoiceXmlValidatorTest {
         assertThat(result.xmlValidationResults).isEmpty()
     }
 
-    private fun assertWrongProfileResult(result: Result<InvoiceValidationResult>) {
+    private fun assertWrongProfileResult(result: Result<InvoiceXmlValidationResult>) {
         val result = assertValidationFailed(result, 1)
 
         val failedAssert = result.xmlValidationResults.first()
@@ -83,7 +83,7 @@ class EInvoiceXmlValidatorTest {
         assertThat(failedAssert.message).isEqualTo("Value of 'ram:ID' is not allowed.")
     }
 
-    private fun assertValidationFailed(result: Result<InvoiceValidationResult>, countValidationErrors: Int): InvoiceValidationResult {
+    private fun assertValidationFailed(result: Result<InvoiceXmlValidationResult>, countValidationErrors: Int): InvoiceXmlValidationResult {
         val result = Asserts.assertSuccess(result)
 
         assertThat(result.isValid).isFalse()

@@ -10,8 +10,8 @@ open class WebServiceEInvoiceValidator(
     protected open val webClient: WebClient = DI.DefaultWebClient,
 ) {
 
-    open suspend fun validateEInvoiceXml(xml: String): Result<InvoiceValidationResult> {
-        val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, xml,
+    open suspend fun validateEInvoiceXml(xml: String): Result<InvoiceXmlValidationResult> {
+        val response = webClient.postAsync(RequestParameters("validate", InvoiceXmlValidationResult::class, xml,
             ContentTypes.XML, ContentTypes.JSON, requestTimeoutMillis = 5 * 60_000))
 
         return response.toResult()
