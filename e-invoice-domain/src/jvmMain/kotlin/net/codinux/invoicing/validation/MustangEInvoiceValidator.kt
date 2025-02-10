@@ -29,12 +29,9 @@ open class MustangEInvoiceValidator {
         validateEInvoiceXmlJvm(xml)
 
     open fun validateEInvoiceXmlJvm(xml: String) =
-        validateEInvoiceFileJvm(xml.toByteArray())
+        validateEInvoicePdf(xml.toByteArray())
 
-    open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
-        validateEInvoiceFileJvm(fileContent)
-
-    open fun validateEInvoiceFileJvm(fileContent: ByteArray): Result<InvoiceValidationResult> =
+    open fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceValidationResult> =
         try {
             val validator = object : ZUGFeRDValidator() {
                 fun getContext() = this.context
@@ -50,7 +47,7 @@ open class MustangEInvoiceValidator {
             //     There are also XSLT, XSD and Schematron files for UBL and EDIFACT in this repo
             // - Falls disableNotices = false oder XrechnungSeverity > notice, dann ruft er noch validateXR() auf - auch fuer Basic und EN16931 -
             //     mit der Datei "/xslt/XR_30/XRechnung-CII-validation.xslt". Begruendung: "This is the default check which is also run on en16931 files to generate notices"
-            val report = validator.validate(fileContent, "validation.xml")
+            val report = validator.validate(pdfBytes, "validation.xml")
 
             val context = validator.getContext()
             val isXmlValid = context.isValid
@@ -66,7 +63,7 @@ open class MustangEInvoiceValidator {
         }
 
     open fun validate(fileToValidate: File) = runBlocking {
-        validateEInvoiceFile(fileToValidate.readBytes())
+        validateEInvoicePdf(fileToValidate.readBytes())
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =

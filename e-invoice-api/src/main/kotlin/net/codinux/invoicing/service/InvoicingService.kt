@@ -96,7 +96,7 @@ class InvoicingService {
         validator.validateEInvoiceXmlJvm(invoiceXml)
 
     fun validateInvoice(invoiceFile: Path): Result<InvoiceValidationResult> =
-        validator.validateEInvoiceFileJvm(invoiceFile.readBytes())
+        validator.validateEInvoicePdfJvm(invoiceFile.readBytes())
 
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =

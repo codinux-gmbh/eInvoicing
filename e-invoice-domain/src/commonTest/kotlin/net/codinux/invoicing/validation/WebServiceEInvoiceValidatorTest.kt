@@ -35,7 +35,7 @@ class WebServiceEInvoiceValidatorTest {
 
     @Test
     fun validateFacturXPdf() = runTest {
-        val result = underTest.validateEInvoiceFile(TestData.FacturXPdf)
+        val result = underTest.validateEInvoicePdf(TestData.FacturXPdf)
 
         assertValidationResult(result)
     }

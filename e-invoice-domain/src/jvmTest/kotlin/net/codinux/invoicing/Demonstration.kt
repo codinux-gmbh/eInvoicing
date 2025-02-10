@@ -42,7 +42,7 @@ class Demonstration {
         val validator = EInvoiceValidator()
         val invoiceFile = File("ZUGFeRD.pdf") // or XRechnung,xml, ...
 
-        val result = validator.validateEInvoiceFileJvm(invoiceFile.readBytes())
+        val result = validator.validateEInvoicePdfJvm(invoiceFile.readBytes())
 
         result.value?.let {
             println("Is valid? ${it.isValid}")

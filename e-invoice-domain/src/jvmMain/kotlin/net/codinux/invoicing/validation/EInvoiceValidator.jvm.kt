@@ -26,20 +26,20 @@ actual open class EInvoiceValidator(
     actual open suspend fun validateEInvoiceXml(xml: String) =
         validateEInvoiceXmlJvm(xml)
 
-    actual open suspend fun validateEInvoiceFile(fileContent: ByteArray): Result<InvoiceValidationResult> =
-        validateEInvoiceFileJvm(fileContent)
+    actual open suspend fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceValidationResult> =
+        validateEInvoicePdfJvm(pdfBytes)
 
-    open fun validateEInvoiceFileJvm(fileContent: ByteArray): Result<InvoiceValidationResult> =
+    open fun validateEInvoicePdfJvm(fileContent: ByteArray): Result<InvoiceValidationResult> =
         if (fileContent.size > 4 && fileContent[0].toInt().toChar() == '%' && fileContent[1].toInt().toChar() == 'P' &&
             fileContent[2].toInt().toChar() == 'D' && fileContent[3].toInt().toChar() == 'F') {
-            mustangValidator.validateEInvoiceFileJvm(fileContent)
+            mustangValidator.validateEInvoicePdf(fileContent)
         } else {
             val fileAsString = fileContent.decodeToString()
             val format = formatDetector.detectFormat(fileAsString)
             if (format == null) {
                 validateEInvoiceXmlJvm(fileAsString)
             } else {
-                mustangValidator.validateEInvoiceFileJvm(fileContent)
+                mustangValidator.validateEInvoicePdf(fileContent)
             }
         }
 
