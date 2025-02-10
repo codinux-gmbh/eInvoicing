@@ -1,7 +1,7 @@
 package net.codinux.invoicing.validation
 
 import net.codinux.invoicing.extension.readAllBytesAndClose
-import net.codinux.invoicing.model.dto.SerializableException
+import net.codinux.invoicing.model.Result
 import net.codinux.log.logger
 import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider
 import org.verapdf.pdfa.Foundries
@@ -13,7 +13,7 @@ import kotlin.io.path.inputStream
 
 // VeraPDF does not work on Android, e.g. calls on initialization JAXBContext.newInstance(type), and as almost everything
 // gets called via static methods it's also not replaceable
-open class EInvoicePdfValidator {
+actual open class EInvoicePdfValidator {
 
     companion object {
         private val CompliantPdfAVersions = listOf(PDFAFlavour.PDFA_3_A, PDFAFlavour.PDFA_3_B, PDFAFlavour.PDFA_3_U)
@@ -27,10 +27,13 @@ open class EInvoicePdfValidator {
     }
 
 
+    actual open suspend fun validateEInvoicePdf(pdfBytes: ByteArray) =
+        validate(pdfBytes)
+
     open fun validate(pdfFile: Path) =
         validate(pdfFile.inputStream().readAllBytesAndClose())
 
-    open fun validate(pdfBytes: ByteArray): PdfValidationResult {
+    open fun validate(pdfBytes: ByteArray): Result<PdfValidationResult> =
         // see https://docs.verapdf.org/develop/
         try {
             Foundries.defaultInstance().createParser(ByteArrayInputStream(pdfBytes)).use { parser ->
@@ -43,13 +46,12 @@ open class EInvoicePdfValidator {
                 val result = validator.validate(parser)
                 val validationErrors = mapErrors(result)
 
-                return PdfValidationResult(result.isCompliant, null, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors)
+                Result.success(PdfValidationResult(result.isCompliant, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors))
             }
         } catch (e: Throwable) {
             log.error(e) { "PDF validation failed" }
-            return PdfValidationResult(false, SerializableException(e))
+            Result.error(e)
         }
-    }
 
     protected open fun mapFlavor(flavour: PDFAFlavour): PdfAFlavour =
         try {

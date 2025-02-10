@@ -6,6 +6,4 @@ expect open class EInvoiceXmlValidator {
 
     open suspend fun validateEInvoiceXml(xml: String): Result<InvoiceValidationResult>
 
-    open suspend fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceValidationResult>
-
 }

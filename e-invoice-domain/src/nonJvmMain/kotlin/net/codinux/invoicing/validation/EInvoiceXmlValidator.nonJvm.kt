@@ -12,7 +12,4 @@ actual open class EInvoiceXmlValidator(
     actual open suspend fun validateEInvoiceXml(xml: String) =
         validator.validateEInvoiceXml(xml)
 
-    actual open suspend fun validateEInvoicePdf(pdfBytes: ByteArray) =
-        validator.validateEInvoicePdf(pdfBytes)
-
 }

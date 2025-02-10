@@ -5,6 +5,7 @@ import assertk.assertions.*
 import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.format.FacturXProfile
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.validation.EInvoicePdfValidator
@@ -57,8 +58,9 @@ class PdfBoxPdfAttachmentWriterTest {
 
         val validationResult = pdfValidator.validate(destination)
 
-        assertThat(validationResult.isValid).isTrue()
-        assertThat(validationResult.validationErrors).isEmpty()
+        val result = Asserts.assertSuccess(validationResult)
+        assertThat(result.isValid).isTrue()
+        assertThat(result.validationErrors).isEmpty()
     }
 
 

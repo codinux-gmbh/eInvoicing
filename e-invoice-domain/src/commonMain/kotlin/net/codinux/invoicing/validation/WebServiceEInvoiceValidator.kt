@@ -17,8 +17,8 @@ open class WebServiceEInvoiceValidator(
         return response.toResult()
     }
 
-    open suspend fun validateEInvoicePdf(pdfBytes: ByteArray): Result<InvoiceValidationResult> {
-        val response = webClient.postAsync(RequestParameters("validate", InvoiceValidationResult::class, pdfBytes,
+    open suspend fun validateEInvoicePdf(pdfBytes: ByteArray): Result<PdfValidationResult> {
+        val response = webClient.postAsync(RequestParameters("validate", PdfValidationResult::class, pdfBytes,
             ContentTypes.OCTET_STREAM, ContentTypes.JSON, requestTimeoutMillis = 5 * 60_000))
 
         return response.toResult()

@@ -30,20 +30,29 @@ class WebServiceEInvoiceValidatorTest {
     fun validateFacturXXml() = runTest {
         val result = underTest.validateEInvoiceXml(TestData.FacturXXml)
 
-        assertValidationResult(result)
+        assertXmlValidationResult(result)
     }
 
     @Test
     fun validateFacturXPdf() = runTest {
         val result = underTest.validateEInvoicePdf(TestData.FacturXPdf)
 
-        assertValidationResult(result)
+        assertPdfValidationResult(result)
     }
 
 
-    private fun assertValidationResult(result: Result<InvoiceValidationResult>) {
+    private fun assertXmlValidationResult(result: Result<InvoiceValidationResult>) {
         val validationResult = Asserts.assertSuccess(result)
+
+        assertThat(validationResult.isValid).isTrue()
         assertThat(validationResult.xmlValidationResults).isEmpty()
+    }
+
+    private fun assertPdfValidationResult(result: Result<PdfValidationResult>) {
+        val validationResult = Asserts.assertSuccess(result)
+
+        assertThat(validationResult.isValid).isTrue()
+        assertThat(validationResult.validationErrors).isEmpty()
     }
 
 }

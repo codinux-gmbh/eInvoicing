@@ -2,6 +2,8 @@ package net.codinux.invoicing.validation
 
 import assertk.assertThat
 import assertk.assertions.*
+import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.EInvoiceFormat
@@ -28,13 +30,13 @@ class EInvoicePdfValidatorTest {
             return // this test does not work on Android, cannot load PDF file from resources
         }
 
-        val result = underTest.validate(TestUtils.getInvalidInvoiceFile("PDF-A-1.pdf"))
+        val validationResult = underTest.validate(TestUtils.getInvalidInvoiceFile("PDF-A-1.pdf"))
 
+        val result = Asserts.assertSuccess(validationResult)
         assertThat(result.isValid).isFalse()
         assertThat(result.isPdfA).isNotNull().isTrue()
         assertThat(result.isPdfA3).isNotNull().isFalse()
         assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_1_B)
-        assertThat(result.readError).isNull()
         assertThat(result.countExecutedTests).isGreaterThan(16_000)
         assertThat(result.validationErrors).hasSize(8)
     }
@@ -44,26 +46,26 @@ class EInvoicePdfValidatorTest {
         val invalidZugferdInvoice = EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_0, EInvoiceProfile.EN16931)
             .first { it.name == "zugferd_2p0_EN16931_Reisekostenabrechnung.pdf" } // this single file is invalid
 
-        val result = underTest.validate(invalidZugferdInvoice)
+        val validationResult = underTest.validate(invalidZugferdInvoice)
 
+        val result = Asserts.assertSuccess(validationResult)
         assertThat(result.isValid).isFalse()
         assertThat(result.isPdfA).isNotNull().isTrue()
         assertThat(result.isPdfA3).isNotNull().isTrue()
         assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_3_B)
-        assertThat(result.readError).isNull()
         assertThat(result.countExecutedTests).isGreaterThan(3_000)
         assertThat(result.validationErrors).hasSize(2)
     }
 
     @Test
     fun validPdfA3() {
-        val result = underTest.validate(TestData.FacturXPdf)
+        val validationResult = underTest.validate(TestData.FacturXPdf)
 
+        val result = Asserts.assertSuccess(validationResult)
         assertThat(result.isValid).isTrue()
         assertThat(result.isPdfA).isNotNull().isTrue()
         assertThat(result.isPdfA3).isNotNull().isTrue()
         assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_3_U)
-        assertThat(result.readError).isNull()
         assertThat(result.countExecutedTests).isGreaterThan(19_000)
         assertThat(result.validationErrors).isEmpty()
     }
@@ -99,22 +101,24 @@ class EInvoicePdfValidatorTest {
         log.info { "All Zugferd invoices are valid" }
     }
 
-    private fun assertIsValidPdfA3(result: PdfValidationResult) {
+    private fun assertIsValidPdfA3(validationResult: Result<PdfValidationResult>) {
+        val result = Asserts.assertSuccess(validationResult)
+
         assertThat(result.isValid).isTrue()
         assertThat(result.isPdfA).isNotNull().isTrue()
         assertThat(result.isPdfA3).isNotNull().isTrue()
         assertThat(result.pdfAFlavor).isIn(PdfAFlavour.PDFA_3_A, PdfAFlavour.PDFA_3_B)
-        assertThat(result.readError).isNull()
         assertThat(result.countExecutedTests).isGreaterThan(2_000)
         assertThat(result.validationErrors).isEmpty()
     }
 
-    private fun assertIsValidPdfA3B(result: PdfValidationResult) {
+    private fun assertIsValidPdfA3B(validationResult: Result<PdfValidationResult>) {
+        val result = Asserts.assertSuccess(validationResult)
+
         assertThat(result.isValid).isTrue()
         assertThat(result.isPdfA).isNotNull().isTrue()
         assertThat(result.isPdfA3).isNotNull().isTrue()
         assertThat(result.pdfAFlavor).isIn(PdfAFlavour.PDFA_3_B)
-        assertThat(result.readError).isNull()
         assertThat(result.countExecutedTests).isGreaterThan(16_000)
         assertThat(result.validationErrors).isEmpty()
     }
