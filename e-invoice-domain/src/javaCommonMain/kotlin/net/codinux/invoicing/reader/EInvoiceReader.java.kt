@@ -62,7 +62,7 @@ actual open class EInvoiceReader(
         val attachmentsResult = extractXmlFromPdfJvm(pdfFile)
         val invoiceXml = attachmentsResult.invoiceXml
         if (attachmentsResult.type != PdfAttachmentExtractionResultType.HasXmlAttachments || invoiceXml.isNullOrBlank()) {
-            return ReadEInvoicePdfResult(ReadEInvoicePdfResultType.valueOf(attachmentsResult.type.name), attachmentsResult)
+            return ReadEInvoicePdfResult(ReadEInvoicePdfResultType.from(attachmentsResult.type), attachmentsResult)
         }
 
         val readXmlResult = extractFromXmlJvm(invoiceXml)

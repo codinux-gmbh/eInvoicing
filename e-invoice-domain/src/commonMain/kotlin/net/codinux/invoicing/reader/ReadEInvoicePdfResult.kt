@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
+import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 
 @Serializable
 data class ReadEInvoicePdfResult(
@@ -13,7 +14,7 @@ data class ReadEInvoicePdfResult(
     val readError: SerializableException? = null
 ) {
     constructor(attachmentsResult: PdfAttachmentExtractionResult, readXmlResult: ReadEInvoiceXmlResult) :
-            this(ReadEInvoicePdfResultType.valueOf(readXmlResult.type.name), attachmentsResult, readXmlResult.invoice, readXmlResult.readError)
+            this(ReadEInvoicePdfResultType.from(readXmlResult.type), attachmentsResult, readXmlResult.invoice, readXmlResult.readError)
 
     override fun toString() = "$type ${invoice ?: readError ?: attachmentExtractionResult}"
 }
@@ -31,6 +32,17 @@ enum class ReadEInvoicePdfResultType {
 
     // ReadEInvoiceXmlResultType
     Success,
+    UnsupportedInvoiceFormat,
     InvalidXml,
     InvalidInvoiceData
+    ;
+
+
+    companion object {
+        fun from(attachmentsResultType: PdfAttachmentExtractionResultType) =
+            ReadEInvoicePdfResultType.valueOf(attachmentsResultType.name)
+
+        fun from(xmlResultType: ReadEInvoiceXmlResultType) =
+            ReadEInvoicePdfResultType.valueOf(xmlResultType.name)
+    }
 }
