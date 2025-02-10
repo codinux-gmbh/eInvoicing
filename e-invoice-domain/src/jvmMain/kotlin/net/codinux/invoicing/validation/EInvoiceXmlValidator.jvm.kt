@@ -15,7 +15,7 @@ import java.io.InputStream
 import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
 
-actual open class EInvoiceValidator(
+actual open class EInvoiceXmlValidator(
     protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector(),
     protected val mustangValidator: MustangEInvoiceValidator = MustangEInvoiceValidator()
 ) {

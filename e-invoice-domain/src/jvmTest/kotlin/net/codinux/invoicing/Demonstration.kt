@@ -8,7 +8,7 @@ import net.codinux.invoicing.email.EmailsFetcher
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.reader.EInvoiceReader
-import net.codinux.invoicing.validation.EInvoiceValidator
+import net.codinux.invoicing.validation.EInvoiceXmlValidator
 import java.io.File
 
 class Demonstration {
@@ -39,7 +39,7 @@ class Demonstration {
     }
 
     fun validate() {
-        val validator = EInvoiceValidator()
+        val validator = EInvoiceXmlValidator()
         val invoiceFile = File("ZUGFeRD.pdf") // or XRechnung,xml, ...
 
         val result = validator.validateEInvoicePdfJvm(invoiceFile.readBytes())

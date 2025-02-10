@@ -11,9 +11,9 @@ import net.codinux.invoicing.test.TestUtils
 import kotlin.io.path.readText
 import kotlin.test.Test
 
-class EInvoiceValidatorTest {
+class EInvoiceXmlValidatorTest {
 
-    private val underTest = EInvoiceValidator()
+    private val underTest = EInvoiceXmlValidator()
 
 
 

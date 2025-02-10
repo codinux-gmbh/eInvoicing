@@ -14,9 +14,8 @@ import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.OpenHtmlToPdfHtmlToPdfConverter
 import net.codinux.invoicing.reader.EInvoiceReader
-import net.codinux.invoicing.validation.EInvoiceValidator
+import net.codinux.invoicing.validation.EInvoiceXmlValidator
 import net.codinux.invoicing.validation.InvoiceValidationResult
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -31,7 +30,7 @@ class InvoicingService {
 
     private val reader = EInvoiceReader()
 
-    private val validator = EInvoiceValidator()
+    private val xmlValidator = EInvoiceXmlValidator()
 
     private val amountsCalculator = AmountsCalculator()
 
@@ -93,10 +92,10 @@ class InvoicingService {
 
 
     fun validateInvoice(invoiceXml: String): Result<InvoiceValidationResult> =
-        validator.validateEInvoiceXmlJvm(invoiceXml)
+        xmlValidator.validateEInvoiceXmlJvm(invoiceXml)
 
     fun validateInvoice(invoiceFile: Path): Result<InvoiceValidationResult> =
-        validator.validateEInvoicePdfJvm(invoiceFile.readBytes())
+        xmlValidator.validateEInvoicePdfJvm(invoiceFile.readBytes())
 
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =

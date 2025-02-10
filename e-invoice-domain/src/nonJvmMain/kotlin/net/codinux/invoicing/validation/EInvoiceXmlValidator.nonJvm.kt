@@ -2,7 +2,7 @@ package net.codinux.invoicing.validation
 
 import net.codinux.invoicing.web.WebClient
 
-actual open class EInvoiceValidator(
+actual open class EInvoiceXmlValidator(
     protected open val validator: WebServiceEInvoiceValidator
 ) {
 
