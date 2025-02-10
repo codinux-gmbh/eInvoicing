@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream
 import java.nio.file.Path
 import kotlin.io.path.inputStream
 
+// VeraPDF does not work on Android, e.g. calls on initialization JAXBContext.newInstance(type), and as almost everything
+// gets called via static methods it's also not replaceable
 open class EInvoicePdfValidator {
 
     companion object {
