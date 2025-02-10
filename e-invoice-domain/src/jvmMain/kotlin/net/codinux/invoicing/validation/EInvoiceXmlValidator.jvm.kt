@@ -81,7 +81,7 @@ actual open class EInvoiceXmlValidator(
 
 //            ValidationResult(failedAsserts.isEmpty(), firedRules.size, activePatterns.size, validationErrors)
 
-            Result.success(InvoiceXmlValidationResult(isValid, isValid, validationErrors, ""))
+            Result.success(InvoiceXmlValidationResult(isValid, validationErrors))
         } catch (e: Throwable) {
             log.warn(e) { "Validation with Xslt failed for XML file ${xml.substring(0, 250)}" }
             Result.error(e)

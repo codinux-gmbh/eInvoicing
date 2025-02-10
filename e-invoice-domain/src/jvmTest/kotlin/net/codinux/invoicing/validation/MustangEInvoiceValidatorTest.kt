@@ -20,7 +20,6 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
-        assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(3)
         assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(2)
@@ -35,7 +34,6 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
-        assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(0)
         assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(0)
@@ -50,7 +48,6 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
-        assertThat(result.reportAsXml).isNotEmpty()
         assertThat(result.xmlValidationResults).hasSize(0)
         assertThat(result.countXmlNotices).isEqualTo(0)
         assertThat(result.countXmlErrors).isEqualTo(0)
