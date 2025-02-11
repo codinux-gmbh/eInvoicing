@@ -26,10 +26,6 @@ class EInvoicePdfValidatorTest {
 
     @Test
     fun notAPdfA3() {
-        if (Platform.type == PlatformType.Android) {
-            return // this test does not work on Android, cannot load PDF file from resources
-        }
-
         val validationResult = underTest.validate(TestUtils.getInvalidInvoiceFile("PDF-A-1.pdf"))
 
         val result = Asserts.assertSuccess(validationResult)
