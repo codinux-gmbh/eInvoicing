@@ -45,7 +45,7 @@ open class WebClientResponse<T>(
     }
 
 
-    open fun toResult(): Result<T> = Result(error, body)
+    open fun toResult(): Result<T> = Result.of(error, body)
 
 
     override fun toString(): String {

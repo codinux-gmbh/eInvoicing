@@ -220,7 +220,10 @@ class InvoicingResource(
         createErrorResponse(result.error)
 
     private fun createErrorResponse(error: Throwable?): Response =
-        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error?.let { SerializableException(it) }).build()
+        createErrorResponse(error?.let { SerializableException(it) })
+
+    private fun createErrorResponse(error: SerializableException?): Response =
+        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build()
 
     private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
         createPdfFileResponse(pdfFile, "${invoice.shortDescription}.pdf")
@@ -236,7 +239,7 @@ class InvoicingResource(
     private fun createPdfFileResponseForPdfBytes(pdfFile: Result<ByteArray>, invoice: Invoice): Response =
         createPdfFileResponse(pdfFile.value, pdfFile.error, invoice)
 
-    private fun createPdfFileResponse(pdfBytes: ByteArray?, error: Throwable?, invoice: Invoice): Response =
+    private fun createPdfFileResponse(pdfBytes: ByteArray?, error: SerializableException?, invoice: Invoice): Response =
         if (pdfBytes != null) {
             Response.ok(pdfBytes)
                 .header("Content-Disposition", "attachment;filename=\"${invoice.shortDescription}.pdf\"")
