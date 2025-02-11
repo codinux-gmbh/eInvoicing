@@ -20,6 +20,8 @@ actual open class EInvoiceXmlValidator(
     protected val mustangValidator: MustangEInvoiceValidator = MustangEInvoiceValidator()
 ) {
 
+    actual constructor() : this(EInvoiceFormatDetector(), MustangEInvoiceValidator())
+
     private val log by logger()
 
 
