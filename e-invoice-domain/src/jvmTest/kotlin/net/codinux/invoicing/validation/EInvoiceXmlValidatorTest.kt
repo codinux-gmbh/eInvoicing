@@ -18,6 +18,22 @@ class EInvoiceXmlValidatorTest {
 
 
     @Test
+    fun validateEN16931InvoiceWithMinimumProfile() {
+        val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("ZUGFeRD.xml"), profileFor(FacturXProfile.Minimum))
+
+        assertWrongProfileResult(result)
+    }
+
+
+    @Test
+    fun validateEN16931InvoiceWithBasicWLProfile() {
+        val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("ZUGFeRD.xml"), profileFor(FacturXProfile.BasicWL))
+
+        assertWrongProfileResult(result)
+    }
+
+
+    @Test
     fun validateEN16931InvoiceWithBasicProfile() {
         val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("ZUGFeRD.xml"), profileFor(FacturXProfile.Basic))
 
