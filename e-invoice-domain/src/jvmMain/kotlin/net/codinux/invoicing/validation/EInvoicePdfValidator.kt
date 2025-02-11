@@ -71,7 +71,7 @@ actual open class EInvoicePdfValidator(
     protected open fun mapErrors(result: ValidationResult): List<PdfValidationError> =
         result.testAssertions.map { assertion ->
             val rule = result.validationProfile.getRuleByRuleId(assertion.ruleId)!!
-            PdfValidationError(assertion.message, rule.description, rule.test, rule.`object`,
+            PdfValidationError(assertion.message, rule.test, rule.`object`,
                 PdfValidationRule(rule.ruleId.specification.id, rule.ruleId.clause, rule.ruleId.testNumber),
                 rule.references.map { PdfReference(it.specification, it.clause.takeUnless { it.isNullOrBlank() }) },
                 rule.error.arguments.map { it.argument }, assertion.location.context)

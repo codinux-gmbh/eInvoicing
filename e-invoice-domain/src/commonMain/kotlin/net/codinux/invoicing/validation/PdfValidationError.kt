@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PdfValidationError(
     val englishMessage: String,
-    val description: String,
     val test: String,
     val category: String,
     val rule: PdfValidationRule,
