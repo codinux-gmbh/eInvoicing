@@ -59,6 +59,9 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
 
         addFacturXXmp(document, format)
 
+        // TODO: actually doesn't belong to here (is actually a side-effect), but on the otherside in this way we don't need to load PDDocument from PDF bytes twice
+        convertToPdfA3(document)
+
         document.save(output)
     }
 
@@ -214,10 +217,13 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             }
         }
 
-    private fun createPdfA3(): PDDocument {
-        val document = PDDocument()
-        document.addPage(PDPage()) // add an empty page
+    protected open fun createPdfA3() = PDDocument().apply {
+        addPage(PDPage()) // add an empty page
 
+        convertToPdfA3(this)
+    }
+
+    protected open fun convertToPdfA3(document: PDDocument) {
         val catalog = document.documentCatalog.apply {
             markInfo = PDMarkInfo(document.pages.cosObject).also { it.isMarked = true }
             structureTreeRoot = PDStructureTreeRoot()
@@ -228,8 +234,6 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         val metadata = PDMetadata(document)
         catalog.metadata = metadata
         setXmpMetadata(metadata, createPdfA3XmpMetadata())
-
-        return document
     }
 
     protected open fun createPdfA3XmpMetadata(): XMPMetadata {
