@@ -2,6 +2,8 @@ package net.codinux.invoicing.validation
 
 import net.codinux.invoicing.extension.readAllBytesAndClose
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
 import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider
 import org.verapdf.pdfa.Foundries
@@ -13,7 +15,12 @@ import kotlin.io.path.inputStream
 
 // VeraPDF does not work on Android, e.g. calls on initialization JAXBContext.newInstance(type), and as almost everything
 // gets called via static methods it's also not replaceable
-actual open class EInvoicePdfValidator {
+actual open class EInvoicePdfValidator(
+    protected val attachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
+    protected val xmlValidator: EInvoiceXmlValidator = EInvoiceXmlValidator()
+) {
+
+    actual constructor() : this(JavaPlatform.pdfAttachmentReader, EInvoiceXmlValidator())
 
     init {
         VeraGreenfieldFoundryProvider.initialise() // alternative: PdfBoxFoundryProvider.initialise()
@@ -42,7 +49,9 @@ actual open class EInvoicePdfValidator {
                 val result = validator.validate(parser)
                 val validationErrors = mapErrors(result)
 
-                Result.success(PdfValidationResult(result.isCompliant, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors))
+                val xmlValidationResult = validateXml(pdfBytes)
+
+                Result.success(PdfValidationResult(result.isCompliant, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors, xmlValidationResult))
             }
         } catch (e: Throwable) {
             log.error(e) { "PDF validation failed" }
@@ -64,6 +73,19 @@ actual open class EInvoicePdfValidator {
                 PdfValidationRule(rule.ruleId.specification.id, rule.ruleId.clause, rule.ruleId.testNumber),
                 rule.references.map { PdfReference(it.specification, it.clause.takeUnless { it.isNullOrBlank() }) },
                 rule.error.arguments.map { it.argument }, assertion.location.context)
+        }
+
+    protected open fun validateXml(pdfBytes: ByteArray): Result<InvoiceXmlValidationResult> =
+        try {
+            val invoiceXml = attachmentReader.getFileAttachments(pdfBytes).invoiceXml
+            if (invoiceXml != null) {
+                xmlValidator.validateEInvoiceXmlJvm(invoiceXml)
+            } else {
+                Result.error(IllegalStateException("No EInvoice XML attached to PDF file"))
+            }
+        } catch (e: Throwable) {
+            log.error(e) { "Could not validate PDF's attached invoice XML" }
+            Result.error(e)
         }
 
 }
