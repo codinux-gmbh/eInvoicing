@@ -15,16 +15,11 @@ import kotlin.io.path.inputStream
 // gets called via static methods it's also not replaceable
 actual open class EInvoicePdfValidator {
 
-    companion object {
-        private val CompliantPdfAVersions = listOf(PDFAFlavour.PDFA_3_A, PDFAFlavour.PDFA_3_B, PDFAFlavour.PDFA_3_U)
-    }
-
-    private val log by logger()
-
-
     init {
         VeraGreenfieldFoundryProvider.initialise() // alternative: PdfBoxFoundryProvider.initialise()
     }
+
+    private val log by logger()
 
 
     actual open suspend fun validateEInvoicePdf(pdfBytes: ByteArray) =
@@ -39,10 +34,11 @@ actual open class EInvoicePdfValidator {
             Foundries.defaultInstance().createParser(ByteArrayInputStream(pdfBytes)).use { parser ->
                 // check if flavor is valid:
                 val isPdfA = parser.flavour != PDFAFlavour.NO_FLAVOUR
-                val isPdfA3 = parser.flavour in CompliantPdfAVersions
+                val isPdfA3 = parser.flavour.part == PDFAFlavour.Specification.ISO_19005_3 // ISO 19005-3 (2012) specifies PDF/A-3
 
-                // TODO: validate explicitly against PDF-A3
-                val validator = Foundries.defaultInstance().createValidator(parser.flavour, false)
+                // if it's already a PDF/A-3 flavour - PDF/A-3a, -b or -u -, use that one, otherwise validate at least against PDF/A-3b
+                val flavourToValidateAgainst = if (isPdfA3) parser.flavour else PDFAFlavour.PDFA_3_B
+                val validator = Foundries.defaultInstance().createValidator(flavourToValidateAgainst, false)
                 val result = validator.validate(parser)
                 val validationErrors = mapErrors(result)
 
