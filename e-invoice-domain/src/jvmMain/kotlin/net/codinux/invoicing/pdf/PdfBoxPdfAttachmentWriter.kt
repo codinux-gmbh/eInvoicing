@@ -15,6 +15,7 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecifica
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot
+import org.apache.pdfbox.pdmodel.graphics.color.PDOutputIntent
 import org.apache.xmpbox.XMPMetadata
 import org.apache.xmpbox.schema.PDFAExtensionSchema
 import org.apache.xmpbox.schema.XMPSchema
@@ -28,6 +29,11 @@ import java.nio.file.Path
 import java.util.*
 
 open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
+
+    companion object {
+        val IccProfile by lazy { ResourceUtil.getResourceBytes("colorprofiles/sRGB_ICC_v4_Appearance.icc") }
+    }
+
 
     protected val FacturXPdfAExtensionSchema: XMPSchema by lazy {
         DomXmpParser().parse(PdfBoxHandlerCommon.FacturXPdfAExtensionSchemaString.byteInputStream()).getSchema(PdfBoxHandlerCommon.PdfAExtensionSchemaNamespace).apply {
@@ -234,6 +240,8 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         val metadata = PDMetadata(document)
         catalog.metadata = metadata
         setXmpMetadata(metadata, createPdfA3XmpMetadata())
+
+        addColorProfile(document)
     }
 
     protected open fun createPdfA3XmpMetadata(): XMPMetadata {
@@ -252,17 +260,6 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
             addDate(Calendar.getInstance()) // TODO: may set creator and title
         }
 
-        // TODO: ChatGPT told me to also add an ICC profile (downloadable from here: https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html),
-        //   but VeraPDF says it's a valid PDF/A-3 also without an ICC profile
-        // Add an ICC profile
-//        val iccProfileStream: InputStream = FileInputStream(File(iccPath))
-//        val outputIntent = PDOutputIntent(document, iccProfileStream)
-//        outputIntent.info = "sRGB IEC61966-2.1"
-//        outputIntent.outputCondition = "sRGB IEC61966-2.1"
-//        outputIntent.outputConditionIdentifier = "sRGB IEC61966-2.1"
-//        outputIntent.registryName = "http://www.color.org"
-//        document.documentCatalog.addOutputIntent(outputIntent)
-
         return xmpMetadata
     }
 
@@ -273,9 +270,17 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         }
 
         metadata.importXMPMetadata(xmpBytes)
+    }
 
-        val xmpXml = xmpBytes.decodeToString()
-        if (xmpXml.isNullOrBlank()) { }
+    protected open fun addColorProfile(document: PDDocument) {
+        // see https://github.com/apache/pdfbox/blob/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/CreatePDFA.java
+        // or https://github.com/typst/typst/pull/5075/files
+        val outputIntent = PDOutputIntent(document, ByteArrayInputStream(IccProfile))
+        outputIntent.info = "sRGB IEC61966-2.1"
+        outputIntent.outputCondition = "sRGB IEC61966-2.1"
+        outputIntent.outputConditionIdentifier = "sRGB IEC61966-2.1"
+        outputIntent.registryName = "http://www.color.org"
+        document.documentCatalog.addOutputIntent(outputIntent)
     }
 
 }
