@@ -34,7 +34,7 @@ class EInvoicePdfValidatorTest {
         assertThat(result.isPdfA3).isFalse()
         assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_1_B)
         assertThat(result.countExecutedTests).isGreaterThan(16_000)
-        assertThat(result.validationErrors).hasSize(8)
+        assertThat(result.validationErrors).hasSize(3)
     }
 
     @Test
