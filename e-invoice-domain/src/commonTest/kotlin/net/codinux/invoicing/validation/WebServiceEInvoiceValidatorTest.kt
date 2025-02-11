@@ -19,7 +19,7 @@ class WebServiceEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(webResult)
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
-        assertThat(result.xmlValidationResults).hasSize(3)
+        assertThat(result.errors).hasSize(3)
     }
 
     @Test
@@ -41,7 +41,7 @@ class WebServiceEInvoiceValidatorTest {
         val validationResult = Asserts.assertSuccess(result)
 
         assertThat(validationResult.isValid).isTrue()
-        assertThat(validationResult.xmlValidationResults).isEmpty()
+        assertThat(validationResult.errors).isEmpty()
     }
 
     private fun assertPdfValidationResult(result: Result<PdfValidationResult>) {

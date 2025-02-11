@@ -97,7 +97,7 @@ actual open class EInvoiceXmlValidator(
 //    }
 
     private fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
-        ValidationResultItem(
+        ValidationError(
             it.children { it.nodeName?.localName == "text" }.map { it.stringValue.trim() }.firstOrNull() ?: "",
             it.attribute("location"),
             it.attribute("test"),

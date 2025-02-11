@@ -3,7 +3,7 @@ package net.codinux.invoicing.validation
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ValidationResultItem(
+class ValidationError(
     val message: String,
     val location: String?,
     val test: String?

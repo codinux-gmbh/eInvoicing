@@ -66,6 +66,6 @@ open class MustangEInvoiceValidator {
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
-        ValidationResultItem(item.message, item.location, CriterionField?.get(item) as? String)
+        ValidationError(item.message, item.location, CriterionField?.get(item) as? String)
 
 }
