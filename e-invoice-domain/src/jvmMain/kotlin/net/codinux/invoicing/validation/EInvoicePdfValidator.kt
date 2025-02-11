@@ -49,6 +49,8 @@ actual open class EInvoicePdfValidator(
                 val result = validator.validate(parser)
                 val validationErrors = mapErrors(result)
 
+                // we also could validate PDF Metadata if it conforms to Factur-X specification (profile set etc.), but we omit that for now
+
                 val xmlValidationResult = validateXml(pdfBytes)
 
                 Result.success(PdfValidationResult(result.isCompliant, isPdfA, isPdfA3, mapFlavor(parser.flavour), result.totalAssertions, validationErrors, xmlValidationResult))
