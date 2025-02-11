@@ -82,9 +82,8 @@ class EInvoiceXmlValidatorTest {
         val result = Asserts.assertSuccess(result)
 
         assertThat(result.isValid).isTrue()
-//        assertThat(result.countFiredRules).isGreaterThan(60)
-//        assertThat(result.countActivePatterns).isGreaterThan(200)
-//        assertThat(result.failedAsserts).isEmpty()
+//        assertThat(result.countAvailableTests).isGreaterThan(200)
+//        assertThat(result.countAppliedTests).isGreaterThan(60)
         assertThat(result.xmlValidationResults).isEmpty()
     }
 
@@ -102,9 +101,8 @@ class EInvoiceXmlValidatorTest {
         val result = Asserts.assertSuccess(result)
 
         assertThat(result.isValid).isFalse()
-//        assertThat(result.countFiredRules).isGreaterThan(40)
-//        assertThat(result.countActivePatterns).isGreaterThan(200)
-//        assertThat(result.failedAsserts).hasSize(countValidationErrors)
+//        assertThat(result.countAvailableTests).isGreaterThan(200)
+//        assertThat(result.countAppliedTests).isGreaterThan(40)
         assertThat(result.xmlValidationResults).hasSize(countValidationErrors)
 
         return result

@@ -20,9 +20,6 @@ class WebServiceEInvoiceValidatorTest {
         val result = Asserts.assertSuccess(webResult)
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
         assertThat(result.xmlValidationResults).hasSize(3)
-        assertThat(result.countXmlNotices).isEqualTo(0)
-        assertThat(result.countXmlErrors).isEqualTo(2)
-        assertThat(result.countXmlFatalOrException).isEqualTo(0)
     }
 
     @Test

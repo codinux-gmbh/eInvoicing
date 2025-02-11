@@ -4,10 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ValidationResultItem(
-    val severity: ValidationResultSeverity,
     val message: String,
     val location: String?,
-    val criterion: String?
+    val test: String?
 ) {
-    override fun toString() = "$severity: $message"
+    override fun toString() = "$location: $message"
 }

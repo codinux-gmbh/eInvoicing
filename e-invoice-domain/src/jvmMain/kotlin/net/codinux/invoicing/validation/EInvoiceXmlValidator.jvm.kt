@@ -74,12 +74,10 @@ actual open class EInvoiceXmlValidator(
             // iterating over children and specifying the namespace URI turned out to be the fastest way (twice as fast
             // as leaving the ns URI away and 50 % faster than root.children { node -> } )
             val failedAsserts = root.children("http://purl.oclc.org/dsdl/svrl", "failed-assert")
-//            val firedRules = root.children("http://purl.oclc.org/dsdl/svrl", "fired-rule")
 //            val activePatterns = root.children("http://purl.oclc.org/dsdl/svrl", "active-pattern")
+//            val testedInvoiceFields = root.children("http://purl.oclc.org/dsdl/svrl", "fired-rule")
             val validationErrors = mapValidationErrors(failedAsserts)
             val isValid = validationErrors.isEmpty()
-
-//            ValidationResult(failedAsserts.isEmpty(), firedRules.size, activePatterns.size, validationErrors)
 
             Result.success(InvoiceXmlValidationResult(isValid, validationErrors))
         } catch (e: Throwable) {
@@ -100,7 +98,6 @@ actual open class EInvoiceXmlValidator(
 
     private fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
         ValidationResultItem(
-            ValidationResultSeverity.Error,
             it.children { it.nodeName?.localName == "text" }.map { it.stringValue.trim() }.firstOrNull() ?: "",
             it.attribute("location"),
             it.attribute("test"),

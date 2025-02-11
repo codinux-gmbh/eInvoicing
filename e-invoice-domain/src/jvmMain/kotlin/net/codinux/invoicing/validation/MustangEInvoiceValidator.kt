@@ -55,7 +55,7 @@ open class MustangEInvoiceValidator {
             // TODO: currently it's not possible to get PDF validation result as for PDF validation the same context object
             //  is used and then in a private method before XML validation context.clear() gets called removing all PDF validation results
 
-            Result.success(InvoiceXmlValidationResult(validator.wasCompletelyValid(), xmlValidationResults))
+            Result.success(InvoiceXmlValidationResult(validator.wasCompletelyValid(), xmlValidationResults)) // not going to rebuild countAvailableTests and countAppliedTests for Mustang
         } catch (e: Throwable) {
             log.error(e) { "Could not validate EInvoice file" }
             Result.error(e)
@@ -66,13 +66,6 @@ open class MustangEInvoiceValidator {
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
-        ValidationResultItem(mapSeverity(item), item.message, item.location, CriterionField?.get(item) as? String)
-
-    protected open fun mapSeverity(item: org.mustangproject.validator.ValidationResultItem): ValidationResultSeverity {
-        var name = item.severity.name
-        name = name.first().uppercase() + name.substring(1)
-
-        return ValidationResultSeverity.valueOf(name)
-    }
+        ValidationResultItem(item.message, item.location, CriterionField?.get(item) as? String)
 
 }
