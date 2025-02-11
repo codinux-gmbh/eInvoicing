@@ -1,18 +1,13 @@
 package net.codinux.invoicing.creation
 
-import net.codinux.invoicing.config.DIJava
-import net.codinux.invoicing.filesystem.FilesystemService
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.*
 import net.codinux.invoicing.reader.EInvoiceXmlReader
 import net.codinux.log.logger
-import java.io.File
-import java.io.OutputStream
-import java.nio.file.Path
-import kotlin.io.path.outputStream
 
 actual open class EInvoicePdfCreator(
     protected val templateService: TemplateService = HandlebarsTemplateService(),
@@ -20,7 +15,6 @@ actual open class EInvoicePdfCreator(
     protected open val attacher: EInvoiceXmlToPdfAttacher = EInvoiceXmlToPdfAttacher(),
     protected open val xmlCreator: EInvoiceXmlCreator = EInvoiceXmlCreator(),
     protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader(), // TODO: make smarter
-    protected open val filesystem: FilesystemService = DIJava.Filesystem
 ) {
 
     actual constructor() : this(HandlebarsTemplateService(), OpenHtmlToPdfHtmlToPdfConverter(), EInvoiceXmlToPdfAttacher(), EInvoiceXmlCreator())
@@ -34,66 +28,34 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoice: Invoice, config: InvoicePdfConfig): Result<ByteArray> {
-        val destinationFile = filesystem.createTempPdfFile()
-
-        createPdfWithAttachedXml(invoice, config.format, destinationFile)
-
-        return Result.success(destinationFile.readBytes())
-    }
+    actual open suspend fun createFacturXPdf(invoice: Invoice, config: InvoicePdfConfig): Result<Pdf> =
+        createPdfWithAttachedXml(invoice, config.format)
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoiceXml: String, config: InvoicePdfConfig): Result<ByteArray> {
-        val destinationFile = filesystem.createTempPdfFile()
-
-        createPdfWithAttachedXml(invoiceXml, config.format, destinationFile)
-
-        return Result.success(destinationFile.readBytes())
-    }
+    actual open suspend fun createFacturXPdf(invoiceXml: String, config: InvoicePdfConfig): Result<Pdf> =
+        createPdfWithAttachedXml(invoiceXml, config.format)
 
 
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    open fun createPdfWithAttachedXml(invoice: Invoice, outputFile: File) =
-        createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX, outputFile)
+    open fun createPdfWithAttachedXml(invoice: Invoice) =
+        createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX)
 
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: File): Result<Unit> =
+    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<Pdf> =
         createXml(invoice, format).ifSuccessful { xml ->
-            createPdfWithAttachedXml(xml, format, outputFile)
+            createPdfWithAttachedXml(xml, format)
         }
 
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: File) =
-        createPdfWithAttachedXml(invoiceXml, format, outputFile.outputStream())
-
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    open fun createPdfWithAttachedXml(invoice: Invoice, outputFile: Path) =
-        createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX, outputFile)
-
-    /**
-     * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
-     */
-    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat, outputFile: Path): Result<Unit> =
-        createXml(invoice, format).ifSuccessful { xml ->
-            createPdfWithAttachedXml(xml, format, outputFile)
-        }
-
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: Path) =
-        createPdfWithAttachedXml(invoiceXml, format, outputFile.outputStream())
-
-    /**
-     * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
-     *
-     * Closes the OutputStream of parameter [outputFile].
-     */
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat, outputFile: OutputStream): Result<Unit> =
+    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat): Result<Pdf> =
         try {
             val readXmlResult = xmlReader.parseInvoiceXml(invoiceXml) // TODO: make smarter
             val invoice = readXmlResult.invoice?.invoice
@@ -104,11 +66,7 @@ actual open class EInvoicePdfCreator(
                 val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice)
                 val pdf = htmlToPdfConverter.createPdf(html)
 
-                val result = attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes)
-                result.ifSuccessful {
-                    outputFile.write(it.bytes)
-                    Result.success(Unit)
-                }
+                attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not create PDF with attached xml: $invoiceXml" }

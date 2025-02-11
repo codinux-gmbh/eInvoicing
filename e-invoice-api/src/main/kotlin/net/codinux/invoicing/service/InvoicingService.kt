@@ -3,7 +3,6 @@ package net.codinux.invoicing.service
 import jakarta.inject.Singleton
 import net.codinux.invoicing.calculator.AmountsCalculator
 import net.codinux.invoicing.calculator.InvoiceItemPrice
-import net.codinux.invoicing.config.DIJava
 import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.creation.EInvoiceXmlCreator
 import net.codinux.invoicing.creation.EInvoiceXmlToPdfAttacher
@@ -40,8 +39,6 @@ class InvoicingService {
 
     private val htmlToPdfConverter = OpenHtmlToPdfHtmlToPdfConverter()
 
-    private val filesystem = DIJava.Filesystem
-
 
     fun createInvoiceXml(invoice: Invoice, format: EInvoiceFormat): Result<String> =
         xmlCreator.createInvoiceXmlJvm(invoice, format)
@@ -52,21 +49,11 @@ class InvoicingService {
     fun createFacturXXml(invoice: Invoice): Result<String> =
         xmlCreator.createFacturXXmlJvm(invoice)
 
-    fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Path {
-        val resultFile = createTempPdfFile()
+    fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Result<Pdf> =
+        pdfCreator.createPdfWithAttachedXml(invoice, format)
 
-        pdfCreator.createPdfWithAttachedXml(invoice, format, resultFile)
-
-        return resultFile
-    }
-
-    fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Path {
-        val resultFile = createTempPdfFile()
-
-        pdfCreator.createPdfWithAttachedXml(invoiceXml, format, resultFile.toFile())
-
-        return resultFile
-    }
+    fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Result<Pdf> =
+        pdfCreator.createPdfWithAttachedXml(invoiceXml, format)
 
 
     fun createPdfFromHtml(html: String): Pdf =
@@ -104,9 +91,5 @@ class InvoicingService {
 
     fun calculateTotalAmounts(itemPrices: Collection<InvoiceItemPrice>) =
         amountsCalculator.calculateTotalAmounts(itemPrices)
-
-
-    private fun createTempPdfFile(): Path =
-        filesystem.createTempPdfFile().toPath()
 
 }

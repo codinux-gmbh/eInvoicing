@@ -1,13 +1,17 @@
 package net.codinux.invoicing.creation
 
 import net.codinux.invoicing.model.EInvoiceXmlFormat
+import net.codinux.invoicing.model.Pdf
+import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.platform.JavaPlatform
+import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.InvoiceXmlAsserter
-import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
-import java.io.File
 import kotlin.test.Test
 
 class EInvoicePdfCreatorTest {
+
+    private val pdfAttachmentReader = JavaPlatform.pdfAttachmentReader
 
     private val underTest = EInvoicePdfCreator()
 
@@ -15,33 +19,29 @@ class EInvoicePdfCreatorTest {
     @Test
     fun createPdfWithAttachedXml_FacturX() {
         val invoice = createInvoice()
-        val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX, testFile)
+        val result = underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX)
 
-        val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
-        val xml = importer.utF8
-
-        assertInvoiceXml(xml)
+        assertInvoiceXml(result)
     }
 
     @Test
     fun createPdfWithAttachedXml_XRechnung() {
         val invoice = createInvoice()
-        val testFile = File.createTempFile("Zugferd", ".pdf")
 
-        underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.XRechnung, testFile)
+        val result = underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.XRechnung)
 
-        val importer = testFile.inputStream().use { ZUGFeRDInvoiceImporter(it) }
-        val xml = importer.utF8
-
-        assertInvoiceXml(xml)
+        assertInvoiceXml(result)
     }
 
 
     private fun createInvoice() = DataGenerator.createInvoice()
 
-    private fun assertInvoiceXml(xml: String) {
+    private fun assertInvoiceXml(createResult: Result<Pdf>) {
+        val pdfBytes = Asserts.assertSuccess(createResult).bytes
+
+        val xml = pdfAttachmentReader.getFileAttachments(pdfBytes).invoiceXml
+
         InvoiceXmlAsserter.assertInvoiceXml(xml)
     }
 

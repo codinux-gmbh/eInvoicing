@@ -20,7 +20,6 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
-import kotlin.io.path.readBytes
 
 @Path("v1")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -71,10 +70,10 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdfByteResponse(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): ByteArray {
-        val pdfFile = service.createFacturXPdf(invoice, format)
+    fun createFacturXPdfByteResponse(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+        val pdf = service.createFacturXPdf(invoice, format)
 
-        return pdfFile.readBytes()
+        return createResponse(pdf)
     }
 
     @Path("create/facturx/pdf")
@@ -83,10 +82,10 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Create a Factur-X / ZUGFeRD from supplied invoice XML and attaches supplied XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdfByteResponse(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): ByteArray {
-        val pdfFile = service.createFacturXPdf(invoiceXml, format)
+    fun createFacturXPdfByteResponse(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+        val pdf = service.createFacturXPdf(invoiceXml, format)
 
-        return pdfFile.readBytes()
+        return createResponse(pdf)
     }
 
 
@@ -225,14 +224,6 @@ class InvoicingResource(
     private fun createErrorResponse(error: SerializableException?): Response =
         Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build()
 
-    private fun createPdfFileResponse(pdfFile: java.nio.file.Path, invoice: Invoice): Response =
-        createPdfFileResponse(pdfFile, "${invoice.shortDescription}.pdf")
-
-    private fun createPdfFileResponse(pdfFile: java.nio.file.Path, filename: String): Response =
-        Response.ok(pdfFile)
-            .header("Content-Disposition", "attachment;filename=\"$filename\"")
-            .build()
-
     private fun createPdfFileResponse(pdfFile: Result<Pdf>, invoice: Invoice): Response =
         createPdfFileResponse(pdfFile.value?.bytes, pdfFile.error, invoice)
 
@@ -247,5 +238,10 @@ class InvoicingResource(
         } else {
             createErrorResponse(error)
         }
+
+    private fun <T> createResponse(result: Result<T>): Response =
+        result.value?.let {
+            Response.ok(it).build()
+        } ?: createErrorResponse(result.error)
 
 }
