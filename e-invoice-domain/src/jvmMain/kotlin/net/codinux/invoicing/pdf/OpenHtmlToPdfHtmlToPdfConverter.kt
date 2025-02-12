@@ -33,33 +33,7 @@ open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
             builder.useFastMode()
 
             /*      Embed fonts for PDF/A compatibility     */
-
-            // in my eyes this is a bug in OpenHtmlToPdf: when searching for a font, "sans-serif" gets converted to "SansSerif",
-            // "serif" to "Serif" and "monospace" to "Monospaced" - but the supplied font family names don't get converted this way!
-            // So the supplied font with key "serif", "sans-serif", ... will never be matched, as OHtP looks for "Serif", "SansSerif", ...
-
-            // system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Oxygen, Cantarell, sans-serif;
-            // and what about Tahoma, San Francisco, Helvetica, Trebuchet MS, Verdana?
-            builder.addWithBoldFont("LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans", "Liberation Sans", "liberation-sans", "system-ui", "-apple-system", "BlinkMacSystemFont", "Helvetica", "Arial", "SansSerif")
-
-            // what about Georgia?
-            builder.addWithBoldFont("LiberationSerif-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationSerif", "Liberation Serif", "liberation-serif", "Times New Roman", "Times Roman", "Times-Roman", "Times", "Serif")
-
-            builder.addWithBoldFont("LiberationMono-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationMono", "Liberation Mono", "liberation-mono", "Courier New", "Courier", "Monospaced")
-
-            // fonts lookup is case sensitive, so add in title case and in lower case
-            builder.addFont("Roboto-VariableFont_wdth,wght.ttf", "Roboto", "roboto")
-            builder.addFont("NotoSans-VariableFont_wdth,wght.ttf", "NotoSans", "Noto Sans", "noto-sans")
-            builder.addFont("OpenSans-VariableFont_wdth,wght.ttf", "OpenSans", "Open Sans", "open-sans")
-            builder.addFont("SourceSans3-VariableFont_wght.ttf", "SourceSans", "Source Sans", "source-sans")
-            builder.addWithBoldFont("Ubuntu-Regular.ttf", "Ubuntu-Bold.ttf", "Ubuntu", "ubuntu")
-
-            builder.addFont("NotoSerif-VariableFont_wdth,wght.ttf", "NotoSerif", "Noto Serif", "noto-serif")
-            builder.addFont("SourceSerif4-VariableFont_opsz,wght.ttf", "SourceSerif", "Source Serif", "source-serif")
-            builder.addFont("EBGaramond-VariableFont_wght.ttf", "EBGaramond", "EB Garamond", "eb-garamond", "Garamond", "garamond")
-
-            builder.addFont("NotoSansMono-VariableFont_wdth,wght.ttf", "NotoSansMono", "Noto Sans Mono", "noto-sans-mono", "noto-mono")
-            builder.addFont("SourceCodePro-VariableFont_wght.ttf", "SourceCodePro", "Source Code Pro", "source-code-pro")
+            builder.addDefaultFonts()
 
             // if there's e.g. a font in HTML that we didn't embed above, then PDF creation crashes. So don't call usePdfAConformance(), we ensure PDF/A-3 compatiblity ourselves
 //            builder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A)
@@ -72,6 +46,35 @@ open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
         pdfBytes = setMetadata(pdfBytes)
 
         return Pdf(pdfBytes)
+    }
+
+    protected open fun PdfRendererBuilder.addDefaultFonts() = this.apply {
+        // in my eyes this is a bug in OpenHtmlToPdf: when searching for a font, "sans-serif" gets converted to "SansSerif",
+        // "serif" to "Serif" and "monospace" to "Monospaced" - but the supplied font family names don't get converted this way!
+        // So the supplied font with key "serif", "sans-serif", ... will never be matched, as OHtP looks for "Serif", "SansSerif", ...
+
+        // system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Oxygen, Cantarell, sans-serif;
+        // and what about Tahoma, San Francisco, Helvetica, Trebuchet MS, Verdana?
+        this.addWithBoldFont("LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans", "Liberation Sans", "liberation-sans", "system-ui", "-apple-system", "BlinkMacSystemFont", "Helvetica", "Arial", "SansSerif")
+
+        // what about Georgia?
+        this.addWithBoldFont("LiberationSerif-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationSerif", "Liberation Serif", "liberation-serif", "Times New Roman", "Times Roman", "Times-Roman", "Times", "Serif")
+
+        this.addWithBoldFont("LiberationMono-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationMono", "Liberation Mono", "liberation-mono", "Courier New", "Courier", "Monospaced")
+
+        // fonts lookup is case sensitive, so add in title case and in lower case
+        this.addFont("Roboto-VariableFont_wdth,wght.ttf", "Roboto", "roboto")
+        this.addFont("NotoSans-VariableFont_wdth,wght.ttf", "NotoSans", "Noto Sans", "noto-sans")
+        this.addFont("OpenSans-VariableFont_wdth,wght.ttf", "OpenSans", "Open Sans", "open-sans")
+        this.addFont("SourceSans3-VariableFont_wght.ttf", "SourceSans", "Source Sans", "source-sans")
+        this.addWithBoldFont("Ubuntu-Regular.ttf", "Ubuntu-Bold.ttf", "Ubuntu", "ubuntu")
+
+        this.addFont("NotoSerif-VariableFont_wdth,wght.ttf", "NotoSerif", "Noto Serif", "noto-serif")
+        this.addFont("SourceSerif4-VariableFont_opsz,wght.ttf", "SourceSerif", "Source Serif", "source-serif")
+        this.addFont("EBGaramond-VariableFont_wght.ttf", "EBGaramond", "EB Garamond", "eb-garamond", "Garamond", "garamond")
+
+        this.addFont("NotoSansMono-VariableFont_wdth,wght.ttf", "NotoSansMono", "Noto Sans Mono", "noto-sans-mono", "noto-mono")
+        this.addFont("SourceCodePro-VariableFont_wght.ttf", "SourceCodePro", "Source Code Pro", "source-code-pro")
     }
 
     protected open fun PdfRendererBuilder.addFont(regularFontName: String, vararg fontFamilies: String) =
