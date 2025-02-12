@@ -3,6 +3,7 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import net.codinux.invoicing.model.InvoiceLanguage
 import net.codinux.invoicing.model.LocalDate
 import net.codinux.invoicing.model.ServiceDate
 import net.codinux.invoicing.test.DataGenerator

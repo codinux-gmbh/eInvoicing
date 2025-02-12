@@ -4,6 +4,7 @@ import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Options
 import net.codinux.invoicing.model.BigDecimal
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.InvoiceLanguage
 import net.codinux.invoicing.model.LocalDate
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure

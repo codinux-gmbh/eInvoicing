@@ -1,6 +1,7 @@
 package net.codinux.invoicing.pdf
 
 import net.codinux.invoicing.model.Invoice
+import net.codinux.invoicing.model.InvoiceLanguage
 
 interface TemplateService {
 
