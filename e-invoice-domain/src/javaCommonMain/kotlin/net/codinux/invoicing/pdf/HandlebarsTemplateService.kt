@@ -34,7 +34,7 @@ open class HandlebarsTemplateService : TemplateService {
         protected val locale = if (language == InvoiceLanguage.German) Locale.GERMAN else Locale.ENGLISH
 
         protected open val dateFormat = DateTimeFormatter.ofLocalizedDate(if (language == InvoiceLanguage.German) FormatStyle.MEDIUM else FormatStyle.SHORT)
-            .localizedBy(locale)
+            .withLocale(locale) // don't use localizedBy() as that requires Android API >= 34
 
         protected open val percentFormat = DecimalFormat.getPercentInstance(locale)
 
