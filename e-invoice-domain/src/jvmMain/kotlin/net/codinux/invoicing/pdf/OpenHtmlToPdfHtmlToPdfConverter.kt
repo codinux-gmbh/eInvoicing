@@ -34,14 +34,18 @@ open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
 
             /*      Embed fonts for PDF/A compatibility     */
 
+            // in my eyes this is a bug in OpenHtmlToPdf: when searching for a font, "sans-serif" gets converted to "SansSerif",
+            // "serif" to "Serif" and "monospace" to "Monospaced" - but the supplied font family names don't get converted this way!
+            // So the supplied font with key "serif", "sans-serif", ... will never be matched, as OHtP looks for "Serif", "SansSerif", ...
+
             // system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Oxygen, Cantarell, sans-serif;
             // and what about Tahoma, San Francisco, Helvetica, Trebuchet MS, Verdana?
-            builder.addWithBoldFont("LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans", "Liberation Sans", "liberation-sans", "system-ui", "-apple-system", "BlinkMacSystemFont", "Helvetica", "Arial", "sans-serif")
+            builder.addWithBoldFont("LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans", "Liberation Sans", "liberation-sans", "system-ui", "-apple-system", "BlinkMacSystemFont", "Helvetica", "Arial", "SansSerif")
 
             // what about Georgia?
-            builder.addWithBoldFont("LiberationSerif-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationSerif", "Liberation Serif", "liberation-serif", "Times New Roman", "Times Roman", "Times-Roman", "Times", "serif")
+            builder.addWithBoldFont("LiberationSerif-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationSerif", "Liberation Serif", "liberation-serif", "Times New Roman", "Times Roman", "Times-Roman", "Times", "Serif")
 
-            builder.addWithBoldFont("LiberationMono-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationMono", "Liberation Mono", "liberation-mono", "Courier New", "Courier", "monospace")
+            builder.addWithBoldFont("LiberationMono-Regular.ttf", "LiberationSerif-Bold.ttf", "LiberationMono", "Liberation Mono", "liberation-mono", "Courier New", "Courier", "Monospaced")
 
             // fonts lookup is case sensitive, so add in title case and in lower case
             builder.addFont("Roboto-VariableFont_wdth,wght.ttf", "Roboto", "roboto")
