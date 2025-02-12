@@ -28,5 +28,11 @@
     <logger name="org.apache.xmlgraphics.image.loader.spi.ImageImplRegistry" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="org.apache.fontbox.ttf.gsub" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="org.apache.fontbox.util.autodetect.FontFileFinder" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 
 </configuration>

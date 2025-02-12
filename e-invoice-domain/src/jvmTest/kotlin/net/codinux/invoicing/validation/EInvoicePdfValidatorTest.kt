@@ -2,16 +2,17 @@ package net.codinux.invoicing.validation
 
 import assertk.assertThat
 import assertk.assertions.*
+import kotlinx.coroutines.test.runTest
+import net.codinux.invoicing.creation.EInvoicePdfCreator
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.test.Asserts
+import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestData
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.EInvoiceFormat
 import net.codinux.invoicing.testfiles.EInvoiceProfile
 import net.codinux.invoicing.testfiles.EInvoiceTestFiles
 import net.codinux.invoicing.testfiles.ZugferdVersion
-import net.codinux.kotlin.Platform
-import net.codinux.kotlin.PlatformType
 import net.codinux.log.logger
 import kotlin.io.path.extension
 import kotlin.io.path.name
@@ -51,6 +52,23 @@ class EInvoicePdfValidatorTest {
         assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_3_B)
         assertThat(result.countExecutedTests).isGreaterThan(3_000)
         assertThat(result.validationErrors).hasSize(2)
+    }
+
+    @Test
+    fun validateSelfCreatedPdf() = runTest {
+        val pdfCreator = EInvoicePdfCreator()
+        val pdfResult = pdfCreator.createFacturXPdf(DataGenerator.createInvoice())
+        val pdfBytes = Asserts.assertSuccess(pdfResult).bytes
+        
+        val validationResult = underTest.validateEInvoicePdf(pdfBytes)
+
+        val result = Asserts.assertSuccess(validationResult)
+        assertThat(result.isValid).isTrue()
+        assertThat(result.isPdfA).isTrue()
+        assertThat(result.isPdfA3).isTrue()
+        assertThat(result.pdfAFlavor).isEqualByComparingTo(PdfAFlavour.PDFA_3_A)
+        assertThat(result.countExecutedTests).isGreaterThan(3_000)
+        assertThat(result.validationErrors).isEmpty()
     }
 
     @Test
