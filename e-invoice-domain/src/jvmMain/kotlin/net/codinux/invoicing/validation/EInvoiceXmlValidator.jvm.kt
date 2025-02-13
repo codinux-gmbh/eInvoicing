@@ -107,7 +107,7 @@ actual open class EInvoiceXmlValidator(
             if (profile.format == EInvoiceFormat.XRechnung || profile.profile == FacturXProfile.XRechnung) {
                 ResourceUtil.getResourceAsStream("cii/xrechnung/schematron/XRechnung-CII-validation.xsl")
             } else if (profile.profile != null) { // Factur-X except XRechnung profile (see above)
-                ResourceUtil.getResourceAsStream("facturx/schematron/${profile.profile}.xslt")
+                ResourceUtil.getResourceAsStream("cii/facturx/schematron/${profile.profile}.xslt")
             } else {
                 ResourceUtil.getResourceAsStream("cii/cen/schematron/EN16931-CII-validation.xslt")
             }
