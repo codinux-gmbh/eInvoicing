@@ -5,6 +5,7 @@ import assertk.assertions.*
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestUtils
+import net.codinux.invoicing.test.mustang.MustangEInvoiceValidator
 import kotlin.test.Test
 
 class MustangEInvoiceValidatorTest {

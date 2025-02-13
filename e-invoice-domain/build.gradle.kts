@@ -196,14 +196,14 @@ kotlin {
                 implementation("io.github.openhtmltopdf:openhtmltopdf-slf4j:$openHtmlToPdfVersion")
 
                 implementation("org.jsoup:jsoup:$jsoupVersion")
-
-                implementation("org.mustangproject:validator:$mustangVersion")
             }
         }
         val jvmTest by getting {
             dependsOn(javaCommonTest)
 
             dependencies {
+                implementation("org.mustangproject:validator:$mustangVersion")
+
                 implementation("ch.qos.logback:logback-classic:$logbackVersion")
             }
         }

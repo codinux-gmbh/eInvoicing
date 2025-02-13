@@ -1,9 +1,6 @@
 package net.codinux.invoicing.validation
 
-import net.codinux.invoicing.format.EInvoiceFormat
-import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
-import net.codinux.invoicing.format.EInvoiceFormatDetector
-import net.codinux.invoicing.format.FacturXProfile
+import net.codinux.invoicing.format.*
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.pdf.ResourceUtil
 import net.codinux.log.logger
@@ -16,11 +13,10 @@ import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
 
 actual open class EInvoiceXmlValidator(
-    protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector(),
-    protected val mustangValidator: MustangEInvoiceValidator = MustangEInvoiceValidator()
+    protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector()
 ) {
 
-    actual constructor() : this(EInvoiceFormatDetector(), MustangEInvoiceValidator())
+    actual constructor() : this(EInvoiceFormatDetector())
 
     private val log by logger()
 
@@ -36,8 +32,6 @@ actual open class EInvoiceXmlValidator(
 
             if (xslt != null) {
                 validate(xslt, xml)
-            } else if (detectedFormat?.format == EInvoiceFormat.XRechnung) { // TODO: implement validating XRechnung
-                mustangValidator.validateEInvoiceXmlJvm(xml)
             } else {
                 Result.error(IllegalArgumentException("Could not detect e-invoice format of provided XML"))
             }
@@ -108,12 +102,16 @@ actual open class EInvoiceXmlValidator(
 
 
     protected open fun getXsltFile(profile: EInvoiceFormatDetectionResult): InputStream? =
-        profile.profile?.let {
-            if (it != FacturXProfile.XRechnung) {
-                ResourceUtil.getResourceAsStream("facturx/schematron/$it.xslt")
+        if (profile.standard == EInvoicingStandard.CII) {
+            if (profile.format == EInvoiceFormat.XRechnung || profile.profile == FacturXProfile.XRechnung) {
+                ResourceUtil.getResourceAsStream("cii/xrechnung/schematron/XRechnung-CII-validation.xsl")
+            } else if (profile.profile != null) {
+                ResourceUtil.getResourceAsStream("facturx/schematron/${profile.profile}.xslt")
             } else {
                 null
             }
+        } else {
+            null
         }
 
 }

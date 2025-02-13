@@ -1,7 +1,9 @@
-package net.codinux.invoicing.validation
+package net.codinux.invoicing.test.mustang
 
 import kotlinx.coroutines.runBlocking
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.validation.InvoiceXmlValidationResult
+import net.codinux.invoicing.validation.ValidationError
 import net.codinux.log.logger
 import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
@@ -50,6 +52,10 @@ open class MustangEInvoiceValidator {
             val report = validator.validate(pdfBytes, "validation.xml")
 
             val context = validator.getContext()
+            // id, test und location extrahiert er. Selten, sehr selten gibt es ein Attribute namens flag mit dem Wert "warning", sonst setzt auch er es.
+            // criterion = test.
+            // message ist zusammengesetzt aus text - er ist nimmt immer nur den letzten, egal ob es mehrere sind oder nicht (koennen es je mehrere sein?) -, id und XSLT filename
+            // section setzt er, 4, 24 oder 27. Was sie bedeuten, weiss ich nicht, scheinen aber Quatsch zu sein
             val xmlValidationResults = context.results.map { mapValidationResultItem(it) }
 
             // TODO: currently it's not possible to get PDF validation result as for PDF validation the same context object
@@ -66,6 +72,6 @@ open class MustangEInvoiceValidator {
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
-        ValidationError(item.message, item.location, CriterionField?.get(item) as? String)
+        ValidationError(item.message, item.location, CriterionField?.get(item) as? String, item.id, item.severity.toString())
 
 }

@@ -56,6 +56,14 @@ class EInvoiceXmlValidatorTest {
 
 
     @Test
+    fun validateXRechnungWithXRechnungProfile() {
+        val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("XRechnung.xml"), profileFor(FacturXProfile.XRechnung))
+
+        assertValidationFailed(result, 3)
+    }
+
+
+    @Test
     fun validateInvoiceWithoutCountryCode() {
         val result = underTest.validateEInvoiceXmlJvm(getInvalidTestFile("NoCountryCode.xml"), profileFor(FacturXProfile.EN16931))
 
