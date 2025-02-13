@@ -21,7 +21,7 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isFalse() // TODO: add required properties to XRechnung.xml
-        assertThat(result.errors).hasSize(3)
+        assertThat(result.resultItems).hasSize(3)
     }
 
     @Test
@@ -32,7 +32,7 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
-        assertThat(result.errors).hasSize(0)
+        assertThat(result.resultItems).hasSize(0)
     }
 
     @Test
@@ -43,7 +43,7 @@ class MustangEInvoiceValidatorTest {
 
         val result = Asserts.assertSuccess(resultHolder)
         assertThat(result.isValid).isTrue()
-        assertThat(result.errors).hasSize(0)
+        assertThat(result.resultItems).hasSize(0)
     }
 
 
@@ -66,7 +66,7 @@ class MustangEInvoiceValidatorTest {
         val result = Asserts.assertSuccess(resultHolder)
 
         assertThat(result.isValid).isFalse()
-        assertThat(result.errors).hasSize(countValidationErrors)
+        assertThat(result.resultItems).hasSize(countValidationErrors)
     }
 
 

@@ -92,8 +92,9 @@ actual open class EInvoiceXmlValidator(
 //            it.childNodesList.filter { it.localName == "text" }.map { it.textContent.trim() })
 //    }
 
-    private fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
-        ValidationError(
+    protected open fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
+        ValidationResultItem(
+            mapSeverity(it.attribute("flag")),
             it.children { it.nodeName?.localName == "text" }.map { it.stringValue.trim() }.firstOrNull() ?: "",
             it.attribute("location"),
             it.attribute("test"),
@@ -101,6 +102,13 @@ actual open class EInvoiceXmlValidator(
         )
     }
 
+    protected open fun mapSeverity(flag: String?): ValidationResultItemSeverity = when (flag?.lowercase()) {
+        // the SVRL failed-assert.flag value is an open list, everyone can define their own error codes for it, so we can only try to map known values
+        "info", "information", "informational", "notice", "hint", "debug", "trace" -> ValidationResultItemSeverity.Info
+        "warn", "warning", "caution" -> ValidationResultItemSeverity.Warning
+        "error", "fatal", "fatal-error" -> ValidationResultItemSeverity.Error
+        else -> ValidationResultItemSeverity.Error // e.g. Factur-X Schematron XSLTs don't specify flag, there each failed-assert means an error
+    }
 
     protected open fun getXsltFile(profile: EInvoiceFormatDetectionResult): InputStream? =
         if (profile.standard == EInvoicingStandard.CII) {

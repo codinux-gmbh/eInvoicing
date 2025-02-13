@@ -3,8 +3,10 @@ package net.codinux.invoicing.test.mustang
 import kotlinx.coroutines.runBlocking
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.validation.InvoiceXmlValidationResult
-import net.codinux.invoicing.validation.ValidationError
+import net.codinux.invoicing.validation.ValidationResultItem
+import net.codinux.invoicing.validation.ValidationResultItemSeverity
 import net.codinux.log.logger
+import org.mustangproject.validator.ESeverity
 import org.mustangproject.validator.ZUGFeRDValidator
 import java.io.File
 import java.lang.reflect.Field
@@ -72,6 +74,13 @@ open class MustangEInvoiceValidator {
     }
 
     protected open fun mapValidationResultItem(item: org.mustangproject.validator.ValidationResultItem) =
-        ValidationError(item.message, item.location, CriterionField?.get(item) as? String, item.id, item.severity.toString())
+        ValidationResultItem(mapSeverity(item.severity), item.message, item.location, CriterionField?.get(item) as? String, item.id)
+
+    private fun mapSeverity(severity: ESeverity?): ValidationResultItemSeverity = when (severity) {
+        ESeverity.notice -> ValidationResultItemSeverity.Info
+        ESeverity.warning -> ValidationResultItemSeverity.Warning
+        ESeverity.error, ESeverity.fatal, ESeverity.exception -> ValidationResultItemSeverity.Error
+        else -> ValidationResultItemSeverity.Error
+    }
 
 }

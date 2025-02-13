@@ -59,7 +59,7 @@ class EInvoiceXmlValidatorTest {
     fun validateXRechnungWithXRechnungProfile() {
         val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("XRechnung.xml"), profileFor(FacturXProfile.XRechnung))
 
-        assertValidationFailed(result, 3)
+        assertValidationFailed(result, 2)
     }
 
 
@@ -92,13 +92,13 @@ class EInvoiceXmlValidatorTest {
         assertThat(result.isValid).isTrue()
 //        assertThat(result.countAvailableTests).isGreaterThan(200)
 //        assertThat(result.countAppliedTests).isGreaterThan(60)
-        assertThat(result.errors).isEmpty()
+        assertThat(result.resultItems).isEmpty()
     }
 
     private fun assertWrongProfileResult(result: Result<InvoiceXmlValidationResult>) {
         val result = assertValidationFailed(result, 1)
 
-        val failedAssert = result.errors.first()
+        val failedAssert = result.resultItems.first()
         assertThat(failedAssert.location).isEqualTo("/:rsm:CrossIndustryInvoice/:rsm:ExchangedDocumentContext/:ram:GuidelineSpecifiedDocumentContextParameter/:ram:ID/")
 //        assertThat(failedAssert.messages).hasSize(1)
 //        assertThat(failedAssert.messages.first()).isEqualTo("Value of 'ram:ID' is not allowed.")
@@ -111,7 +111,7 @@ class EInvoiceXmlValidatorTest {
         assertThat(result.isValid).isFalse()
 //        assertThat(result.countAvailableTests).isGreaterThan(200)
 //        assertThat(result.countAppliedTests).isGreaterThan(40)
-        assertThat(result.errors).hasSize(countValidationErrors)
+        assertThat(result.resultItems.filter { it.severity == ValidationResultItemSeverity.Error }).hasSize(countValidationErrors)
 
         return result
     }
