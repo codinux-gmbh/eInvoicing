@@ -36,6 +36,7 @@ class CompareEInvoiceXmlValidatorWithMustangValidator {
             assertThat(mustangError.message).contains(eInvoicingError.message)
             assertThat(mustangError.location).isEqualTo(eInvoicingError.location)
             assertThat(mustangError.test).isEqualTo(eInvoicingError.test)
+            assertThat(mustangError.testId).isEqualTo(eInvoicingError.testId)
         }
     }
 

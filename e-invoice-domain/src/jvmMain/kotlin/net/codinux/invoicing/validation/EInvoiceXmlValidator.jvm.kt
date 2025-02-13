@@ -97,6 +97,7 @@ actual open class EInvoiceXmlValidator(
             it.children { it.nodeName?.localName == "text" }.map { it.stringValue.trim() }.firstOrNull() ?: "",
             it.attribute("location"),
             it.attribute("test"),
+            it.attribute("id")
         )
     }
 
