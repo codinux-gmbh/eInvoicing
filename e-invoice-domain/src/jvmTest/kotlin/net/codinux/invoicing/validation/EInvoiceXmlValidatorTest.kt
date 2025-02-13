@@ -56,6 +56,14 @@ class EInvoiceXmlValidatorTest {
 
 
     @Test
+    fun validateEN16931InvoiceWithCenSchematronXslt() {
+        val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("ZUGFeRD.xml"), EInvoiceFormatDetectionResult.CII)
+
+        assertValidationSucceeded(result)
+    }
+
+
+    @Test
     fun validateXRechnungWithXRechnungProfile() {
         val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("XRechnung.xml"), profileFor(FacturXProfile.XRechnung))
 
@@ -75,6 +83,15 @@ class EInvoiceXmlValidatorTest {
         val result = underTest.validateEInvoiceXmlJvm(getInvalidTestFile("AllInvalidDataErrors.xml"), profileFor(FacturXProfile.EN16931))
 
         assertValidationFailed(result, 7)
+    }
+
+    @Test
+    fun validateInvoiceWithManyErrorsWithCenSchematronXslt() {
+        val result = underTest.validateEInvoiceXmlJvm(getInvalidTestFile("AllInvalidDataErrors.xml"), EInvoiceFormatDetectionResult.CII)
+
+        // 8 instead of 7 as when validating with Factur-X Schematron: additionally finds:
+        // "[BR-CO-15]-Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-109) + Invoice total VAT amount (BT-110)."
+        assertValidationFailed(result, 8)
     }
 
 

@@ -84,14 +84,6 @@ actual open class EInvoiceXmlValidator(
     private fun sourceFor(string: String): Source =
         StreamSource(ByteArrayInputStream(string.encodeToByteArray()))
 
-//    private fun mapValidationErrors(failedAsserts: List<Node>) = failedAsserts.map {
-//        ValidationError(
-//            ValidationErrorSeverity.Error,
-//            it.attributes.getNamedItem("test")?.nodeValue,
-//            it.attributes.getNamedItem("location")?.nodeValue,
-//            it.childNodesList.filter { it.localName == "text" }.map { it.textContent.trim() })
-//    }
-
     protected open fun mapValidationErrors(failedAsserts: Iterable<XdmNode>) = failedAsserts.map {
         ValidationResultItem(
             mapSeverity(it.attribute("flag")),
@@ -114,10 +106,10 @@ actual open class EInvoiceXmlValidator(
         if (profile.standard == EInvoicingStandard.CII) {
             if (profile.format == EInvoiceFormat.XRechnung || profile.profile == FacturXProfile.XRechnung) {
                 ResourceUtil.getResourceAsStream("cii/xrechnung/schematron/XRechnung-CII-validation.xsl")
-            } else if (profile.profile != null) {
+            } else if (profile.profile != null) { // Factur-X except XRechnung profile (see above)
                 ResourceUtil.getResourceAsStream("facturx/schematron/${profile.profile}.xslt")
             } else {
-                null
+                ResourceUtil.getResourceAsStream("cii/cen/schematron/EN16931-CII-validation.xslt")
             }
         } else {
             null
