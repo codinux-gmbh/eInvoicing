@@ -13,7 +13,9 @@ import net.codinux.invoicing.testfiles.EInvoiceFormat
 import net.codinux.invoicing.testfiles.EInvoiceProfile
 import net.codinux.invoicing.testfiles.EInvoiceTestFiles
 import net.codinux.invoicing.testfiles.ZugferdVersion
-import net.codinux.log.logger
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.name
 import kotlin.test.Test
@@ -21,8 +23,6 @@ import kotlin.test.Test
 class EInvoicePdfValidatorTest {
 
     private val underTest = EInvoicePdfValidator()
-
-    private val log by logger()
 
 
     @Test
@@ -84,35 +84,20 @@ class EInvoicePdfValidatorTest {
         assertThat(result.validationErrors).isEmpty()
     }
 
-    @Test
-    fun validateFacturXInvoices_AllValid() {
-        val facturXFiles = EInvoiceTestFiles.getTestFiles(EInvoiceFormat.FacturX).filter { it.extension.lowercase() == "pdf" }
+    @ParameterizedTest
+    @MethodSource("facturXInvoices")
+    fun validateFacturXInvoices_AllValid(pdfFile: Path) {
+        val result = underTest.validate(pdfFile)
 
-        log.info { "Validating ${facturXFiles.size} Factur-X invoices ..." }
-
-        facturXFiles.forEach { pdfFile ->
-            val result = underTest.validate(pdfFile)
-
-            assertIsValidPdfA3B(result)
-        }
-
-        log.info { "All Factur-X invoices are valid" }
+        assertIsValidPdfA3B(result)
     }
 
-    @Test
-    fun validateZugferdInvoices_AllValid() {
-        val zugferdFiles = EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd).filter { it.extension.lowercase() == "pdf" }
-            .filter { it.name != "zugferd_2p0_EN16931_Reisekostenabrechnung.pdf" } // this single file is invalid
+    @ParameterizedTest
+    @MethodSource("zugferdInvoices")
+    fun validateZugferdInvoices_AllValid(pdfFile: Path) {
+        val result = underTest.validate(pdfFile)
 
-        log.info { "Validating ${zugferdFiles.size} Zugferd invoices ..." }
-
-        zugferdFiles.forEach { pdfFile ->
-            val result = underTest.validate(pdfFile)
-
-            assertIsValidPdfA3(result)
-        }
-
-        log.info { "All Zugferd invoices are valid" }
+        assertIsValidPdfA3(result)
     }
 
     private fun assertIsValidPdfA3(validationResult: Result<PdfValidationResult>) {
@@ -135,6 +120,19 @@ class EInvoicePdfValidatorTest {
         assertThat(result.pdfAFlavor).isIn(PdfAFlavour.PDFA_3_B)
         assertThat(result.countExecutedTests).isGreaterThan(16_000)
         assertThat(result.validationErrors).isEmpty()
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun facturXInvoices() = TestUtils.FacturXInvoices
+            .filter { it.payload.extension.lowercase() == "pdf" }
+
+        @JvmStatic
+        fun zugferdInvoices() = TestUtils.ZugferdInvoices
+            .filter { it.payload.extension.lowercase() == "pdf" }
+            .filter { it.name != "zugferd_2p0_EN16931_Reisekostenabrechnung.pdf" } // this single file is invalid
+
     }
 
 }

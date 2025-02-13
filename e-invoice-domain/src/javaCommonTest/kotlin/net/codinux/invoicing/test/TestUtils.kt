@@ -45,6 +45,9 @@ object TestUtils {
         }
 
 
+    val FacturXInvoices by lazy { named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.FacturX)) }
+
+
     val FacturXMinimumProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Minimum) }
 
     val FacturXBasicWLProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.BasicWL) }
@@ -54,6 +57,9 @@ object TestUtils {
     val FacturXEN16931ProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.EN16931) }
 
     val FacturXExtendedProfileInvoices by lazy { facturXInvoicesFor(EInvoiceProfile.Extended) }
+
+
+    val ZugferdInvoices by lazy { named(EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd)) }
 
 
 //    val ZugferdMinimumProfileInvoices by lazy { zugferdInvoicesFor(EInvoiceProfile.Minimum) }
