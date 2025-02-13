@@ -1,16 +1,12 @@
 package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.extension.readAllBytesAndClose
-import net.codinux.invoicing.mapper.MustangMapper
-import net.codinux.invoicing.model.MapInvoiceResult
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
-import org.mustangproject.Exceptions.ArithmetricException
-import org.mustangproject.ZUGFeRD.ZUGFeRDInvoiceImporter
 import java.io.File
 import java.io.InputStream
 import kotlin.io.path.Path
@@ -18,11 +14,10 @@ import kotlin.io.path.extension
 
 actual open class EInvoiceReader(
     protected open val pdfAttachmentReader: PdfAttachmentReader = JavaPlatform.pdfAttachmentReader,
-    protected open val mapper: MustangMapper = MustangMapper(),
     protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader()
 ) {
 
-    actual constructor() : this(JavaPlatform.pdfAttachmentReader, MustangMapper())
+    actual constructor() : this(JavaPlatform.pdfAttachmentReader)
 
 
     private val log by logger()
@@ -108,31 +103,6 @@ actual open class EInvoiceReader(
 
         ReadEInvoiceFileResult(filename, directory, readError = SerializableException(e))
     }
-
-
-    protected open fun extractInvoice(importer: ZUGFeRDInvoiceImporter): MapInvoiceResult {
-        val invoice = importer.extractInvoice()
-
-        // TODO: the values LineTotalAmount, ChargeTotalAmount, AllowanceTotalAmount, TaxBasisTotalAmount, TaxTotalAmount,
-        //  GrandTotalAmount, TotalPrepaidAmount adn DuePayableAmount are not extracted from XML document
-        // we could use TransactionCalculator to manually calculate these values - Importer also does this and asserts
-        // that its calculated value matches XML doc's GrandTotalAmount value. But then we would have to make some
-        // methods of TransactionCalculator public
-        // Another option would be to manually extract these values from XML document.
-
-        return mapper.mapToInvoice(invoice)
-    }
-
-    protected open fun containsCalculationErrors(xml: String): Boolean =
-        try {
-            val importer = ZUGFeRDInvoiceImporter()
-            importer.fromXML(xml)
-
-            extractInvoice(importer).invoice == null
-        } catch (e: Throwable) {
-            log.debug(e) { "Calculating total amounts failed for:\n$xml" }
-            e is ArithmetricException || e.cause is ArithmetricException // in case of calculation error Mustang throws an ArithmetricException
-        }
 
 
     protected open fun <T> orNull(action: () -> T): T? =
