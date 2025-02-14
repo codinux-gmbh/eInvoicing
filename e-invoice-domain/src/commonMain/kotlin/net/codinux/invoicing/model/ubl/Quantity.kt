@@ -1,0 +1,34 @@
+package net.codinux.invoicing.model.ubl
+
+import kotlin.String
+import kotlinx.serialization.Serializable
+import net.codinux.invoicing.model.BigDecimal
+import net.codinux.invoicing.serialization.CiiBigDecimalSerializer
+import nl.adaptivity.xmlutil.serialization.XmlElement
+import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import nl.adaptivity.xmlutil.serialization.XmlValue
+
+@Serializable
+data class Quantity(
+  @XmlSerialName(
+    value = "value",
+    prefix = "ccts-cct",
+    namespace = "urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2",
+  )
+  @XmlElement(value = true)
+  @XmlValue
+  @Serializable(with = CiiBigDecimalSerializer::class)
+  val `value`: BigDecimal? = null,
+  @XmlSerialName(value = "unitCode")
+  @XmlElement(value = false)
+  val unitCode: String? = null,
+  @XmlSerialName(value = "unitCodeListID")
+  @XmlElement(value = false)
+  val unitCodeListID: String? = null,
+  @XmlSerialName(value = "unitCodeListAgencyID")
+  @XmlElement(value = false)
+  val unitCodeListAgencyID: String? = null,
+  @XmlSerialName(value = "unitCodeListAgencyName")
+  @XmlElement(value = false)
+  val unitCodeListAgencyName: String? = null,
+)
