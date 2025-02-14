@@ -129,6 +129,10 @@ object TestUtils {
         namedIncludingParent(EInvoiceTestFiles.getXRechnungTestFiles(EInvoiceXmlFlavour.UBL))
     }
 
+    val NonXRechnungUblInvoices by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getOfficialUblInvoiceFiles() + EInvoiceTestFiles.getEN16931UblInvoiceFiles())
+    }
+
     val EN16931CIIXmlInvoices by lazy { EInvoiceTestFiles.getEN16931TestFiles(EInvoiceXmlFlavour.CII) }
 
 

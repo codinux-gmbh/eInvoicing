@@ -5,6 +5,8 @@ import net.codinux.invoicing.format.EInvoiceFormatDetector
 import net.codinux.invoicing.format.EInvoicingStandard
 import net.codinux.invoicing.model.cii.lenient.CrossIndustryInvoice
 import net.codinux.invoicing.model.mapper.CiiMapper
+import net.codinux.invoicing.model.mapper.UblMapper
+import net.codinux.invoicing.model.ubl.UblInvoice
 import net.codinux.kotlin.extensions.ofMaxLength
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
@@ -13,7 +15,8 @@ import nl.adaptivity.xmlutil.serialization.XML
 
 open class EInvoiceXmlReader(
     protected val formatDetector: EInvoiceFormatDetector = EInvoiceFormatDetector(),
-    protected val mapper: CiiMapper = CiiMapper()
+    protected val ciiMapper: CiiMapper = CiiMapper(),
+    protected val ublMapper: UblMapper = UblMapper(),
 ) {
 
     @OptIn(ExperimentalXmlUtilApi::class)
@@ -36,7 +39,10 @@ open class EInvoiceXmlReader(
 
             if (format?.standard == EInvoicingStandard.CII) {
                 val ciiInvoice = xml.decodeFromString<CrossIndustryInvoice>(fixedXml)
-                mapper.map(ciiInvoice, format)
+                ciiMapper.map(ciiInvoice, format)
+            } else if (format?.standard == EInvoicingStandard.UBL) {
+                val ublInvoice = xml.decodeFromString<UblInvoice>(fixedXml)
+                ublMapper.map(ublInvoice, format)
             } else {
                 ReadEInvoiceXmlResult(ReadEInvoiceXmlResultType.UnsupportedInvoiceFormat, null as? Throwable)
             }

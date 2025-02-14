@@ -7,6 +7,14 @@ import net.codinux.invoicing.format.EInvoiceFormatDetectionResult.Companion.isNo
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.cii.lenient.*
 import net.codinux.invoicing.model.codes.*
+import net.codinux.invoicing.model.mapper.MapperConstants.BigDecimalFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.CodeFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.CountryFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.CurrencyFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.IdFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.LocalDateFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.TextFallbackValue
+import net.codinux.invoicing.model.mapper.MapperConstants.UnitFallbackValue
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResult
 import net.codinux.invoicing.reader.ReadEInvoiceXmlResultType
 import net.codinux.log.logger
@@ -17,22 +25,6 @@ open class CiiMapper {
         const val Iso8601DateFormatCode = "102" // YYYYMMDD
         const val Iso8601TimeFormatCode = "303" // HHMM
         const val Iso8601DateTimeFormatCode = "203" // YYYYMMDDHHMM
-
-        val IdFallbackValue = ""
-
-        val CodeFallbackValue = ""
-
-        val TextFallbackValue = ""
-
-        val BigDecimalFallbackValue = BigDecimal.Zero
-
-        val LocalDateFallbackValue = LocalDate(0, 1, 1)
-
-        val CurrencyFallbackValue = Currency.TheCodesAssignedForTransactionsWhereNoCurrencyIsInvolved
-
-        val CountryFallbackValue = Country.UnknownCountry
-
-        val UnitFallbackValue = UnitOfMeasure.ZZ
     }
 
 
@@ -82,7 +74,7 @@ open class CiiMapper {
 
             supplier = mapParty(tradeAgreement.sellerTradeParty, true, profile, dataErrors, mapBankDetails(tradeSettlement)),
             customer = mapParty(tradeAgreement.buyerTradeParty, false, profile, dataErrors),
-            items = (tradeTransaction.includedSupplyChainTradeLineItem.mapNotNull { mapInvoiceItem(it, dataErrors) }).also {
+            items = (tradeTransaction.includedSupplyChainTradeLineItem.map { mapInvoiceItem(it, dataErrors) }).also {
                 if (it.isEmpty() && profile.isNotMinimumOrBasicWLProfile) {
                     dataErrors.add(InvoiceDataError.missing(InvoiceField.Items))
                 }
@@ -128,6 +120,9 @@ open class CiiMapper {
             Party(TextFallbackValue, TextFallbackValue, null, null, TextFallbackValue)
         } else {
             // according to XSD the TradeParty object has no mandatory field - even in Extended profile. Only the Technical Appendix says that name is required
+            if (party.name?.value == null) {
+                dataErrors.add(InvoiceDataError.missing(if (isSeller) InvoiceField.SupplierName else InvoiceField.CustomerName))
+            }
             val address = party.postalTradeAddress
             // countryId is the only mandatory field of address. And only in Factur-X, neither in CII nor in XRechnung
             if (profile?.format == EInvoiceFormat.FacturX && address != null && address.countryID?.value == null) {
@@ -135,7 +130,7 @@ open class CiiMapper {
             }
 
             Party(
-                map(party.name), // that's curious, the XSD says name is optional, the Technical Appendix says it's mandatory
+                map(party.name),
                 // streetName is only in CII and XRechnung, not in Factur-X, that uses lineOne
                 map(address?.streetName ?: address?.lineOne), // lineOne = Usually the street name and number or post office box.
                 // also additionalStreetName is only in CII and XRechnung, not in Factur-X, that uses lineTwo and lineThree
@@ -171,7 +166,7 @@ open class CiiMapper {
             }
         }
 
-    protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, dataErrors: MutableList<InvoiceDataError>): InvoiceItem? {
+    protected open fun mapInvoiceItem(item: SupplyChainTradeLineItem, dataErrors: MutableList<InvoiceDataError>): InvoiceItem {
         val document = item.associatedDocumentLineDocument
         val product = item.specifiedTradeProduct
         val agreement = item.specifiedLineTradeAgreement
@@ -326,15 +321,15 @@ open class CiiMapper {
 
     protected open fun mapNullableQuantity(quantity: Quantity?): BigDecimal? = quantity?.value
 
-    protected open fun mapQuantity(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
+    protected open fun mapQuantity(quantity: Quantity?, quantityField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         mapNullableQuantity(quantity) ?: run {
-            dataErrors.add(InvoiceDataError.missing(amountField))
+            dataErrors.add(InvoiceDataError.missing(quantityField))
             BigDecimalFallbackValue
         }
 
-    protected open fun mapUnit(quantity: Quantity?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure =
+    protected open fun mapUnit(quantity: Quantity?, unitField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): UnitOfMeasure =
         quantity?.unitCode?.let { unitCode -> UnitOfMeasure.entries.firstOrNull { it.code == unitCode } } ?: run {
-            dataErrors.add(InvoiceDataError.missing(amountField))
+            dataErrors.add(InvoiceDataError.missing(unitField))
             UnitFallbackValue
         }
 
