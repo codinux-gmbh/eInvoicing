@@ -12,6 +12,11 @@ data class EInvoiceFormatDetectionResult(
     val profile: FacturXProfile? = null,
 ) {
     companion object {
+        val CII = EInvoiceFormatDetectionResult(EInvoicingStandard.CII)
+
+        val UBL = EInvoiceFormatDetectionResult(EInvoicingStandard.UBL)
+
+
         val EInvoiceFormatDetectionResult?.isMinimumOrBasicWLProfile: Boolean
             get() = this?.profile.isMinimumOrBasicWL
 

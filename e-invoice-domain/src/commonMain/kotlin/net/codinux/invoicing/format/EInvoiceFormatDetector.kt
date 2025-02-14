@@ -58,12 +58,12 @@ open class EInvoiceFormatDetector {
                 return if (reader.readToNextStartTag() && reader.readToNextText()) {
                     detectCiiFormat(reader.text)
                 } else {
-                    null
+                    EInvoiceFormatDetectionResult.CII
                 }
             }
         }
 
-        return null
+        return EInvoiceFormatDetectionResult.CII
     }
 
     protected open fun detectCiiFormat(formatId: String): EInvoiceFormatDetectionResult? =
@@ -117,7 +117,7 @@ open class EInvoiceFormatDetector {
                 if (isXRechnungFormatId(formatId)) {
                     detectXRechnungFormat(EInvoicingStandard.CII, formatId)
                 } else {
-                    null
+                    EInvoiceFormatDetectionResult.CII
                 }
             }
         }
@@ -136,14 +136,14 @@ open class EInvoiceFormatDetector {
             }
         }
 
-        return null
+        return EInvoiceFormatDetectionResult.UBL
     }
 
     protected open fun detectUblFormat(formatId: String): EInvoiceFormatDetectionResult? =
         if (isXRechnungFormatId(formatId)) {
             detectXRechnungFormat(EInvoicingStandard.UBL, formatId)
         } else {
-            null
+            EInvoiceFormatDetectionResult.UBL
         }
 
     protected open fun isXRechnungFormatId(formatId: String): Boolean =
