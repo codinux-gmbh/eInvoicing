@@ -14,7 +14,7 @@ data class TaxTotal(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val taxAmount: Amount,
+  val taxAmount: Amount? = null,
   @XmlSerialName(
     value = "RoundingAmount",
     prefix = "cbc",

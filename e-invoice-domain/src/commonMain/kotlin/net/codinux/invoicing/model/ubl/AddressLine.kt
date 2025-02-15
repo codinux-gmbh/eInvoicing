@@ -12,5 +12,5 @@ data class AddressLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val line: Text,
+  val line: Text? = null,
 )

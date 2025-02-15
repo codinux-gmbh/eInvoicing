@@ -13,7 +13,7 @@ data class Dimension(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val attributeID: Identifier,
+  val attributeID: Identifier? = null,
   @XmlSerialName(
     value = "Measure",
     prefix = "cbc",

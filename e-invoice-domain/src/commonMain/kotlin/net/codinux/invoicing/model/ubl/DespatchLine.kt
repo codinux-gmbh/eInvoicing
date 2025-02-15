@@ -13,7 +13,7 @@ data class DespatchLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val id: Identifier,
+  val id: Identifier? = null,
   @XmlSerialName(
     value = "UUID",
     prefix = "cbc",
@@ -83,7 +83,7 @@ data class DespatchLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val orderLineReference: List<OrderLineReference>,
+  val orderLineReference: List<OrderLineReference> = emptyList(),
   @XmlSerialName(
     value = "DocumentReference",
     prefix = "cac",
@@ -97,7 +97,7 @@ data class DespatchLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val item: Item,
+  val item: Item? = null,
   @XmlSerialName(
     value = "Shipment",
     prefix = "cac",

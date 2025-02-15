@@ -61,7 +61,7 @@ data class MonetaryTotal(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val payableAmount: Amount,
+  val payableAmount: Amount? = null,
   @XmlSerialName(
     value = "PayableAlternativeAmount",
     prefix = "cbc",

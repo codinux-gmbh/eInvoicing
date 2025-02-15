@@ -12,7 +12,7 @@ data class ExchangeRate(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val sourceCurrencyCode: Code,
+  val sourceCurrencyCode: Code? = null,
   @XmlSerialName(
     value = "SourceCurrencyBaseRate",
     prefix = "cbc",
@@ -26,7 +26,7 @@ data class ExchangeRate(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val targetCurrencyCode: Code,
+  val targetCurrencyCode: Code? = null,
   @XmlSerialName(
     value = "TargetCurrencyBaseRate",
     prefix = "cbc",

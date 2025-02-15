@@ -12,5 +12,5 @@ data class RoadTransport(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val licensePlateID: Identifier,
+  val licensePlateID: Identifier? = null,
 )

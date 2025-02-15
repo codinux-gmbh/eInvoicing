@@ -12,7 +12,7 @@ data class RailTransport(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val trainID: Identifier,
+  val trainID: Identifier? = null,
   @XmlSerialName(
     value = "RailCarID",
     prefix = "cbc",

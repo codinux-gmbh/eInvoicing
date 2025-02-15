@@ -13,21 +13,21 @@ data class Certificate(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val id: Identifier,
+  val id: Identifier? = null,
   @XmlSerialName(
     value = "CertificateTypeCode",
     prefix = "cbc",
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val certificateTypeCode: Code,
+  val certificateTypeCode: Code? = null,
   @XmlSerialName(
     value = "CertificateType",
     prefix = "cbc",
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val certificateType: Text,
+  val certificateType: Text? = null,
   @XmlSerialName(
     value = "Remarks",
     prefix = "cbc",
@@ -41,7 +41,7 @@ data class Certificate(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val issuerParty: Party,
+  val issuerParty: Party? = null,
   @XmlSerialName(
     value = "DocumentReference",
     prefix = "cac",

@@ -12,5 +12,5 @@ data class CreditAccount(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val accountID: Identifier,
+  val accountID: Identifier? = null,
 )

@@ -12,7 +12,7 @@ data class LineReference(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val lineID: Identifier,
+  val lineID: Identifier? = null,
   @XmlSerialName(
     value = "UUID",
     prefix = "cbc",

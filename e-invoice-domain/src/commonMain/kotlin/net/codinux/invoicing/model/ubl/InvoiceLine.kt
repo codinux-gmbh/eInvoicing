@@ -14,7 +14,7 @@ data class InvoiceLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val id: Identifier,
+  val id: Identifier? = null,
   @XmlSerialName(
     value = "UUID",
     prefix = "cbc",
@@ -42,7 +42,7 @@ data class InvoiceLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val lineExtensionAmount: Amount,
+  val lineExtensionAmount: Amount? = null,
   @XmlSerialName(
     value = "TaxPointDate",
     prefix = "cbc",
@@ -175,7 +175,7 @@ data class InvoiceLine(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val item: Item,
+  val item: Item? = null,
   @XmlSerialName(
     value = "Price",
     prefix = "cac",

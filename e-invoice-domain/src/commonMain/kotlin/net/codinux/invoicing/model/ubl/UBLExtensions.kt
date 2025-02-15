@@ -13,5 +13,5 @@ data class UBLExtensions(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2",
   )
   @XmlElement(value = true)
-  val uBLExtension: List<UBLExtension>,
+  val uBLExtension: List<UBLExtension> = emptyList(),
 )

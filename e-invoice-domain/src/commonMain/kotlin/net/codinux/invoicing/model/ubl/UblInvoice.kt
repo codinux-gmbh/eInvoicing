@@ -49,7 +49,7 @@ data class UblInvoice(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val id: Identifier,
+  val id: Identifier? = null,
   @XmlSerialName(
     value = "CopyIndicator",
     prefix = "cbc",
@@ -70,7 +70,7 @@ data class UblInvoice(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val issueDate: Date,
+  val issueDate: Date? = null,
   @XmlSerialName(
     value = "IssueTime",
     prefix = "cbc",
@@ -252,14 +252,14 @@ data class UblInvoice(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val accountingSupplierParty: SupplierParty,
+  val accountingSupplierParty: SupplierParty? = null,
   @XmlSerialName(
     value = "AccountingCustomerParty",
     prefix = "cac",
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val accountingCustomerParty: CustomerParty,
+  val accountingCustomerParty: CustomerParty? = null,
   @XmlSerialName(
     value = "PayeeParty",
     prefix = "cac",
@@ -378,12 +378,12 @@ data class UblInvoice(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val legalMonetaryTotal: MonetaryTotal,
+  val legalMonetaryTotal: MonetaryTotal? = null,
   @XmlSerialName(
     value = "InvoiceLine",
     prefix = "cac",
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val invoiceLine: List<InvoiceLine>,
+  val invoiceLine: List<InvoiceLine> = emptyList(),
 )

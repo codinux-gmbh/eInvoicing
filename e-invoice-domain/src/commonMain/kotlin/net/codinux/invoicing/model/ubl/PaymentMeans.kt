@@ -20,7 +20,7 @@ data class PaymentMeans(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val paymentMeansCode: Code,
+  val paymentMeansCode: Code? = null,
   @XmlSerialName(
     value = "PaymentDueDate",
     prefix = "cbc",

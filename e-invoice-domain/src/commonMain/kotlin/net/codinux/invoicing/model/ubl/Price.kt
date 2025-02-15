@@ -13,7 +13,7 @@ data class Price(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val priceAmount: Amount,
+  val priceAmount: Amount? = null,
   @XmlSerialName(
     value = "BaseQuantity",
     prefix = "cbc",

@@ -13,7 +13,7 @@ data class ProjectReference(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val id: Identifier,
+  val id: Identifier? = null,
   @XmlSerialName(
     value = "UUID",
     prefix = "cbc",

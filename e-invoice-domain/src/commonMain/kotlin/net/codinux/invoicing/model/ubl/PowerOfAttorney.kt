@@ -48,7 +48,7 @@ data class PowerOfAttorney(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val agentParty: Party,
+  val agentParty: Party? = null,
   @XmlSerialName(
     value = "WitnessParty",
     prefix = "cac",

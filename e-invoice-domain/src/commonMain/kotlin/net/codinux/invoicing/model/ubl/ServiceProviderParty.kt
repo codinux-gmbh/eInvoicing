@@ -34,7 +34,7 @@ data class ServiceProviderParty(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val party: Party,
+  val party: Party? = null,
   @XmlSerialName(
     value = "SellerContact",
     prefix = "cac",

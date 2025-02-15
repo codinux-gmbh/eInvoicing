@@ -12,7 +12,7 @@ data class OrderLineReference(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val lineID: Identifier,
+  val lineID: Identifier? = null,
   @XmlSerialName(
     value = "SalesOrderLineID",
     prefix = "cbc",

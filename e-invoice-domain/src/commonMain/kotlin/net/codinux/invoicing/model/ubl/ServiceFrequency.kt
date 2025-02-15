@@ -12,5 +12,5 @@ data class ServiceFrequency(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val weekDayCode: Code,
+  val weekDayCode: Code? = null,
 )

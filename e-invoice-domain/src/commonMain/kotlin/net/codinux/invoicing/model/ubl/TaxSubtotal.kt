@@ -19,7 +19,7 @@ data class TaxSubtotal(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val taxAmount: Amount,
+  val taxAmount: Amount? = null,
   @XmlSerialName(
     value = "CalculationSequenceNumeric",
     prefix = "cbc",
@@ -75,5 +75,5 @@ data class TaxSubtotal(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val taxCategory: TaxCategory,
+  val taxCategory: TaxCategory? = null,
 )

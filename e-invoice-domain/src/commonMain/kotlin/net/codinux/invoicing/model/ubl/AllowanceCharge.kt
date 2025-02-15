@@ -21,7 +21,7 @@ data class AllowanceCharge(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val chargeIndicator: Boolean,
+  val chargeIndicator: Boolean = false,
   @XmlSerialName(
     value = "AllowanceChargeReasonCode",
     prefix = "cbc",
@@ -63,7 +63,7 @@ data class AllowanceCharge(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val amount: Amount,
+  val amount: Amount? = null,
   @XmlSerialName(
     value = "BaseAmount",
     prefix = "cbc",

@@ -75,5 +75,5 @@ data class UBLExtension(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2",
   )
   @XmlElement(value = true)
-  val extensionContent: ExtensionContent,
+  val extensionContent: ExtensionContent? = null,
 )

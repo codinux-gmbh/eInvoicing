@@ -41,7 +41,7 @@ data class TradeFinancing(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val financingParty: Party,
+  val financingParty: Party? = null,
   @XmlSerialName(
     value = "FinancingFinancialAccount",
     prefix = "cac",

@@ -13,7 +13,7 @@ data class DeliveryUnit(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val batchQuantity: Quantity,
+  val batchQuantity: Quantity? = null,
   @XmlSerialName(
     value = "ConsumerUnitQuantity",
     prefix = "cbc",

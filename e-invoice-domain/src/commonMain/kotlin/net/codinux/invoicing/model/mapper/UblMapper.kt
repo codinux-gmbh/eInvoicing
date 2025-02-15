@@ -47,8 +47,8 @@ open class UblMapper {
     )
 
     protected open fun mapInvoiceDetails(invoice: UblInvoice, dataErrors: MutableList<InvoiceDataError>) = InvoiceDetails(
-        invoiceNumber = invoice.id.value ?: TextFallbackValue,
-        invoiceDate = mapDate(invoice.issueDate),
+        invoiceNumber = invoice.id?.value ?: TextFallbackValue,
+        invoiceDate = mapNullableDate(invoice.issueDate),
         // TODO: map InvoiceTypeCode
         currency = mapCurrency(invoice.documentCurrencyCode)
         // TODO: map serviceDate, dueDate and paymentDescription
@@ -70,20 +70,20 @@ open class UblMapper {
 
     protected open fun mapLineItem(line: InvoiceLine, dataErrors: MutableList<InvoiceDataError>) = InvoiceItem(
         // TODO: map ID (a required field)
-        name = mapText(line.item.name),
+        name = mapText(line.item?.name),
         // TODO: what's the difference between line.cbcInvoicedQuantity and line.price.baseQuantity
         quantity = mapQuantity(line.invoicedQuantity, InvoiceField.ItemQuantity, dataErrors),
         unit = mapUnit(line.invoicedQuantity, InvoiceField.ItemUnit, dataErrors),
         unitPrice = mapAmount(line.price?.priceAmount, InvoiceField.ItemUnitPrice, dataErrors),
-        vatRate = mapVatRateOrDefault(line.item.classifiedTaxCategory),
+        vatRate = mapVatRateOrDefault(line.item?.classifiedTaxCategory),
 
-        description = line.item.description.joinToString(" "), // TODO: or use new line?
+        description = line.item?.description?.joinToString(" "), // TODO: or use new line?
     )
 
 
     protected open fun checkCommonDataErrors(invoice: UblInvoice, format: EInvoiceFormatDetectionResult?) = mutableListOf<InvoiceDataError>().apply {
         // TODO: check also for empty values
-        if (invoice.id.value == null) {
+        if (invoice.id?.value == null) {
             add(InvoiceDataError.missing(InvoiceField.InvoiceNumber))
         }
         if (invoice.issueDate == null) {
@@ -93,7 +93,7 @@ open class UblMapper {
             add(InvoiceDataError.missing(InvoiceField.Currency))
         }
 
-        val supplier = invoice.accountingSupplierParty.party
+        val supplier = invoice.accountingSupplierParty?.party
         if (supplier == null) {
             add(InvoiceDataError.missing(InvoiceField.Supplier))
         } else {
@@ -105,7 +105,7 @@ open class UblMapper {
             }
         }
 
-        val customer = invoice.accountingCustomerParty.party
+        val customer = invoice.accountingCustomerParty?.party
         if (customer == null) {
             add(InvoiceDataError.missing(InvoiceField.Customer))
         } else {
@@ -127,7 +127,7 @@ open class UblMapper {
         tradeTax?.let { mapVatRate(it) } ?: BigDecimal.Zero
 
     protected open fun mapVatRate(tradeTax: List<TaxCategory>): BigDecimal =
-        tradeTax.firstOrNull { it.taxScheme.id?.value == "VAT" && it.id?.value == VatCategoryCode.S.code && it.percent != null }
+        tradeTax.firstOrNull { it.taxScheme?.id?.value == "VAT" && it.id?.value == VatCategoryCode.S.code && it.percent != null }
             ?.percent?.value ?: BigDecimalFallbackValue
 
     protected open fun mapAmount(amount: Amount?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =

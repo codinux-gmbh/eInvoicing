@@ -12,5 +12,5 @@ data class PartyName(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val name: Text,
+  val name: Text? = null,
 )

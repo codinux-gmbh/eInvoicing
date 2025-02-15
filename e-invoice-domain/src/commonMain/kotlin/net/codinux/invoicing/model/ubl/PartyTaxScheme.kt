@@ -55,5 +55,5 @@ data class PartyTaxScheme(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   )
   @XmlElement(value = true)
-  val taxScheme: TaxScheme,
+  val taxScheme: TaxScheme? = null,
 )

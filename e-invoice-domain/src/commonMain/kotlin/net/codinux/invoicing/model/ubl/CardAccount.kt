@@ -12,14 +12,14 @@ data class CardAccount(
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val primaryAccountNumberID: Identifier,
+  val primaryAccountNumberID: Identifier? = null,
   @XmlSerialName(
     value = "NetworkID",
     prefix = "cbc",
     namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
   )
   @XmlElement(value = true)
-  val networkID: Identifier,
+  val networkID: Identifier? = null,
   @XmlSerialName(
     value = "CardTypeCode",
     prefix = "cbc",
