@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualByComparingTo
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
 import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
 import net.codinux.invoicing.model.Party

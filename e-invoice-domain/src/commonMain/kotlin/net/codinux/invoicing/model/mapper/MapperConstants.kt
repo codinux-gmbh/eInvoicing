@@ -24,4 +24,21 @@ object MapperConstants {
 
     val UnitFallbackValue = UnitOfMeasure.ZZ
 
+
+
+    val CountriesByIsoCode = Country.entries.associateBy { it.alpha2Code }
+
+    val CurrenciesByIsoCode = Currency.entries.associateBy { it.alpha3Code }
+
+    val UnitsByCode = UnitOfMeasure.entries.associateBy { it.code }
+
+    fun mapCountry(countryIsoCode: String?): Country =
+        countryIsoCode?.let { CountriesByIsoCode[it.uppercase()] } ?: CountryFallbackValue
+
+    fun mapCurrency(currencyIsoCode: String?): Currency =
+        currencyIsoCode?.let { CurrenciesByIsoCode[it.uppercase()] } ?: CurrencyFallbackValue
+
+    fun mapUnit(countryIsoCode: String?): UnitOfMeasure =
+        countryIsoCode?.let { UnitsByCode[it.uppercase()] } ?: UnitFallbackValue
+
 }

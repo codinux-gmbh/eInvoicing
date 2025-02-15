@@ -4,11 +4,10 @@ import net.codinux.invoicing.format.EInvoiceFormatDetectionResult
 import net.codinux.invoicing.format.EInvoiceFormatDetectionResult.Companion.isNotMinimumOrBasicWLProfile
 import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.Party
-import net.codinux.invoicing.model.codes.Currency
+import net.codinux.invoicing.model.codes.ElectronicAddressSchemeIdentifier
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 import net.codinux.invoicing.model.codes.VatCategoryCode
 import net.codinux.invoicing.model.mapper.MapperConstants.BigDecimalFallbackValue
-import net.codinux.invoicing.model.mapper.MapperConstants.CurrencyFallbackValue
 import net.codinux.invoicing.model.mapper.MapperConstants.LocalDateFallbackValue
 import net.codinux.invoicing.model.mapper.MapperConstants.TextFallbackValue
 import net.codinux.invoicing.model.mapper.MapperConstants.UnitFallbackValue
@@ -39,11 +38,14 @@ open class UblMapper {
     protected open fun mapInvoice(invoice: UblInvoice, dataErrors: MutableList<InvoiceDataError>) = Invoice(
         details = mapInvoiceDetails(invoice, dataErrors),
 
-        supplier = mapParty(invoice.accountingSupplierParty.party),
-        customer = mapParty(invoice.accountingCustomerParty.party),
+        supplier = mapParty(invoice.accountingSupplierParty?.party, invoice.paymentMeans.firstNotNullOfOrNull { it.payeeFinancialAccount }),
+        customer = mapParty(invoice.accountingCustomerParty?.party, invoice.paymentMeans.firstNotNullOfOrNull { it.payerFinancialAccount }),
         items = invoice.invoiceLine.map { mapLineItem(it, dataErrors) },
 
-        customerReferenceNumber = mapNullableText(invoice.buyerReference)
+        customerReferenceNumber = mapNullableText(invoice.buyerReference),
+
+        amountAdjustments = mapAmountAdjustments(invoice),
+        totals = mapTotalAmounts(invoice, dataErrors)
     )
 
     protected open fun mapInvoiceDetails(invoice: UblInvoice, dataErrors: MutableList<InvoiceDataError>) = InvoiceDetails(
@@ -54,18 +56,37 @@ open class UblMapper {
         // TODO: map serviceDate, dueDate and paymentDescription
     )
 
-    protected open fun mapParty(party: net.codinux.invoicing.model.ubl.Party?) =
+    protected open fun mapParty(party: net.codinux.invoicing.model.ubl.Party?, financialAccount: FinancialAccount? = null) =
         if (party == null) {
             Party(TextFallbackValue, TextFallbackValue, null, null, TextFallbackValue)
         } else {
             Party(
-                name = party.partyName.joinToString(" ") { mapText(it.name) },
+                name = if (party.partyName.isNotEmpty()) party.partyName.joinToString(" ") { mapText(it.name) } else party.partyLegalEntity.joinToString(" ") { mapText(it.registrationName) },
                 address = party.postalAddress?.streetName?.value?.let { "$it${party.postalAddress.buildingNumber?.value?.let { " $it" } ?: ""}" }
                     ?: mapText(party.postalAddress?.addressLine?.firstOrNull()?.line),
                 additionalAddressLine = null, // TODO
                 postalCode = mapNullableText(party.postalAddress?.postalZone),
                 city = mapText(party.postalAddress?.cityName),
+                country = mapCountry(party.postalAddress?.country),
+
+                vatId = party.partyTaxScheme.firstOrNull { it.taxScheme?.id?.value == "VAT" }?.companyID?.value,
+
+                email = party.endpointID?.takeIf { it.schemeID == ElectronicAddressSchemeIdentifier.EM.code }?.value
+                    ?: mapNullableText(party.contact?.electronicMail),
+                phone = mapNullableText(party.contact?.telephone),
+                fax = mapNullableText(party.contact?.telefax),
+
+                contactName = mapNullableText(party.contact?.name) ?: party.person.firstNotNullOfOrNull { mapNullableText(it.familyName) },
+
+                bankDetails = mapBankDetails(party.financialAccount ?: financialAccount)
             )
+        }
+
+    protected open fun mapBankDetails(account: FinancialAccount?): BankDetails? =
+        account?.let {
+            account.id?.value?.let { accountId ->
+                BankDetails(accountId, account.financialInstitutionBranch?.id?.value, mapNullableText(account.name), mapNullableText(account.financialInstitutionBranch?.name))
+            }
         }
 
     protected open fun mapLineItem(line: InvoiceLine, dataErrors: MutableList<InvoiceDataError>) = InvoiceItem(
@@ -79,6 +100,28 @@ open class UblMapper {
 
         description = line.item?.description?.joinToString(" "), // TODO: or use new line?
     )
+
+    protected open fun mapAmountAdjustments(invoice: UblInvoice): AmountAdjustments? {
+        return null
+    }
+
+    protected open fun mapTotalAmounts(invoice: UblInvoice, dataErrors: MutableList<InvoiceDataError>): TotalAmounts? = invoice.legalMonetaryTotal?.let { total ->
+        val taxBasisTotalAmount = mapAmount(total.taxExclusiveAmount, InvoiceField.TaxBasisTotalAmount, dataErrors)
+        val grandTotalAmount = mapAmount(total.taxInclusiveAmount, InvoiceField.GrandTotalAmount, dataErrors)
+
+        TotalAmounts(
+            lineTotalAmount = mapAmount(total.lineExtensionAmount, InvoiceField.LineTotalAmount, dataErrors),
+            chargeTotalAmount = mapAmountOrZero(total.chargeTotalAmount),
+            allowanceTotalAmount = mapAmountOrZero(total.allowanceTotalAmount),
+            taxBasisTotalAmount = taxBasisTotalAmount,
+            taxTotalAmount = mapNullableAmount(invoice.taxTotal.firstNotNullOfOrNull { it.taxAmount }) // TODO: is this correct
+                ?: (grandTotalAmount - taxBasisTotalAmount), // TODO: should we do this?
+            grandTotalAmount = grandTotalAmount,
+            totalPrepaidAmount = mapAmountOrZero(total.prepaidAmount),
+            duePayableAmount = mapAmount(total.payableAmount, InvoiceField.DuePayableAmount, dataErrors),
+            // TODO: there's also payableRoundingAmount and payableAlternativeAmount
+        )
+    }
 
 
     protected open fun checkCommonDataErrors(invoice: UblInvoice, format: EInvoiceFormatDetectionResult?) = mutableListOf<InvoiceDataError>().apply {
@@ -97,7 +140,7 @@ open class UblMapper {
         if (supplier == null) {
             add(InvoiceDataError.missing(InvoiceField.Supplier))
         } else {
-            if (supplier.partyName.isEmpty()) {
+            if (nameNotSet(supplier)) {
                 add(InvoiceDataError.missing(InvoiceField.SupplierName))
             }
             if (supplier.postalAddress?.country?.identificationCode == null) {
@@ -109,7 +152,7 @@ open class UblMapper {
         if (customer == null) {
             add(InvoiceDataError.missing(InvoiceField.Customer))
         } else {
-            if (customer.partyName.isEmpty()) {
+            if (nameNotSet(customer)) {
                 add(InvoiceDataError.missing(InvoiceField.CustomerName))
             }
             if (customer.postalAddress?.country?.identificationCode == null) {
@@ -122,6 +165,10 @@ open class UblMapper {
         }
     }
 
+    protected open fun nameNotSet(party: net.codinux.invoicing.model.ubl.Party): Boolean =
+        (party.partyName.isEmpty() || party.partyName.joinToString { mapText(it.name) }.isBlank())
+                && (party.partyLegalEntity.isEmpty() || party.partyLegalEntity.joinToString { mapText(it.registrationName) }.isBlank())
+
 
     protected open fun mapVatRateOrDefault(tradeTax: List<TaxCategory>?): BigDecimal =
         tradeTax?.let { mapVatRate(it) } ?: BigDecimal.Zero
@@ -129,6 +176,12 @@ open class UblMapper {
     protected open fun mapVatRate(tradeTax: List<TaxCategory>): BigDecimal =
         tradeTax.firstOrNull { it.taxScheme?.id?.value == "VAT" && it.id?.value == VatCategoryCode.S.code && it.percent != null }
             ?.percent?.value ?: BigDecimalFallbackValue
+
+    protected open fun mapNullableAmount(amount: Amount?): BigDecimal? =
+        amount?.value
+
+    protected open fun mapAmountOrZero(amount: Amount?): BigDecimal =
+        mapNullableAmount(amount) ?: BigDecimalFallbackValue
 
     protected open fun mapAmount(amount: Amount?, amountField: InvoiceField, dataErrors: MutableList<InvoiceDataError>): BigDecimal =
         if (amount?.value != null) {
@@ -152,10 +205,9 @@ open class UblMapper {
             UnitFallbackValue
         }
 
-    protected open fun mapCurrency(currency: Code?): Currency =
-        currency?.value?.let { code ->
-            Currency.entries.firstOrNull { it.alpha3Code == code }
-        } ?: CurrencyFallbackValue
+    protected open fun mapCurrency(currency: Code?) = MapperConstants.mapCurrency(currency?.value)
+
+    protected open fun mapCountry(country: Country?) = MapperConstants.mapCountry(country?.identificationCode?.value)
 
 
     protected open fun mapNullableDate(date: Date?) =

@@ -7,7 +7,7 @@ import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimum
 import net.codinux.invoicing.format.FacturXProfile.Companion.isNotMinimumOrBasicWL
 import net.codinux.invoicing.model.Party
-import net.codinux.invoicing.model.mapper.CiiMapper
+import net.codinux.invoicing.model.mapper.MapperConstants
 import net.codinux.invoicing.test.TestUtils
 import net.codinux.invoicing.testfiles.*
 import net.codinux.log.logger
@@ -269,9 +269,9 @@ class EInvoiceXmlReaderTest {
 
             assertThat(invoice.details).isNotNull()
             val details = invoice.details
-            assertThat(details.invoiceNumber).isNotEqualTo(CiiMapper.IdFallbackValue)
-            assertThat(details.invoiceDate).isNotEqualTo(CiiMapper.LocalDateFallbackValue)
-            assertThat(details.currency).isNotEqualTo(CiiMapper.CurrencyFallbackValue)
+            assertThat(details.invoiceNumber).isNotEqualTo(MapperConstants.IdFallbackValue)
+            assertThat(details.invoiceDate).isNotEqualTo(MapperConstants.LocalDateFallbackValue)
+            assertThat(details.currency).isNotEqualTo(MapperConstants.CurrencyFallbackValue)
 
             assertParty(invoice.supplier, profile)
             assertParty(invoice.customer, profile)
@@ -280,14 +280,14 @@ class EInvoiceXmlReaderTest {
                 assertThat(invoice.items).isNotEmpty()
 
                 invoice.items.forEach { item ->
-                    assertThat(item.name).isNotEqualTo(CiiMapper.TextFallbackValue)
-                    assertThat(item.quantity).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
-                    assertThat(item.unit).isNotEqualTo(CiiMapper.TextFallbackValue)
+                    assertThat(item.name).isNotEqualTo(MapperConstants.TextFallbackValue)
+                    assertThat(item.quantity).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
+                    assertThat(item.unit).isNotEqualTo(MapperConstants.TextFallbackValue)
 
                     val isItemWithoutPrice = item.description == "Artikel wie vereinbart ohne Berechnung" // there are some items in test invoices without a price
                             || item.name == "Lebensgefährte/in zur Privathaftpflicht"
                     if (areAmountsAllowedToBeZero == false && isItemWithoutPrice != true) {
-                        assertThat(item.unitPrice).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                        assertThat(item.unitPrice).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
                     }
                     // vatRate may be zero
                 }
@@ -297,12 +297,12 @@ class EInvoiceXmlReaderTest {
             val totals = invoice.totals!!
             if (areAmountsAllowedToBeZero == false) {
                 if (profile.isNotMinimumOrBasicWL) {
-                    assertThat(totals.lineTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    assertThat(totals.lineTotalAmount).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
                 }
-                assertThat(totals.taxBasisTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
-                assertThat(totals.grandTotalAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                assertThat(totals.taxBasisTotalAmount).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
+                assertThat(totals.grandTotalAmount).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
                 if (totals.totalPrepaidAmount != totals.grandTotalAmount) { // if the whole amount has been prepaid, than duePayableAmount is zero
-                    assertThat(totals.duePayableAmount).isNotEqualTo(CiiMapper.BigDecimalFallbackValue)
+                    assertThat(totals.duePayableAmount).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
                 }
             }
 
@@ -324,9 +324,9 @@ class EInvoiceXmlReaderTest {
     private fun assertParty(party: Party?, profile: FacturXProfile?) {
         assertThat(party).isNotNull()
 
-        assertThat(party!!.name).isNotEqualTo(CiiMapper.TextFallbackValue)
+        assertThat(party!!.name).isNotEqualTo(MapperConstants.TextFallbackValue)
         if (profile.isNotMinimum) { // in Minimum profile TradeParty has no countryId
-            assertThat(party.country).isNotEqualTo(CiiMapper.CountryFallbackValue)
+            assertThat(party.country).isNotEqualTo(MapperConstants.CountryFallbackValue)
         }
     }
 

@@ -5,7 +5,7 @@ import assertk.assertions.*
 import net.codinux.invoicing.model.InvoiceDataErrorType
 import net.codinux.invoicing.model.InvoiceField
 import net.codinux.invoicing.model.MapInvoiceResult
-import net.codinux.invoicing.model.mapper.CiiMapper
+import net.codinux.invoicing.model.mapper.MapperConstants
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.test.InvoiceAsserter
 import net.codinux.invoicing.test.InvoiceXmlAsserter
@@ -40,7 +40,7 @@ class EInvoiceReaderTest {
         assertThat(result.type).isEqualByComparingTo(ReadEInvoiceXmlResultType.InvalidInvoiceData)
         assertThat(result.readError).isNull()
         assertThat(result.invoice).isNotNull()
-        assertThat(result.invoice!!.invoice.supplier.country).isEqualByComparingTo(CiiMapper.CountryFallbackValue)
+        assertThat(result.invoice!!.invoice.supplier.country).isEqualByComparingTo(MapperConstants.CountryFallbackValue)
         assertThat(result.invoice!!.invoiceDataErrors).hasSize(4)
 
         val countryErrors = result.invoice!!.invoiceDataErrors.filter { it.field in listOf(InvoiceField.SupplierCountry, InvoiceField.CustomerCountry) }
