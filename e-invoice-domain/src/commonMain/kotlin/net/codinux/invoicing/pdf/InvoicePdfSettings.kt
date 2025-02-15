@@ -7,7 +7,7 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 class InvoicePdfSettings(
     val xmlFormat: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX, // TODO: rename to xmlFormat?
 //    val template: String, // TODO: add enum with available templates
-    val templateSettings: InvoicePdfTemplateSettings = InvoicePdfTemplateSettings(),
+    val templateSettings: InvoicePdfTemplateSettings? = null,
 ) {
     override fun toString() = "$xmlFormat $templateSettings"
 }
