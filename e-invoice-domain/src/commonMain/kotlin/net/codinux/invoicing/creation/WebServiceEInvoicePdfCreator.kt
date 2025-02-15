@@ -22,7 +22,7 @@ open class WebServiceEInvoicePdfCreator(
 
     protected open suspend fun <T> createRequest(body: T, contentType: String, config: InvoicePdfConfig): Result<Pdf> {
         val queryParameters = buildMap<String, Any> {
-            put("format", config.format.name)
+            put("format", config.xmlFormat.name)
         }
         val response = webClient.postAsync(RequestParameters("create/facturx/pdf", ByteArray::class, body, contentType, ContentTypes.OCTET_STREAM, queryParameters = queryParameters))
 

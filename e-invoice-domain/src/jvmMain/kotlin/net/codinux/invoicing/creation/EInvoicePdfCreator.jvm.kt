@@ -29,13 +29,13 @@ actual open class EInvoicePdfCreator(
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
     actual open suspend fun createFacturXPdf(invoice: Invoice, config: InvoicePdfConfig): Result<Pdf> =
-        createPdfWithAttachedXml(invoice, config.format)
+        createPdfWithAttachedXml(invoice, config.xmlFormat)
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
     actual open suspend fun createFacturXPdf(invoiceXml: String, config: InvoicePdfConfig): Result<Pdf> =
-        createPdfWithAttachedXml(invoiceXml, config.format)
+        createPdfWithAttachedXml(invoiceXml, config.xmlFormat)
 
 
     /**
