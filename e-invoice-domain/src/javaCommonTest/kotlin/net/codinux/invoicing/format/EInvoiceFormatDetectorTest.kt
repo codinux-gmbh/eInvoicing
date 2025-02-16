@@ -209,11 +209,30 @@ class EInvoiceFormatDetectorTest { // TODO: use TestUtils to get invoice files (
     }
 
 
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideNonXRechnungUblInvoices")
+    fun `Non-XRechnung UBL`(invoiceFile: Path) {
+        assertFile(invoiceFile, EInvoicingStandard.UBL, null, null, null)
+    }
+
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideUblInvoicesWithVersionSetTo2_0")
+    fun `UBL 2_0`(invoiceFile: Path) {
+        assertFile(invoiceFile, EInvoicingStandard.UBL, null, null, null, "2.0")
+    }
+
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideUblInvoicesWithVersionSetTo2_1")
+    fun `UBL 2_1`(invoiceFile: Path) {
+        assertFile(invoiceFile, EInvoicingStandard.UBL, null, null, null, "2.1")
+    }
+
+
     private fun assertCiiFile(testFile: Path, format: EInvoiceFormat, formatVersion: String? = null, profile: FacturXProfile? = null) {
         assertFile(testFile, EInvoicingStandard.CII, format, formatVersion, profile)
     }
 
-    private fun assertFile(testFile: Path, standard: EInvoicingStandard, format: EInvoiceFormat?, formatVersion: String?, profile: FacturXProfile?) {
+    private fun assertFile(testFile: Path, standard: EInvoicingStandard, format: EInvoiceFormat?, formatVersion: String?, profile: FacturXProfile?, standardVersion: String? = null) {
         val invoiceXml = getInvoiceXml(testFile)
         if (invoiceXml == null) {
             fail("Could not get invoice XML for test file: $testFile")
@@ -232,6 +251,10 @@ class EInvoiceFormatDetectorTest { // TODO: use TestUtils to get invoice files (
                 assertThat(result.profile).isNull()
             } else {
                 assertThat(result.profile).isNotNull().isEqualByComparingTo(profile)
+            }
+
+            if (standardVersion != null) {
+                assertThat(result.standardVersion).isEqualTo(standardVersion)
             }
         }
     }

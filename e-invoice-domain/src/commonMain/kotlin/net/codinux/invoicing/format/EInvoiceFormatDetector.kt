@@ -3,6 +3,7 @@ package net.codinux.invoicing.format
 import net.codinux.invoicing.reader.fixXmlForReading
 import net.codinux.invoicing.reader.readToNextStartTag
 import net.codinux.invoicing.reader.readToNextText
+import net.codinux.kotlin.extensions.substringAfterLastOrNull
 import net.codinux.log.logger
 import nl.adaptivity.xmlutil.EventType
 import nl.adaptivity.xmlutil.Namespace
@@ -25,8 +26,8 @@ open class EInvoiceFormatDetector {
 
                 if (standard == EInvoicingStandard.CII && xml.contains("GuidelineSpecifiedDocumentContextParameter>")) {
                     detectCiiFormat(reader)
-                } else if (standard == EInvoicingStandard.UBL && xml.contains("CustomizationID>")) {
-                    detectUblFormat(reader)
+                } else if (standard == EInvoicingStandard.UBL) {
+                    detectUblFormat(xml, reader)
                 } else {
                     EInvoiceFormatDetectionResult(standard)
                 }
@@ -115,7 +116,7 @@ open class EInvoiceFormatDetector {
 
             else -> {
                 if (isXRechnungFormatId(formatId)) {
-                    detectXRechnungFormat(EInvoicingStandard.CII, formatId)
+                    EInvoiceFormatDetectionResult(EInvoicingStandard.CII, EInvoiceFormat.XRechnung, getXRechnungVersion(formatId))
                 } else {
                     EInvoiceFormatDetectionResult.CII
                 }
@@ -125,13 +126,48 @@ open class EInvoiceFormatDetector {
     protected open fun ciiResult(format: EInvoiceFormat, formatVersion: String, profile: FacturXProfile) =
         EInvoiceFormatDetectionResult(EInvoicingStandard.CII, format, formatVersion, profile)
 
-    protected open fun detectUblFormat(reader: XmlReader): EInvoiceFormatDetectionResult? {
+    protected open fun detectUblFormat(xml: String, reader: XmlReader): EInvoiceFormatDetectionResult? {
+        val containsUblVersion = xml.contains("UBLVersionID>")
+        val containsCustomizationId = xml.contains("CustomizationID>")
+        val containsProfileId = xml.contains("ProfileID>")
+
+        return if (containsUblVersion || containsCustomizationId || containsProfileId) {
+            detectUblFormat(reader, containsUblVersion, containsCustomizationId, containsProfileId)
+        } else {
+            EInvoiceFormatDetectionResult.UBL
+        }
+    }
+
+    protected open fun detectUblFormat(reader: XmlReader, containsUblVersion: Boolean, containsCustomizationId: Boolean,
+                                       containsProfileId: Boolean): EInvoiceFormatDetectionResult? {
+        var ublVersion: String? = null
+        var customizationId: String? = null
+        var profileId: String? = null
+
         while (reader.hasNext()) {
             var event = reader.next() // .nextTag() throws an exception on TEXT events
-            if (event == EventType.START_ELEMENT && reader.localName == "CustomizationID") {
-                event = reader.next()
-                if (event == EventType.TEXT) {
-                    return detectUblFormat(reader.text)
+            if (event == EventType.START_ELEMENT) {
+                if (reader.localName == "UBLVersionID") {
+                    event = reader.next()
+                    if (event == EventType.TEXT) {
+                        ublVersion = reader.text
+                    }
+                } else if (reader.localName == "CustomizationID") {
+                    event = reader.next()
+                    if (event == EventType.TEXT) {
+                        customizationId = reader.text
+                    }
+                } else if (reader.localName == "ProfileID") {
+                    event = reader.next()
+                    if (event == EventType.TEXT) {
+                        profileId = reader.text
+                    }
+                }
+
+                if ((containsUblVersion == false || ublVersion != null) && (containsCustomizationId == false || customizationId != null)
+                    && (containsProfileId == false || profileId != null)) {
+                    val (format, version) = if (customizationId == null) null to null else detectUblFormatAndVersion(customizationId)
+                    return EInvoiceFormatDetectionResult(EInvoicingStandard.UBL, format, version, null, profileId, ublVersion)
                 }
             }
         }
@@ -139,24 +175,22 @@ open class EInvoiceFormatDetector {
         return EInvoiceFormatDetectionResult.UBL
     }
 
-    protected open fun detectUblFormat(formatId: String): EInvoiceFormatDetectionResult? =
+    protected open fun detectUblFormatAndVersion(formatId: String): Pair<EInvoiceFormat?, String?> =
         if (isXRechnungFormatId(formatId)) {
-            detectXRechnungFormat(EInvoicingStandard.UBL, formatId)
+            EInvoiceFormat.XRechnung to getXRechnungVersion(formatId)
         } else {
-            EInvoiceFormatDetectionResult.UBL
+            null to null
         }
 
     protected open fun isXRechnungFormatId(formatId: String): Boolean =
         formatId.contains("urn:xoev-de:kosit:standard:xrechnung") || formatId.contains("urn:xeinkauf.de:kosit:xrechnung")
 
-    protected open fun detectXRechnungFormat(standard: EInvoicingStandard, formatId: String): EInvoiceFormatDetectionResult? {
+    protected open fun getXRechnungVersion(formatId: String): String? {
         // XRechnung format IDs look like:
         // "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2",
         // "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1",
         // "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0"
-        val version = formatId.substringAfterLast(":xrechnung_")
-
-        return EInvoiceFormatDetectionResult(standard, EInvoiceFormat.XRechnung, version)
+        return formatId.substringAfterLastOrNull(":xrechnung_")
     }
 
 }

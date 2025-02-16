@@ -10,6 +10,8 @@ data class EInvoiceFormatDetectionResult(
     val format: EInvoiceFormat? = null,
     val formatVersion: String? = null,
     val profile: FacturXProfile? = null,
+    val profileId: String? = null,
+    val standardVersion: String? = null,
 ) {
     companion object {
         val CII = EInvoiceFormatDetectionResult(EInvoicingStandard.CII)

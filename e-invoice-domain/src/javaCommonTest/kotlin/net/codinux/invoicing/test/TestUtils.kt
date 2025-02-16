@@ -133,6 +133,14 @@ object TestUtils {
         namedIncludingParent(EInvoiceTestFiles.getOfficialUblInvoiceFiles() + EInvoiceTestFiles.getEN16931UblInvoiceFiles())
     }
 
+    val UblInvoicesWithVersionSetTo2_0 by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getUblInvoiceFilesWithVersionSetTo2_0())
+    }
+
+    val UblInvoicesWithVersionSetTo2_1 by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getUblInvoiceFilesWithVersionSetTo2_1())
+    }
+
     val EN16931CIIXmlInvoices by lazy { EInvoiceTestFiles.getEN16931TestFiles(EInvoiceXmlFlavour.CII) }
 
 
@@ -255,6 +263,12 @@ object TestUtils {
 
     @JvmStatic
     fun provideNonXRechnungUblInvoices() = TestUtils.NonXRechnungUblInvoices
+
+    @JvmStatic
+    fun provideUblInvoicesWithVersionSetTo2_0() = TestUtils.UblInvoicesWithVersionSetTo2_0
+
+    @JvmStatic
+    fun provideUblInvoicesWithVersionSetTo2_1() = TestUtils.UblInvoicesWithVersionSetTo2_1
 
     @JvmStatic
     fun provideEN16931CIIXmlInvoices() = TestUtils.EN16931CIIXmlInvoices
