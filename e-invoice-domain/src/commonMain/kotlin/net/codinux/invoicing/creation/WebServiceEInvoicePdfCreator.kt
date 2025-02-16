@@ -4,6 +4,8 @@ import net.codinux.invoicing.config.DI
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.model.dto.CreatePdfDto
+import net.codinux.invoicing.model.dto.CreatePdfFromInvoiceXmlDto
 import net.codinux.invoicing.pdf.InvoicePdfSettings
 import net.codinux.invoicing.web.ContentTypes
 import net.codinux.invoicing.web.RequestParameters
@@ -14,17 +16,14 @@ open class WebServiceEInvoicePdfCreator(
 ) {
 
     open suspend fun createInvoicePdf(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
-        createRequest(invoice, ContentTypes.JSON, settings)
+        createRequest(CreatePdfDto(invoice, settings), "create/pdf")
 
     open suspend fun createInvoicePdf(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
-        createRequest(invoiceXml, ContentTypes.XML, settings)
+        createRequest(CreatePdfFromInvoiceXmlDto(invoiceXml, settings), "create/pdf/fromXml")
 
 
-    protected open suspend fun <T> createRequest(body: T, contentType: String, settings: InvoicePdfSettings): Result<Pdf> {
-        val queryParameters = buildMap<String, Any> {
-            put("format", settings.xmlFormat.name)
-        }
-        val response = webClient.postAsync(RequestParameters("create/facturx/pdf", ByteArray::class, body, contentType, ContentTypes.PDF, queryParameters = queryParameters))
+    protected open suspend fun <T> createRequest(body: T, urlPath: String): Result<Pdf> {
+        val response = webClient.postAsync(RequestParameters(urlPath, ByteArray::class, body, ContentTypes.JSON, ContentTypes.PDF))
 
         return Result.of(response.error, response.body?.let { Pdf(it) })
     }

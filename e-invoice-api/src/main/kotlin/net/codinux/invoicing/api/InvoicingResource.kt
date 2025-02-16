@@ -7,7 +7,10 @@ import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.invoicing.model.*
+import net.codinux.invoicing.model.dto.CreatePdfDto
+import net.codinux.invoicing.model.dto.CreatePdfFromInvoiceXmlDto
 import net.codinux.invoicing.model.dto.SerializableException
+import net.codinux.invoicing.pdf.InvoicePdfSettings
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -53,13 +56,35 @@ class InvoicingResource(
         toResponse(service.createFacturXXml(invoice))
 
 
+    @Path("create/pdf")
+    @POST
+    @Produces(MediaTypePdf)
+    @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
+    @Tag(name = "Create")
+    suspend fun createFacturXPdf(dto: CreatePdfDto): Response {
+        val pdf = service.createFacturXPdf(dto.invoice, dto.settings)
+
+        return createPdfResponse(pdf, dto.invoice)
+    }
+
+    @Path("create/pdf/fromXml")
+    @POST
+    @Produces(MediaTypePdf)
+    @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
+    @Tag(name = "Create")
+    suspend fun createFacturXPdfFromInvoiceXml(dto: CreatePdfFromInvoiceXmlDto): Response {
+        val pdf = service.createFacturXPdf(dto.invoiceXml, dto.settings)
+
+        return createPdfResponse(pdf)
+    }
+
     @Path("create/facturx/pdf")
     @POST
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    suspend fun createFacturXPdf(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
-        val pdf = service.createFacturXPdf(invoice, format)
+    suspend fun createFacturXPdfFromInvoiceJson(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+        val pdf = service.createFacturXPdf(invoice, InvoicePdfSettings(format))
 
         return createPdfResponse(pdf, invoice)
     }
@@ -70,17 +95,14 @@ class InvoicingResource(
     @Produces(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Operation(summary = "Create a Factur-X / ZUGFeRD from supplied invoice XML and attaches supplied XML to it")
     @Tag(name = "Create")
-    suspend fun createFacturXPdfByteResponse(
-        invoiceXml: String,
-        @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX
-    ): Response {
-        val pdf = service.createFacturXPdf(invoiceXml, format)
+    suspend fun createFacturXPdfFromInvoiceXml(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+        val pdf = service.createFacturXPdf(invoiceXml, InvoicePdfSettings(format))
 
         return createPdfResponse(pdf)
     }
 
 
-    @Path("create/pdf")
+    @Path("html2pdf")
     @POST
     @Consumes(MediaType.TEXT_HTML)
     @Produces(MediaTypePdf)
