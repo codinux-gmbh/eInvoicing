@@ -50,7 +50,7 @@ actual open class EInvoicePdfCreator(
             if (invoice == null) {
                 readXmlResult.readError?.originalException?.let { Result.error(it) } ?: Result(null, null)
             } else {
-                val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice)
+                val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice, settings.templateSettings)
                 val pdf = htmlToPdfConverter.createPdf(html)
 
                 attacher.attachInvoiceXmlToPdf(invoiceXml, settings.xmlFormat, pdf.bytes)

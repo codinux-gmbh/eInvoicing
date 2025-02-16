@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+{{#with invoice}}
 <head>
   <meta charset="UTF-8">
   <title>Invoice {{details.invoiceNumber}}</title>
@@ -176,8 +177,8 @@
     <tbody>
     <tr>
       <td>
-        {{#if supplier.logoUrl}}
-        <img class="header-company-logo" src="{{supplier.logoUrl}}" alt="Company Logo">
+        {{#if settings.logoUrl}}
+        <img class="header-company-logo" src="{{settings.logoUrl}}" alt="Company Logo" />
         {{/if}}
       </td>
       <td class="header-company-address">
@@ -327,4 +328,5 @@
 </div>
 
 </body>
+{{/with}}
 </html>

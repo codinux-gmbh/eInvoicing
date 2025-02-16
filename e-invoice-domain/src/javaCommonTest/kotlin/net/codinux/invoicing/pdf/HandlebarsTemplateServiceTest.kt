@@ -29,7 +29,7 @@ class HandlebarsTemplateServiceTest {
     fun emailNotSet_English() {
         val invoice = invoice.copy(supplier = invoice.supplier.copy(email = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.English))
 
         assertThat(result).doesNotContain("Email")
     }
@@ -38,7 +38,7 @@ class HandlebarsTemplateServiceTest {
     fun emailNotSet_German() {
         val invoice = invoice.copy(supplier = invoice.supplier.copy(email = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.German))
 
         assertThat(result).doesNotContain("E-Mail")
     }
@@ -47,7 +47,7 @@ class HandlebarsTemplateServiceTest {
     fun phoneNotSet_English() {
         val invoice = invoice.copy(supplier = invoice.supplier.copy(phone = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.English))
 
         assertThat(result).doesNotContain("Phone")
     }
@@ -56,7 +56,7 @@ class HandlebarsTemplateServiceTest {
     fun phoneNotSet_German() {
         val invoice = invoice.copy(supplier = invoice.supplier.copy(phone = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.German))
 
         assertThat(result).doesNotContain("Tel.")
     }
@@ -65,7 +65,7 @@ class HandlebarsTemplateServiceTest {
     fun serviceDateNotSet_English() { // in an earlier version if serviceDate was not set, applying template crashed
         val invoice = invoice.copy(details = invoice.details.copy(serviceDate = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.English))
 
         assertThat(result).contains("For the services rendered, I hereby invoice you for the following:")
     }
@@ -74,7 +74,7 @@ class HandlebarsTemplateServiceTest {
     fun serviceDateNotSet_German() { // in an earlier version if serviceDate was not set, applying template crashed
         val invoice = invoice.copy(details = invoice.details.copy(serviceDate = null))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.German))
 
         assertThat(result).contains("Für die erbrachten Leistungen erlaube ich mir in Rechnung zu stellen:")
     }
@@ -83,7 +83,7 @@ class HandlebarsTemplateServiceTest {
     fun deliveryDateSet_English() {
         val invoice = invoice.copy(details = invoice.details.copy(serviceDate = ServiceDate.DeliveryDate(LocalDate(2015, 10, 21))))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.English))
 
         assertThat(result).contains("For the goods delivered on 10/21/15, I hereby invoice you for the following:")
     }
@@ -92,15 +92,39 @@ class HandlebarsTemplateServiceTest {
     fun deliveryDateSet_German() {
         val invoice = invoice.copy(details = invoice.details.copy(serviceDate = ServiceDate.DeliveryDate(LocalDate(2015, 10, 21))))
 
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.German))
 
         assertThat(result).contains("Für die am 21.10.2015 gelieferten Güter erlaube ich mir in Rechnung zu stellen:")
     }
 
 
     @Test
+    fun logoNotSet() {
+        val result = underTest.renderTemplate(template, invoice, null)
+
+        assertThat(result).doesNotContain("""<img class="header-company-logo" """)
+    }
+
+    @Test
+    fun logoUrlSet() {
+        val result = underTest.renderTemplate(template, invoice, settingsFor(logoUrl = "https://codinux.net/images/favicons/favicon-96x96.png"))
+
+        assertThat(result).contains("""<img class="header-company-logo" src="https://codinux.net/images/favicons/favicon-96x96.png" alt="Company Logo" />""")
+    }
+
+    @Test
+    fun logoBytesSet() {
+        val logoBytes = ResourceUtil.getResourceBytes("img/codinux-favicon-96x96.png")
+
+        val result = underTest.renderTemplate(template, invoice, settingsFor(logoBytes = logoBytes, logoMimeType = "image/png"))
+
+        assertThat(result).contains("""<img class="header-company-logo" src="data:image/png;base64,""")
+    }
+
+
+    @Test
     fun renderTemplate_English() {
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.English)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.English))
 
 
         val locale = Locale.ENGLISH
@@ -161,7 +185,7 @@ class HandlebarsTemplateServiceTest {
 
     @Test
     fun renderTemplate_German() {
-        val result = underTest.renderTemplate(template, invoice, InvoiceLanguage.German)
+        val result = underTest.renderTemplate(template, invoice, settingsFor(InvoiceLanguage.German))
 
 
         val locale = Locale.GERMAN
@@ -219,6 +243,10 @@ class HandlebarsTemplateServiceTest {
 
         assertLineItems(result, currencyFormat, percentFormat)
     }
+
+
+    private fun settingsFor(language: InvoiceLanguage = InvoiceLanguage.English, logoUrl: String? = null, logoBytes: ByteArray? = null, logoMimeType: String? = null) =
+        InvoicePdfTemplateSettings(language, logoUrl, logoBytes, logoMimeType)
 
     private fun assertCommonText(result: String) {
         assertThat(result).contains("""${invoice.supplier.name} | ${invoice.supplier.address} | ${invoice.supplier.postalCode} ${invoice.supplier.city}""")

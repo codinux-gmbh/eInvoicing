@@ -5,6 +5,6 @@ import net.codinux.invoicing.model.InvoiceLanguage
 
 interface TemplateService {
 
-    fun renderTemplate(template: String, invoice: Invoice, language: InvoiceLanguage? = null): String
+    fun renderTemplate(template: String, invoice: Invoice, settings: InvoicePdfTemplateSettings? = null): String
 
 }

@@ -11,6 +11,7 @@ import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Base64
 import java.util.Locale
 
 open class HandlebarsTemplateService : TemplateService {
@@ -21,13 +22,25 @@ open class HandlebarsTemplateService : TemplateService {
     )
 
 
-    override fun renderTemplate(template: String, invoice: Invoice, language: InvoiceLanguage?): String {
-        val handlebars = handlebarsByLanguage[language ?: InvoiceLanguage.English]!!
+    data class TemplateContext(
+        val invoice: Invoice,
+        val settings: InvoicePdfTemplateSettings?
+    )
+
+
+    override fun renderTemplate(template: String, invoice: Invoice, settings: InvoicePdfTemplateSettings?): String {
+        val handlebars = handlebarsByLanguage[settings?.language ?: InvoiceLanguage.English]!!
 
         val compiledTemplate = handlebars.compileInline(template) // TODO: cache invoice template
 
-        return compiledTemplate.apply(invoice)
+        val templateSettings = if (settings?.logoBytes != null) settings.copy(logoUrl = createLogoDataUrl(settings))
+                                else settings
+        return compiledTemplate.apply(TemplateContext(invoice, templateSettings))
     }
+
+    protected open fun createLogoDataUrl(settings: InvoicePdfTemplateSettings) =
+        "data:${settings.logoMimeType ?: "image/png"};base64,${Base64.getEncoder().encodeToString(settings.logoBytes)}"
+
 
     open class HelperSource(protected val language: InvoiceLanguage) {
 
