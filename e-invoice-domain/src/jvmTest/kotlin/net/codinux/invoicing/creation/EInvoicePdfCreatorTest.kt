@@ -18,19 +18,19 @@ class EInvoicePdfCreatorTest {
 
 
     @Test
-    fun createInvoicePdf_FacturX() {
+    fun createFacturXPdf_FacturX() {
         val invoice = createInvoice()
 
-        val result = underTest.createInvoicePdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.FacturX))
+        val result = underTest.createFacturXPdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.FacturX))
 
         assertInvoiceXml(result)
     }
 
     @Test
-    fun createInvoicePdf_XRechnung() {
+    fun createFacturXPdf_XRechnung() {
         val invoice = createInvoice()
 
-        val result = underTest.createInvoicePdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.XRechnung))
+        val result = underTest.createFacturXPdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.XRechnung))
 
         assertInvoiceXml(result)
     }

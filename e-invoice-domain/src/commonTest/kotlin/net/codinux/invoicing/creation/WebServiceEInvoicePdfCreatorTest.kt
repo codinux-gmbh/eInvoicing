@@ -18,17 +18,17 @@ class WebServiceEInvoicePdfCreatorTest {
 
 
     @Test
-    fun createInvoicePdf() = runTest {
+    fun createFacturXPdf() = runTest {
         val invoice = createInvoice()
 
-        val result = underTest.createInvoicePdf(invoice)
+        val result = underTest.createFacturXPdf(invoice)
 
         assertInvoice(result)
     }
 
     @Test
-    fun createInvoicePdfFromXml() = runTest {
-        val result = underTest.createInvoicePdf(TestData.FacturXXml, InvoicePdfSettings(EInvoiceXmlFormat.FacturX))
+    fun createFacturXPdfFromXml() = runTest {
+        val result = underTest.createFacturXPdf(TestData.FacturXXml, InvoicePdfSettings(EInvoiceXmlFormat.FacturX))
 
         assertInvoice(result)
     }

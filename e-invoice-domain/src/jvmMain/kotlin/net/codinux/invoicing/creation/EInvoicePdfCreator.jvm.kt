@@ -28,21 +28,21 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createInvoicePdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
-        createInvoicePdfJvm(invoice, settings)
+    actual open suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
+        createFacturXPdfJvm(invoice, settings)
 
-    open fun createInvoicePdfJvm(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
+    open fun createFacturXPdfJvm(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
         createXml(invoice, settings.xmlFormat).ifSuccessful { xml ->
-            createInvoicePdfJvm(xml, settings)
+            createFacturXPdfJvm(xml, settings)
         }
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createInvoicePdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
-        createInvoicePdfJvm(invoiceXml, settings)
+    actual open suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
+        createFacturXPdfJvm(invoiceXml, settings)
 
-    open fun createInvoicePdfJvm(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
+    open fun createFacturXPdfJvm(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
         try {
             val readXmlResult = xmlReader.parseInvoiceXml(invoiceXml) // TODO: make smarter
             val invoice = readXmlResult.invoice?.invoice

@@ -49,10 +49,10 @@ class InvoicingService {
         xmlCreator.createFacturXXmlJvm(invoice)
 
     suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
-        pdfCreator.createInvoicePdf(invoice, settings)
+        pdfCreator.createFacturXPdf(invoice, settings)
 
     suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
-        pdfCreator.createInvoicePdf(invoiceXml, settings)
+        pdfCreator.createFacturXPdf(invoiceXml, settings)
 
 
     fun createPdfFromHtml(html: String): Result<Pdf> =

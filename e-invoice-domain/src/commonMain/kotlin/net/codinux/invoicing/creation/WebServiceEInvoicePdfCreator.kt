@@ -15,10 +15,10 @@ open class WebServiceEInvoicePdfCreator(
     protected open val webClient: WebClient = DI.DefaultWebClient,
 ) {
 
-    open suspend fun createInvoicePdf(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
+    open suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
         createRequest(CreatePdfDto(invoice, settings), "create/pdf")
 
-    open suspend fun createInvoicePdf(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
+    open suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
         createRequest(CreatePdfFromInvoiceXmlDto(invoiceXml, settings), "create/pdf/fromXml")
 
 
