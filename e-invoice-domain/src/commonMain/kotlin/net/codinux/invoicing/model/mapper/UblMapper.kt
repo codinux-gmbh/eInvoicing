@@ -18,6 +18,10 @@ import net.codinux.log.logger
 
 open class UblMapper {
 
+    companion object {
+        private const val NewLine = "\r\n"
+    }
+
     private val log by logger()
 
 
@@ -52,19 +56,30 @@ open class UblMapper {
         invoiceNumber = invoice.id?.value ?: TextFallbackValue,
         invoiceDate = mapNullableDate(invoice.issueDate),
         // TODO: map InvoiceTypeCode
-        currency = mapCurrency(invoice.documentCurrencyCode)
-        // TODO: map serviceDate, dueDate and paymentDescription
+        currency = mapCurrency(invoice.documentCurrencyCode),
+        serviceDate = mapServiceDate(invoice.invoicePeriod.firstOrNull()),
+        dueDate = mapNullableDate(invoice.dueDate),
+        paymentDescription = invoice.paymentTerms.flatMap { it.note.mapNotNull { mapNullableText(it) } }.joinToString(NewLine)
     )
+
+    protected open fun mapServiceDate(period: Period?): ServiceDate? = period?.startDate?.let { startDate ->
+        if (period.endDate != null) {
+            ServiceDate.ServicePeriod(mapDate(startDate), mapDate(period.endDate))
+        } else {
+            ServiceDate.DeliveryDate(mapDate(startDate))
+        }
+    }
 
     protected open fun mapParty(party: net.codinux.invoicing.model.ubl.Party?, financialAccount: FinancialAccount? = null) =
         if (party == null) {
             Party(TextFallbackValue, TextFallbackValue, null, null, TextFallbackValue)
         } else {
             Party(
-                name = if (party.partyName.isNotEmpty()) party.partyName.joinToString(" ") { mapText(it.name) } else party.partyLegalEntity.joinToString(" ") { mapText(it.registrationName) },
+                name = if (party.partyName.isNotEmpty()) party.partyName.joinToString(NewLine) { mapText(it.name) } else party.partyLegalEntity.joinToString(NewLine) { mapText(it.registrationName) },
                 address = party.postalAddress?.streetName?.value?.let { "$it${party.postalAddress.buildingNumber?.value?.let { " $it" } ?: ""}" }
                     ?: mapText(party.postalAddress?.addressLine?.firstOrNull()?.line),
-                additionalAddressLine = null, // TODO
+                additionalAddressLine = mapNullableText(party.postalAddress?.additionalStreetName)
+                    ?: party.postalAddress?.addressLine.orEmpty().drop(1).mapNotNull { mapNullableText(it.line) }.joinToString(NewLine),
                 postalCode = mapNullableText(party.postalAddress?.postalZone),
                 city = mapText(party.postalAddress?.cityName),
                 country = mapCountry(party.postalAddress?.country),
@@ -90,7 +105,7 @@ open class UblMapper {
         }
 
     protected open fun mapLineItem(line: InvoiceLine, dataErrors: MutableList<InvoiceDataError>) = InvoiceItem(
-        // TODO: map ID (a required field)
+        // TODO: map ID (a mandatory UBL field)
         name = mapText(line.item?.name),
         // TODO: what's the difference between line.cbcInvoicedQuantity and line.price.baseQuantity
         quantity = mapQuantity(line.invoicedQuantity, InvoiceField.ItemQuantity, dataErrors),
@@ -98,12 +113,32 @@ open class UblMapper {
         unitPrice = mapAmount(line.price?.priceAmount, InvoiceField.ItemUnitPrice, dataErrors),
         vatRate = mapVatRateOrDefault(line.item?.classifiedTaxCategory),
 
-        description = line.item?.description?.joinToString(" "), // TODO: or use new line?
+        description = line.item?.description?.joinToString(NewLine),
     )
 
-    protected open fun mapAmountAdjustments(invoice: UblInvoice): AmountAdjustments? {
-        return null
-    }
+    protected open fun mapAmountAdjustments(invoice: UblInvoice): AmountAdjustments? =
+        if (invoice.allowanceCharge.isEmpty()) null
+        else AmountAdjustments(
+            prepaidAmounts = BigDecimal.Zero, // TODO: check if we keep this property here are use only that one on TotalAmounts
+            allowances = mapChargeOrAllowances(invoice.allowanceCharge.filter { it.chargeIndicator == false })
+        )
+
+    protected open fun mapChargeOrAllowances(chargeOrAllowance: List<AllowanceCharge>) =
+        chargeOrAllowance.map { mapChargeOrAllowance(it) }
+
+    protected open fun mapChargeOrAllowance(chargeOrAllowance: AllowanceCharge) = ChargeOrAllowance(
+        actualAmount = mapAmountOrZero(chargeOrAllowance.amount),
+        basisAmount = mapNullableAmount(chargeOrAllowance.baseAmount),
+        basisQuantity = mapNullableAmount(chargeOrAllowance.perUnitAmount),
+        calculationPercent = chargeOrAllowance.multiplierFactorNumeric?.value, // TODO: is this correct?
+        reason = chargeOrAllowance.allowanceChargeReason.joinToString(NewLine) { mapText(it) },
+        reasonCode = chargeOrAllowance.allowanceChargeReasonCode?.value,
+        taxRateApplicablePercent = chargeOrAllowance.taxCategory.firstOrNull { it.taxScheme?.id?.value == "VAT" }?.percent?.value
+            ?: chargeOrAllowance.taxCategory.firstOrNull()?.percent?.value,
+        taxCategoryCode = chargeOrAllowance.taxCategory.firstOrNull { it.taxScheme?.id?.value == "VAT" }?.id?.value
+            ?: chargeOrAllowance.taxCategory.firstOrNull()?.id?.value
+        // TODO: there's also taxableAmount and taxAmount
+    )
 
     protected open fun mapTotalAmounts(invoice: UblInvoice, dataErrors: MutableList<InvoiceDataError>): TotalAmounts? = invoice.legalMonetaryTotal?.let { total ->
         val taxBasisTotalAmount = mapAmount(total.taxExclusiveAmount, InvoiceField.TaxBasisTotalAmount, dataErrors)
@@ -125,14 +160,13 @@ open class UblMapper {
 
 
     protected open fun checkCommonDataErrors(invoice: UblInvoice, format: EInvoiceFormatDetectionResult?) = mutableListOf<InvoiceDataError>().apply {
-        // TODO: check also for empty values
-        if (invoice.id?.value == null) {
+        if (invoice.id?.value.isNullOrBlank()) {
             add(InvoiceDataError.missing(InvoiceField.InvoiceNumber))
         }
-        if (invoice.issueDate == null) {
+        if (invoice.issueDate?.isoDateString.isNullOrBlank()) {
             add(InvoiceDataError.missing(InvoiceField.InvoiceDate))
         }
-        if (invoice.documentCurrencyCode?.value == null) {
+        if (invoice.documentCurrencyCode?.value.isNullOrBlank()) {
             add(InvoiceDataError.missing(InvoiceField.Currency))
         }
 
@@ -143,7 +177,7 @@ open class UblMapper {
             if (nameNotSet(supplier)) {
                 add(InvoiceDataError.missing(InvoiceField.SupplierName))
             }
-            if (supplier.postalAddress?.country?.identificationCode == null) {
+            if (supplier.postalAddress?.country?.identificationCode?.value.isNullOrBlank()) {
                 add(InvoiceDataError.missing(InvoiceField.SupplierCountry))
             }
         }
@@ -155,7 +189,7 @@ open class UblMapper {
             if (nameNotSet(customer)) {
                 add(InvoiceDataError.missing(InvoiceField.CustomerName))
             }
-            if (customer.postalAddress?.country?.identificationCode == null) {
+            if (customer.postalAddress?.country?.identificationCode?.value.isNullOrBlank()) {
                 add(InvoiceDataError.missing(InvoiceField.CustomerCountry))
             }
         }
@@ -166,8 +200,8 @@ open class UblMapper {
     }
 
     protected open fun nameNotSet(party: net.codinux.invoicing.model.ubl.Party): Boolean =
-        (party.partyName.isEmpty() || party.partyName.joinToString { mapText(it.name) }.isBlank())
-                && (party.partyLegalEntity.isEmpty() || party.partyLegalEntity.joinToString { mapText(it.registrationName) }.isBlank())
+        (party.partyName.isEmpty() || party.partyName.joinToString("") { mapText(it.name) }.isBlank())
+                && (party.partyLegalEntity.isEmpty() || party.partyLegalEntity.joinToString("") { mapText(it.registrationName) }.isBlank())
 
 
     protected open fun mapVatRateOrDefault(tradeTax: List<TaxCategory>?): BigDecimal =

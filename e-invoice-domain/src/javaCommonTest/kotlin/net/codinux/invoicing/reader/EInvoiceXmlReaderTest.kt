@@ -204,7 +204,20 @@ class EInvoiceXmlReaderTest {
     @ParameterizedTest
     @MethodSource("net.codinux.invoicing.test.TestUtils#provideXRechnungUblInvoices")
     fun `XRechnung UBL`(invoiceFile: Path) {
-        assertFile(invoiceFile, EInvoicingStandard.UBL, EInvoiceFormat.XRechnung)
+        assertFile(invoiceFile, EInvoicingStandard.UBL, EInvoiceFormat.XRechnung, areAmountsAllowedToBeZero = invoiceFile.name in listOf(
+            "02.04a-INVOICE_ubl.xml", "02.05a-INVOICE_ubl.xml",
+            "02.04a-INVOICE_uncefact_ubl_generated.xml", "02.05a-INVOICE_uncefact_ubl_generated.xml"
+        ))
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideValidNonXRechnungUbl_2_1_Invoices")
+    fun `Non-XRechnung UBL`(invoiceFile: Path) {
+        assertFile(invoiceFile, EInvoicingStandard.UBL, areAmountsAllowedToBeZero = invoiceFile.name in listOf(
+            "02.04a-INVOICE_uncefact_ubl_generated.xml", "02.05a-INVOICE_uncefact_ubl_generated.xml",
+            "BIS_Billing_30-Telefoni.xml", "BIS_Billing_30-Hyrbil.xml"
+        ))
     }
 
 
@@ -275,6 +288,7 @@ class EInvoiceXmlReaderTest {
 
                     val isItemWithoutPrice = item.description == "Artikel wie vereinbart ohne Berechnung" // there are some items in test invoices without a price
                             || item.name == "Lebensgefährte/in zur Privathaftpflicht"
+                            || item.name == "Guarantee facility"
                     if (areAmountsAllowedToBeZero == false && isItemWithoutPrice != true) {
                         assertThat(item.unitPrice).isNotEqualTo(MapperConstants.BigDecimalFallbackValue)
                     }

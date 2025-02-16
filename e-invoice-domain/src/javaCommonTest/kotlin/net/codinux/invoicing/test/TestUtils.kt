@@ -133,6 +133,10 @@ object TestUtils {
         namedIncludingParent(EInvoiceTestFiles.getOfficialUblInvoiceFiles() + EInvoiceTestFiles.getEN16931UblInvoiceFiles())
     }
 
+    val ValidNonXRechnungUbl_2_1_Invoices by lazy {
+        namedIncludingParent(EInvoiceTestFiles.getValidNonXRechnungUbl_2_1_InvoiceFiles())
+    }
+
     val UblInvoicesWithVersionSetTo2_0 by lazy {
         namedIncludingParent(EInvoiceTestFiles.getUblInvoiceFilesWithVersionSetTo2_0())
     }
@@ -263,6 +267,9 @@ object TestUtils {
 
     @JvmStatic
     fun provideNonXRechnungUblInvoices() = TestUtils.NonXRechnungUblInvoices
+
+    @JvmStatic
+    fun provideValidNonXRechnungUbl_2_1_Invoices() = TestUtils.ValidNonXRechnungUbl_2_1_Invoices
 
     @JvmStatic
     fun provideUblInvoicesWithVersionSetTo2_0() = TestUtils.UblInvoicesWithVersionSetTo2_0
