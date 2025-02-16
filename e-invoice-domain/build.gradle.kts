@@ -185,6 +185,8 @@ kotlin {
                 implementation("io.mockk:mockk:$mockkVersion")
 
                 implementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
+
+                implementation("ch.qos.logback:logback-classic:$logbackVersion")
             }
         }
 
@@ -203,8 +205,6 @@ kotlin {
 
             dependencies {
                 implementation("org.mustangproject:validator:$mustangVersion")
-
-                implementation("ch.qos.logback:logback-classic:$logbackVersion")
             }
         }
 
