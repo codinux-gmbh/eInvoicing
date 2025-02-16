@@ -30,178 +30,174 @@ class EInvoiceXmlCreatorMPTest {
 
 
     @ParameterizedTest
-    @MethodSource("provideFacturXMinimumProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideFacturXMinimumProfileInvoices")
     fun `Factur-X Version 1-0-7 Profile Minimum`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Minimum)
     }
 
     @ParameterizedTest
-    @MethodSource("provideFacturXBasicWLProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideFacturXBasicWLProfileInvoices")
     fun `Factur-X Version 1-0-7 Profile BasicWL`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
     @ParameterizedTest
-    @MethodSource("provideFacturXBasicProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideFacturXBasicProfileInvoices")
     fun `Factur-X Version 1-0-7 Profile Basic`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Basic)
     }
 
     @ParameterizedTest
-    @MethodSource("provideFacturXEN16931ProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideFacturXEN16931ProfileInvoices")
     fun `Factur-X Version 1-0-7 Profile EN16931`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.EN16931)
     }
 
     @ParameterizedTest
-    @MethodSource("provideFacturXExtendedProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideFacturXExtendedProfileInvoices")
     fun `Factur-X Version 1-0-7 Profile Extended`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Extended)
     }
 
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_MinimumProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_MinimumProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile Minimum`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Minimum)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_BasicWLProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_BasicWLProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile BasicWL`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_BasicProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_BasicProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile Basic`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Basic)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_EN16931ProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_EN16931ProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile EN16931`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.EN16931)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_ExtendedProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_ExtendedProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile Extended`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Extended)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_3_XRechnungProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_3_XRechnungProfileInvoices")
     fun `Zugferd Version 2-3-2 Profile XRechnung`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.XRechnung)
     }
 
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_MinimumProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_MinimumProfileInvoices")
     fun `Zugferd Version 2-2 Profile Minimum`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Minimum)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_BasicWLProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_BasicWLProfileInvoices")
     fun `Zugferd Version 2-2 Profile BasicWL`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_BasicProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_BasicProfileInvoices")
     fun `Zugferd Version 2-2 Profile Basic`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Basic)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_EN16931ProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_EN16931ProfileInvoices")
     fun `Zugferd Version 2-2 Profile EN16931`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.EN16931)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_ExtendedProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_ExtendedProfileInvoices")
     fun `Zugferd Version 2-2 Profile Extended`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Extended)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_2_XRechnungProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_2_XRechnungProfileInvoices")
     fun `Zugferd Version 2-2 Profile XRechnung`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.XRechnung)
     }
 
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_1_MinimumProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_MinimumProfileInvoices")
     fun `Zugferd Version 2-1 Profile Minimum`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Minimum)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_1_BasicWLProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_BasicWLProfileInvoices")
     fun `Zugferd Version 2-1 Profile BasicWL`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.BasicWL)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_1_BasicProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_BasicProfileInvoices")
     fun `Zugferd Version 2-1 Profile Basic`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Basic)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_1_EN16931ProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_EN16931ProfileNonXRechnungInvoices")
     fun `Zugferd Version 2-1 Profile EN16931`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.EN16931)
     }
 
-    @Test
-    fun `Zugferd Version 2-1 Profile EN16931_XRechnung`() {
-        val testFiles = EInvoiceTestFiles.getTestFiles(EInvoiceFormat.Zugferd, ZugferdVersion.V2_1, EInvoiceProfile.EN16931)
-            .filter { it.name.contains("_XRechnung") } // maintainers have put same XRechnung files into EN16931 folder
-
-        testFiles.forEach { invoiceFile ->
-            assertInvoiceFile(invoiceFile, FacturXProfile.XRechnung)
-        }
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_EN16931ProfileXRechnungInvoices")
+    fun `Zugferd Version 2-1 Profile EN16931_XRechnung`(invoiceFile: Path) {
+        assertInvoiceFile(invoiceFile, FacturXProfile.XRechnung)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_1_ExtendedProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_1_ExtendedProfileInvoices")
     fun `Zugferd Version 2-1 Profile Extended`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Extended)
     }
 
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_0_MinimumProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_0_MinimumProfileInvoices")
     fun `Zugferd Version 2-0 Profile Minimum`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Minimum)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_0_BasicProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_0_BasicProfileInvoices")
     fun `Zugferd Version 2-0 Profile Basic`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Basic)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_0_EN16931ProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_0_EN16931ProfileInvoices")
     fun `Zugferd Version 2-0 Profile EN16931`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.EN16931)
     }
 
     @ParameterizedTest
-    @MethodSource("provideZugferd_2_0_ExtendedProfileInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideZugferd_2_0_ExtendedProfileInvoices")
     fun `Zugferd Version 2-0 Profile Extended`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.Extended)
     }
 
 
     @ParameterizedTest
-    @MethodSource("provideXRechnungCiiInvoices")
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideXRechnungCiiInvoices")
     fun `XRechnung CII`(invoiceFile: Path) {
         assertInvoiceFile(invoiceFile, FacturXProfile.XRechnung)
     }
@@ -294,102 +290,5 @@ class EInvoiceXmlCreatorMPTest {
 
 
     private fun getInvoiceXml(file: Path) = TestUtils.getInvoiceXml(file)
-
-
-    companion object {
-
-        @JvmStatic
-        fun provideFacturXMinimumProfileInvoices() = TestUtils.FacturXMinimumProfileInvoices
-
-        @JvmStatic
-        fun provideFacturXBasicWLProfileInvoices() = TestUtils.FacturXBasicWLProfileInvoices
-
-        @JvmStatic
-        fun provideFacturXBasicProfileInvoices() = TestUtils.FacturXBasicProfileInvoices
-
-        @JvmStatic
-        fun provideFacturXEN16931ProfileInvoices() = TestUtils.FacturXEN16931ProfileInvoices
-
-        @JvmStatic
-        fun provideFacturXExtendedProfileInvoices() = TestUtils.FacturXExtendedProfileInvoices
-
-
-        @JvmStatic
-        fun provideZugferd_2_3_MinimumProfileInvoices() = TestUtils.Zugferd_2_3_MinimumProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_3_BasicWLProfileInvoices() = TestUtils.Zugferd_2_3_BasicWLProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_3_BasicProfileInvoices() = TestUtils.Zugferd_2_3_BasicProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_3_EN16931ProfileInvoices() = TestUtils.Zugferd_2_3_EN16931ProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_3_ExtendedProfileInvoices() = TestUtils.Zugferd_2_3_ExtendedProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_3_XRechnungProfileInvoices() = TestUtils.Zugferd_2_3_XRechnungProfileInvoices
-
-
-        @JvmStatic
-        fun provideZugferd_2_2_MinimumProfileInvoices() = TestUtils.Zugferd_2_2_MinimumProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_2_BasicWLProfileInvoices() = TestUtils.Zugferd_2_2_BasicWLProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_2_BasicProfileInvoices() = TestUtils.Zugferd_2_2_BasicProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_2_EN16931ProfileInvoices() = TestUtils.Zugferd_2_2_EN16931ProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_2_ExtendedProfileInvoices() = TestUtils.Zugferd_2_2_ExtendedProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_2_XRechnungProfileInvoices() = TestUtils.Zugferd_2_2_XRechnungProfileInvoices
-
-
-        @JvmStatic
-        fun provideZugferd_2_1_MinimumProfileInvoices() = TestUtils.Zugferd_2_1_MinimumProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_1_BasicWLProfileInvoices() = TestUtils.Zugferd_2_1_BasicWLProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_1_BasicProfileInvoices() = TestUtils.Zugferd_2_1_BasicProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_1_EN16931ProfileInvoices() = TestUtils.Zugferd_2_1_EN16931ProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_1_ExtendedProfileInvoices() = TestUtils.Zugferd_2_1_ExtendedProfileInvoices
-
-
-        @JvmStatic
-        fun provideZugferd_2_0_MinimumProfileInvoices() = TestUtils.Zugferd_2_0_MinimumProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_0_BasicProfileInvoices() = TestUtils.Zugferd_2_0_BasicProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_0_EN16931ProfileInvoices() = TestUtils.Zugferd_2_0_EN16931ProfileInvoices
-
-        @JvmStatic
-        fun provideZugferd_2_0_ExtendedProfileInvoices() = TestUtils.Zugferd_2_0_ExtendedProfileInvoices
-
-
-        @JvmStatic
-        fun provideXRechnungCiiInvoices() = TestUtils.XRechnungCiiInvoices
-
-        @JvmStatic
-        fun provideXRechnungUblInvoices() = TestUtils.XRechnungUblInvoices
-
-        @JvmStatic
-        fun provideEN16931CIIXmlInvoices() = TestUtils.EN16931CIIXmlInvoices
-
-    }
 
 }

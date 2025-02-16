@@ -154,4 +154,109 @@ object TestUtils {
         Named.of("${it.parent.name}/${it.name}", it)
     }
 
+
+
+    @JvmStatic
+    fun provideFacturXMinimumProfileInvoices() = TestUtils.FacturXMinimumProfileInvoices
+
+    @JvmStatic
+    fun provideFacturXBasicWLProfileInvoices() = TestUtils.FacturXBasicWLProfileInvoices
+
+    @JvmStatic
+    fun provideFacturXBasicProfileInvoices() = TestUtils.FacturXBasicProfileInvoices
+
+    @JvmStatic
+    fun provideFacturXEN16931ProfileInvoices() = TestUtils.FacturXEN16931ProfileInvoices
+
+    @JvmStatic
+    fun provideFacturXExtendedProfileInvoices() = TestUtils.FacturXExtendedProfileInvoices
+
+
+    @JvmStatic
+    fun provideZugferd_2_3_MinimumProfileInvoices() = TestUtils.Zugferd_2_3_MinimumProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_3_BasicWLProfileInvoices() = TestUtils.Zugferd_2_3_BasicWLProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_3_BasicProfileInvoices() = TestUtils.Zugferd_2_3_BasicProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_3_EN16931ProfileInvoices() = TestUtils.Zugferd_2_3_EN16931ProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_3_ExtendedProfileInvoices() = TestUtils.Zugferd_2_3_ExtendedProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_3_XRechnungProfileInvoices() = TestUtils.Zugferd_2_3_XRechnungProfileInvoices
+
+
+    @JvmStatic
+    fun provideZugferd_2_2_MinimumProfileInvoices() = TestUtils.Zugferd_2_2_MinimumProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_2_BasicWLProfileInvoices() = TestUtils.Zugferd_2_2_BasicWLProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_2_BasicProfileInvoices() = TestUtils.Zugferd_2_2_BasicProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_2_EN16931ProfileInvoices() = TestUtils.Zugferd_2_2_EN16931ProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_2_ExtendedProfileInvoices() = TestUtils.Zugferd_2_2_ExtendedProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_2_XRechnungProfileInvoices() = TestUtils.Zugferd_2_2_XRechnungProfileInvoices
+
+
+    @JvmStatic
+    fun provideZugferd_2_1_MinimumProfileInvoices() = TestUtils.Zugferd_2_1_MinimumProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_1_BasicWLProfileInvoices() = TestUtils.Zugferd_2_1_BasicWLProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_1_BasicProfileInvoices() = TestUtils.Zugferd_2_1_BasicProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_1_EN16931ProfileInvoices() = TestUtils.Zugferd_2_1_EN16931ProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_1_EN16931ProfileNonXRechnungInvoices() = TestUtils.Zugferd_2_1_EN16931ProfileInvoices
+        .filter { it.name.contains("_XRechnung") == false } // maintainers have put same XRechnung files into EN16931 folder
+
+    @JvmStatic
+    fun provideZugferd_2_1_EN16931ProfileXRechnungInvoices() = TestUtils.Zugferd_2_1_EN16931ProfileInvoices
+        .filter { it.name.contains("_XRechnung") } // maintainers have put same XRechnung files into EN16931 folder
+
+    @JvmStatic
+    fun provideZugferd_2_1_ExtendedProfileInvoices() = TestUtils.Zugferd_2_1_ExtendedProfileInvoices
+
+
+    @JvmStatic
+    fun provideZugferd_2_0_MinimumProfileInvoices() = TestUtils.Zugferd_2_0_MinimumProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_0_BasicProfileInvoices() = TestUtils.Zugferd_2_0_BasicProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_0_EN16931ProfileInvoices() = TestUtils.Zugferd_2_0_EN16931ProfileInvoices
+
+    @JvmStatic
+    fun provideZugferd_2_0_ExtendedProfileInvoices() = TestUtils.Zugferd_2_0_ExtendedProfileInvoices
+
+
+    @JvmStatic
+    fun provideXRechnungCiiInvoices() = TestUtils.XRechnungCiiInvoices
+
+    @JvmStatic
+    fun provideXRechnungUblInvoices() = TestUtils.XRechnungUblInvoices
+
+    @JvmStatic
+    fun provideNonXRechnungUblInvoices() = TestUtils.NonXRechnungUblInvoices
+
+    @JvmStatic
+    fun provideEN16931CIIXmlInvoices() = TestUtils.EN16931CIIXmlInvoices
+
 }
