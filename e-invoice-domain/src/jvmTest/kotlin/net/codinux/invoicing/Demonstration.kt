@@ -61,7 +61,7 @@ class Demonstration {
 
         // create a PDF that also contains the eInvoice as XML attachment
         val pdfCreator = EInvoicePdfCreator()
-        val result = pdfCreator.createPdfWithAttachedXml(invoice)
+        val result = pdfCreator.createInvoicePdfJvm(invoice)
 
         result.value?.let {
             pdfResultFile.writeBytes(it.bytes)

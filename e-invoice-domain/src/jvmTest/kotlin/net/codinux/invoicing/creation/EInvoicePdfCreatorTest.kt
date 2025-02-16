@@ -3,6 +3,7 @@ package net.codinux.invoicing.creation
 import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.InvoicePdfSettings
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.DataGenerator
@@ -17,19 +18,19 @@ class EInvoicePdfCreatorTest {
 
 
     @Test
-    fun createPdfWithAttachedXml_FacturX() {
+    fun createInvoicePdf_FacturX() {
         val invoice = createInvoice()
 
-        val result = underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX)
+        val result = underTest.createInvoicePdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.FacturX))
 
         assertInvoiceXml(result)
     }
 
     @Test
-    fun createPdfWithAttachedXml_XRechnung() {
+    fun createInvoicePdf_XRechnung() {
         val invoice = createInvoice()
 
-        val result = underTest.createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.XRechnung)
+        val result = underTest.createInvoicePdfJvm(invoice, InvoicePdfSettings(EInvoiceXmlFormat.XRechnung))
 
         assertInvoiceXml(result)
     }

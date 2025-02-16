@@ -15,13 +15,13 @@ actual open class EInvoicePdfCreator(protected open val pdfCreator: WebServiceEI
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings) =
-        pdfCreator.createFacturXPdf(invoice, settings)
+    actual open suspend fun createInvoicePdf(invoice: Invoice, settings: InvoicePdfSettings) =
+        pdfCreator.createInvoicePdf(invoice, settings)
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings) =
-        pdfCreator.createFacturXPdf(invoiceXml, settings)
+    actual open suspend fun createInvoicePdf(invoiceXml: String, settings: InvoicePdfSettings) =
+        pdfCreator.createInvoicePdf(invoiceXml, settings)
 
 }

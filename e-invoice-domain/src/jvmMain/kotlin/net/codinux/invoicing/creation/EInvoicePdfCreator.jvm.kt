@@ -28,34 +28,21 @@ actual open class EInvoicePdfCreator(
     /**
      * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
-        createPdfWithAttachedXml(invoice, settings.xmlFormat)
+    actual open suspend fun createInvoicePdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
+        createInvoicePdfJvm(invoice, settings)
+
+    open fun createInvoicePdfJvm(invoice: Invoice, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
+        createXml(invoice, settings.xmlFormat).ifSuccessful { xml ->
+            createInvoicePdfJvm(xml, settings)
+        }
 
     /**
      * Creates a hybrid PDF that also contains provided Factur-X / ZUGFeRD or XRechnung XML as attachment.
      */
-    actual open suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
-        createPdfWithAttachedXml(invoiceXml, settings.xmlFormat)
+    actual open suspend fun createInvoicePdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
+        createInvoicePdfJvm(invoiceXml, settings)
 
-
-    /**
-     * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
-     */
-    open fun createPdfWithAttachedXml(invoice: Invoice) =
-        createPdfWithAttachedXml(invoice, EInvoiceXmlFormat.FacturX)
-
-    /**
-     * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
-     */
-    open fun createPdfWithAttachedXml(invoice: Invoice, format: EInvoiceXmlFormat): Result<Pdf> =
-        createXml(invoice, format).ifSuccessful { xml ->
-            createPdfWithAttachedXml(xml, format)
-        }
-
-    /**
-     * Creates a hybrid PDF that also contains the Factur-X / ZUGFeRD or XRechnung XML as attachment.
-     */
-    open fun createPdfWithAttachedXml(invoiceXml: String, format: EInvoiceXmlFormat): Result<Pdf> =
+    open fun createInvoicePdfJvm(invoiceXml: String, settings: InvoicePdfSettings = InvoicePdfSettings()): Result<Pdf> =
         try {
             val readXmlResult = xmlReader.parseInvoiceXml(invoiceXml) // TODO: make smarter
             val invoice = readXmlResult.invoice?.invoice
@@ -66,7 +53,7 @@ actual open class EInvoicePdfCreator(
                 val html = templateService.renderTemplate(invoiceHtmlTemplate, invoice)
                 val pdf = htmlToPdfConverter.createPdf(html)
 
-                attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdf.bytes)
+                attacher.attachInvoiceXmlToPdf(invoiceXml, settings.xmlFormat, pdf.bytes)
             }
         } catch (e: Throwable) {
             log.error(e) { "Could not create PDF with attached xml: $invoiceXml" }

@@ -57,7 +57,7 @@ class EInvoicePdfValidatorTest {
     @Test
     fun validateSelfCreatedPdf() = runTest {
         val pdfCreator = EInvoicePdfCreator()
-        val pdfResult = pdfCreator.createFacturXPdf(DataGenerator.createInvoice())
+        val pdfResult = pdfCreator.createInvoicePdf(DataGenerator.createInvoice())
         val pdfBytes = Asserts.assertSuccess(pdfResult).bytes
         
         val validationResult = underTest.validateEInvoicePdf(pdfBytes)

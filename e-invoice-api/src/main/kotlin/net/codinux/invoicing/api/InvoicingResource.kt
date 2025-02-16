@@ -6,10 +6,7 @@ import jakarta.ws.rs.core.Response
 import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.format.EInvoiceFormat
-import net.codinux.invoicing.model.EInvoiceXmlFormat
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.Pdf
-import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.service.InvoicingService
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -61,7 +58,7 @@ class InvoicingResource(
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdf(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+    suspend fun createFacturXPdf(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
         val pdf = service.createFacturXPdf(invoice, format)
 
         return createPdfResponse(pdf, invoice)
@@ -73,7 +70,10 @@ class InvoicingResource(
     @Produces(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Operation(summary = "Create a Factur-X / ZUGFeRD from supplied invoice XML and attaches supplied XML to it")
     @Tag(name = "Create")
-    fun createFacturXPdfByteResponse(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
+    suspend fun createFacturXPdfByteResponse(
+        invoiceXml: String,
+        @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX
+    ): Response {
         val pdf = service.createFacturXPdf(invoiceXml, format)
 
         return createPdfResponse(pdf)

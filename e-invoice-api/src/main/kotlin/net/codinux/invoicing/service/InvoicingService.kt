@@ -11,6 +11,7 @@ import net.codinux.invoicing.model.EInvoiceXmlFormat
 import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.Pdf
 import net.codinux.invoicing.model.Result
+import net.codinux.invoicing.pdf.InvoicePdfSettings
 import net.codinux.invoicing.pdf.OpenHtmlToPdfHtmlToPdfConverter
 import net.codinux.invoicing.reader.EInvoiceReader
 import net.codinux.invoicing.validation.EInvoicePdfValidator
@@ -47,11 +48,11 @@ class InvoicingService {
     fun createFacturXXml(invoice: Invoice): Result<String> =
         xmlCreator.createFacturXXmlJvm(invoice)
 
-    fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Result<Pdf> =
-        pdfCreator.createPdfWithAttachedXml(invoice, format)
+    suspend fun createFacturXPdf(invoice: Invoice, format: EInvoiceXmlFormat): Result<Pdf> =
+        pdfCreator.createInvoicePdf(invoice, InvoicePdfSettings(format))
 
-    fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Result<Pdf> =
-        pdfCreator.createPdfWithAttachedXml(invoiceXml, format)
+    suspend fun createFacturXPdf(invoiceXml: String, format: EInvoiceXmlFormat): Result<Pdf> =
+        pdfCreator.createInvoicePdf(invoiceXml, InvoicePdfSettings(format))
 
 
     fun createPdfFromHtml(html: String): Result<Pdf> =
