@@ -5,8 +5,8 @@ import net.codinux.invoicing.model.dto.SerializableException
 
 @Serializable
 open class Result<T>(
-    open val error: SerializableException?,
-    open val value: T?
+    open val error: SerializableException? = null, // without setting to null, deserialization with kotlinx-serialization fails
+    open val value: T? = null
 ) {
     companion object {
         fun <T> error(error: SerializableException): Result<T> = ErrorResult(error)
