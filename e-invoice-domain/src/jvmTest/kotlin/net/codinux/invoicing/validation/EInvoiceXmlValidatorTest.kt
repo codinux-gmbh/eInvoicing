@@ -8,6 +8,9 @@ import net.codinux.invoicing.format.FacturXProfile
 import net.codinux.invoicing.model.Result
 import net.codinux.invoicing.test.Asserts
 import net.codinux.invoicing.test.TestUtils
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.nio.file.Path
 import kotlin.io.path.readText
 import kotlin.test.Test
 
@@ -68,6 +71,23 @@ class EInvoiceXmlValidatorTest {
         val result = underTest.validateEInvoiceXmlJvm(getValidTestFile("XRechnung.xml"), profileFor(FacturXProfile.XRechnung))
 
         assertValidationFailed(result, 2)
+    }
+
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideXRechnungUblInvoices")
+    fun `XRechnung UBL`(invoiceFile: Path) {
+        val result = underTest.validateEInvoiceXmlJvm(invoiceFile.readText(), EInvoiceFormatDetectionResult(EInvoicingStandard.UBL, net.codinux.invoicing.format.EInvoiceFormat.XRechnung))
+
+        assertValidationSucceeded(result)
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("net.codinux.invoicing.test.TestUtils#provideValidNonXRechnungUbl_2_1_Invoices")
+    fun `Non-XRechnung UBL`(invoiceFile: Path) {
+        val result = underTest.validateEInvoiceXmlJvm(invoiceFile.readText(), EInvoiceFormatDetectionResult.UBL)
+
+        assertValidationSucceeded(result)
     }
 
 

@@ -111,6 +111,12 @@ actual open class EInvoiceXmlValidator(
             } else {
                 ResourceUtil.getResourceAsStream("cii/cen/schematron/EN16931-CII-validation.xslt")
             }
+        } else if (profile.standard == EInvoicingStandard.UBL) {
+            if (profile.format == EInvoiceFormat.XRechnung) {
+                ResourceUtil.getResourceAsStream("ubl/xrechnung/schematron/XRechnung-UBL-validation.xsl")
+            } else {
+                ResourceUtil.getResourceAsStream("ubl/cen/schematron/EN16931-UBL-validation.xslt")
+            }
         } else {
             null
         }
