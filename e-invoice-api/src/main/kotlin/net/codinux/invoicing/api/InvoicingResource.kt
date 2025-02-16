@@ -136,7 +136,7 @@ class InvoicingResource(
 
     @Path("extract")
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM, MediaTypePdf)
+    @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
@@ -158,7 +158,7 @@ class InvoicingResource(
 
     @Path("extractXml")
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "extractXmlFromPdf", summary = "Extract invoice XML from a Factur-X / ZUGFeRD PDF")
     @RequestBody(
@@ -181,7 +181,7 @@ class InvoicingResource(
 
     @Path("validate")
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD PDF")
     @Tag(name = "Validate")

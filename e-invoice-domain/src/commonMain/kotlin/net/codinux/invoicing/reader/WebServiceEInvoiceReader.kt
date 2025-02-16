@@ -19,7 +19,7 @@ open class WebServiceEInvoiceReader(
     }
 
     open suspend fun extractFromPdf(pdfFile: ByteArray): ReadEInvoicePdfResult {
-        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoicePdfResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON))
+        val response = webClient.postAsync(RequestParameters("extract", ReadEInvoicePdfResult::class, pdfFile, ContentTypes.PDF, ContentTypes.JSON))
 
         return response.body ?: run {
             val error = response.error?.let { SerializableException(it) }
@@ -29,7 +29,7 @@ open class WebServiceEInvoiceReader(
     }
 
     open suspend fun extractXmlFromPdf(pdfFile: ByteArray): PdfAttachmentExtractionResult {
-        val response = webClient.postAsync(RequestParameters("extractXml", PdfAttachmentExtractionResult::class, pdfFile, ContentTypes.OCTET_STREAM, ContentTypes.JSON))
+        val response = webClient.postAsync(RequestParameters("extractXml", PdfAttachmentExtractionResult::class, pdfFile, ContentTypes.PDF, ContentTypes.JSON))
 
         return response.body
             ?: PdfAttachmentExtractionResult(PdfAttachmentExtractionResultType.TechnicalError, emptyList(), response.error?.let { SerializableException(it) })

@@ -56,8 +56,12 @@ class InvoicingService {
         pdfCreator.createPdfWithAttachedXml(invoiceXml, format)
 
 
-    fun createPdfFromHtml(html: String): Pdf =
-        htmlToPdfConverter.createPdf(html)
+    fun createPdfFromHtml(html: String): Result<Pdf> =
+        try {
+            Result.success(htmlToPdfConverter.createPdf(html))
+        } catch (e: Throwable) {
+            Result.error(e)
+        }
 
 
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Result<ByteArray> =
