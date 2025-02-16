@@ -54,38 +54,28 @@ class InvoicingResource(
     fun createFacturXXml(invoice: Invoice): Response =
         toResponse(service.createFacturXXml(invoice))
 
+
     @Path("create/facturx/pdf")
     @POST
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
     fun createFacturXPdf(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
-        val pdfFile = service.createFacturXPdf(invoice, format)
-
-        return createPdfFileResponse(pdfFile, invoice)
-    }
-
-    @Path("create/facturx/pdf")
-    @POST
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
-    @Tag(name = "Create")
-    fun createFacturXPdfByteResponse(invoice: Invoice, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
         val pdf = service.createFacturXPdf(invoice, format)
 
-        return createResponse(pdf)
+        return createPdfResponse(pdf, invoice)
     }
 
     @Path("create/facturx/pdf")
     @POST
     @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
     @Operation(summary = "Create a Factur-X / ZUGFeRD from supplied invoice XML and attaches supplied XML to it")
     @Tag(name = "Create")
     fun createFacturXPdfByteResponse(invoiceXml: String, @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX): Response {
         val pdf = service.createFacturXPdf(invoiceXml, format)
 
-        return createResponse(pdf)
+        return createPdfResponse(pdf)
     }
 
 
@@ -95,10 +85,10 @@ class InvoicingResource(
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a PDF from supplied HTML")
     @Tag(name = "Create")
-    fun createPdfFromHtml(html: String): ByteArray {
+    fun createPdfFromHtml(html: String): Response {
         val pdf = service.createPdfFromHtml(html)
 
-        return pdf.bytes
+        return createPdfResponse(pdf, "CreatedPdf.pdf")
     }
 
 
@@ -115,7 +105,7 @@ class InvoicingResource(
     ): Response {
         val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile(), format)
 
-        return createPdfFileResponseForPdfBytes(pdfFile, invoice)
+        return createPdfResponseForPdfBytes(pdfFile, invoice)
     }
 
     @Path("attach")
@@ -127,7 +117,7 @@ class InvoicingResource(
     fun attachInvoiceToPdf(body: AttachInvoiceToPdfRequest): Response {
         val pdfFile = service.attachInvoiceXmlToPdf(body.invoice, body.pdfFile, body.format)
 
-        return createPdfFileResponse(pdfFile, body.invoice)
+        return createPdfResponse(pdfFile, body.invoice)
     }
 
 //    @Path("attach/xml")
@@ -218,30 +208,25 @@ class InvoicingResource(
     private fun <T> createErrorResponse(result: Result<T>): Response =
         createErrorResponse(result.error)
 
-    private fun createErrorResponse(error: Throwable?): Response =
-        createErrorResponse(error?.let { SerializableException(it) })
-
     private fun createErrorResponse(error: SerializableException?): Response =
         Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build()
 
-    private fun createPdfFileResponse(pdfFile: Result<Pdf>, invoice: Invoice): Response =
-        createPdfFileResponse(pdfFile.value?.bytes, pdfFile.error, invoice)
+    private fun createPdfResponse(pdfFile: Result<Pdf>, invoice: Invoice): Response =
+        createPdfResponse(pdfFile.value?.bytes, pdfFile.error, invoice.shortDescription)
 
-    private fun createPdfFileResponseForPdfBytes(pdfFile: Result<ByteArray>, invoice: Invoice): Response =
-        createPdfFileResponse(pdfFile.value, pdfFile.error, invoice)
+    private fun createPdfResponseForPdfBytes(pdfFile: Result<ByteArray>, invoice: Invoice): Response =
+        createPdfResponse(pdfFile.value, pdfFile.error, invoice.shortDescription)
 
-    private fun createPdfFileResponse(pdfBytes: ByteArray?, error: SerializableException?, invoice: Invoice): Response =
+    private fun createPdfResponse(result: Result<Pdf>, filename: String = "invoice.pdf"): Response =
+        createPdfResponse(result.value?.bytes, result.error, filename)
+
+    private fun createPdfResponse(pdfBytes: ByteArray?, error: SerializableException?, filename: String): Response =
         if (pdfBytes != null) {
             Response.ok(pdfBytes)
-                .header("Content-Disposition", "attachment;filename=\"${invoice.shortDescription}.pdf\"")
+                .header("Content-Disposition", "attachment;filename=\"$filename.pdf\"")
                 .build()
         } else {
             createErrorResponse(error)
         }
-
-    private fun <T> createResponse(result: Result<T>): Response =
-        result.value?.let {
-            Response.ok(it).build()
-        } ?: createErrorResponse(result.error)
 
 }

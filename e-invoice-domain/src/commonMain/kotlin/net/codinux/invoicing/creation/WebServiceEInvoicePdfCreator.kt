@@ -24,7 +24,7 @@ open class WebServiceEInvoicePdfCreator(
         val queryParameters = buildMap<String, Any> {
             put("format", settings.xmlFormat.name)
         }
-        val response = webClient.postAsync(RequestParameters("create/facturx/pdf", ByteArray::class, body, contentType, ContentTypes.OCTET_STREAM, queryParameters = queryParameters))
+        val response = webClient.postAsync(RequestParameters("create/facturx/pdf", ByteArray::class, body, contentType, ContentTypes.PDF, queryParameters = queryParameters))
 
         return Result.of(response.error, response.body?.let { Pdf(it) })
     }
