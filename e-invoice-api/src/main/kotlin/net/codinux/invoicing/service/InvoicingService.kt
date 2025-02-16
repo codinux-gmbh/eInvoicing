@@ -17,8 +17,6 @@ import net.codinux.invoicing.validation.EInvoicePdfValidator
 import net.codinux.invoicing.validation.EInvoiceXmlValidator
 import net.codinux.invoicing.validation.InvoiceXmlValidationResult
 import net.codinux.invoicing.validation.PdfValidationResult
-import java.nio.file.Path
-import kotlin.io.path.*
 
 @Singleton
 class InvoicingService {
@@ -64,9 +62,6 @@ class InvoicingService {
         }
 
 
-    fun attachInvoiceXmlToPdf(invoice: Invoice, pdf: Path, format: EInvoiceXmlFormat): Result<ByteArray> =
-        attacher.attachInvoiceXmlToPdfJvm(invoice, pdf.readBytes(), format) // TODO: also return Result<Pdf>
-
     fun attachInvoiceXmlToPdf(invoice: Invoice, pdfFile: ByteArray, format: EInvoiceXmlFormat) =
         createInvoiceXml(invoice, EInvoiceFormat.valueOf(format.name)).ifSuccessful { xml ->
             attachInvoiceXmlToPdf(xml, pdfFile, format)
@@ -76,14 +71,14 @@ class InvoicingService {
         attacher.attachInvoiceXmlToPdf(invoiceXml, format, pdfFile)
 
 
-    fun extractInvoiceDataFromPdf(invoiceFile: Path) =
-        reader.extractFromPdf(invoiceFile.toFile())
+    suspend fun extractInvoiceDataFromPdf(pdfBytes: ByteArray) =
+        reader.extractFromPdf(pdfBytes)
 
     fun extractInvoiceDataFromXml(invoiceXml: String) =
         reader.extractFromXmlJvm(invoiceXml)
 
-    fun extractXmlFromPdf(pdfFile: Path) =
-        reader.extractXmlFromPdf(pdfFile.toFile())
+    suspend fun extractXmlFromPdf(pdfBytes: ByteArray) =
+        reader.extractXmlFromPdf(pdfBytes)
 
 
     fun validateInvoiceXml(invoiceXml: String): Result<InvoiceXmlValidationResult> =

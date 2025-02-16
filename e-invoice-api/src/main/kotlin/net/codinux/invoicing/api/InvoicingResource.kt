@@ -20,6 +20,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
+import kotlin.io.path.readBytes
 
 @Path("v1")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -103,9 +104,9 @@ class InvoicingResource(
         @RestForm("pdf") @PartType(MediaTypePdf) pdf: FileUpload,
         @QueryParam("format") format: EInvoiceXmlFormat = EInvoiceXmlFormat.FacturX
     ): Response {
-        val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile(), format)
+        val pdfFile = service.attachInvoiceXmlToPdf(invoice, pdf.uploadedFile().readBytes(), format)
 
-        return createPdfResponseForPdfBytes(pdfFile, invoice)
+        return createPdfResponse(pdfFile, invoice)
     }
 
     @Path("attach")
@@ -140,8 +141,8 @@ class InvoicingResource(
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
-    fun extractInvoiceDataFromPdf(invoice: java.nio.file.Path) =
-        service.extractInvoiceDataFromPdf(invoice)
+    suspend fun extractInvoiceDataFromPdf(pdfBytes: ByteArray) =
+        service.extractInvoiceDataFromPdf(pdfBytes)
 
     @Path("extract")
     @POST
@@ -166,8 +167,8 @@ class InvoicingResource(
         content = arrayOf(Content(mediaType = MediaType.APPLICATION_XML, schema = Schema(implementation = org.mustangproject.Invoice::class)))
     )
     @Tag(name = "Extract")
-    fun extractInvoiceXmlFromPdf(pdfFile: java.nio.file.Path) =
-        service.extractXmlFromPdf(pdfFile)
+    suspend fun extractInvoiceXmlFromPdf(pdfBytes: ByteArray) =
+        service.extractXmlFromPdf(pdfBytes)
 
 
     @Path("validate")
