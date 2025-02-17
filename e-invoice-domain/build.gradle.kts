@@ -195,6 +195,7 @@ kotlin {
 
             dependencies {
                 implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:$openHtmlToPdfVersion")
+                implementation("io.github.openhtmltopdf:openhtmltopdf-svg-support:$openHtmlToPdfVersion")
                 implementation("io.github.openhtmltopdf:openhtmltopdf-slf4j:$openHtmlToPdfVersion")
 
                 implementation("org.jsoup:jsoup:$jsoupVersion")

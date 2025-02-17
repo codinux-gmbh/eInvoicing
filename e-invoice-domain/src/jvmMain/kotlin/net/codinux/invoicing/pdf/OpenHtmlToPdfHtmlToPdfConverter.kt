@@ -3,6 +3,7 @@ package net.codinux.invoicing.pdf
 import com.openhtmltopdf.extend.FSSupplier
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
+import com.openhtmltopdf.svgsupport.BatikSVGDrawer
 import net.codinux.invoicing.extension.useAndGet
 import net.codinux.invoicing.model.Pdf
 import org.apache.pdfbox.Loader
@@ -31,6 +32,7 @@ open class OpenHtmlToPdfHtmlToPdfConverter : HtmlToPdfConverter {
 
             val builder = PdfRendererBuilder()
             builder.useFastMode()
+            builder.useSVGDrawer(BatikSVGDrawer())
 
             /*      Embed fonts for PDF/A compatibility     */
             builder.addDefaultFonts()
