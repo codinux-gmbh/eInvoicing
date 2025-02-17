@@ -3,6 +3,8 @@ package net.codinux.invoicing.api
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.codinux.invoicing.api.ResourceConstants.CurrentVersion
+import net.codinux.invoicing.api.ResourceConstants.MediaTypePdf
 import net.codinux.invoicing.calculator.InvoiceItemPrice
 import net.codinux.invoicing.creation.AttachInvoiceToPdfRequest
 import net.codinux.invoicing.format.EInvoiceFormat
@@ -22,17 +24,12 @@ import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
 import kotlin.io.path.readBytes
 
-@Path("v1")
+@Path(CurrentVersion)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_XML)
 class InvoicingResource(
     private val service: InvoicingService
 ) {
-
-    companion object {
-        private const val MediaTypePdf = "application/pdf"
-    }
-
 
     @Path("create")
     @POST
@@ -99,19 +96,6 @@ class InvoicingResource(
         val pdf = service.createFacturXPdf(invoiceXml, InvoicePdfSettings(format))
 
         return createPdfResponse(pdf)
-    }
-
-
-    @Path("html2pdf")
-    @POST
-    @Consumes(MediaType.TEXT_HTML)
-    @Produces(MediaTypePdf)
-    @Operation(summary = "Create a PDF from supplied HTML")
-    @Tag(name = "Create")
-    fun createPdfFromHtml(html: String): Response {
-        val pdf = service.createPdfFromHtml(html)
-
-        return createPdfResponse(pdf, "CreatedPdf.pdf")
     }
 
 
@@ -226,30 +210,12 @@ class InvoicingResource(
 
     private fun <T> toResponse(result: Result<T>): Response =
         result.value?.let { Response.ok(it).build() }
-            ?: createErrorResponse(result)
-
-    private fun <T> createErrorResponse(result: Result<T>): Response =
-        createErrorResponse(result.error)
-
-    private fun createErrorResponse(error: SerializableException?): Response =
-        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build()
+            ?: ResourceConstants.createErrorResponse(result)
 
     private fun createPdfResponse(pdfFile: Result<Pdf>, invoice: Invoice): Response =
-        createPdfResponse(pdfFile.value?.bytes, pdfFile.error, invoice.shortDescription)
-
-    private fun createPdfResponseForPdfBytes(pdfFile: Result<ByteArray>, invoice: Invoice): Response =
-        createPdfResponse(pdfFile.value, pdfFile.error, invoice.shortDescription)
+        ResourceConstants.createPdfResponse(pdfFile.value?.bytes, pdfFile.error, invoice.shortDescription)
 
     private fun createPdfResponse(result: Result<Pdf>, filename: String = "invoice.pdf"): Response =
-        createPdfResponse(result.value?.bytes, result.error, filename)
-
-    private fun createPdfResponse(pdfBytes: ByteArray?, error: SerializableException?, filename: String): Response =
-        if (pdfBytes != null) {
-            Response.ok(pdfBytes)
-                .header("Content-Disposition", "attachment;filename=\"$filename.pdf\"")
-                .build()
-        } else {
-            createErrorResponse(error)
-        }
+        ResourceConstants.createPdfResponse(result, filename)
 
 }
