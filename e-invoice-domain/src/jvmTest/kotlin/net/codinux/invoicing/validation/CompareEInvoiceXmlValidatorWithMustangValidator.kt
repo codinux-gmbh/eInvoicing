@@ -29,9 +29,9 @@ class CompareEInvoiceXmlValidatorWithMustangValidator {
 
 
         assertThat(mustangResult.isValid).isEqualTo(eInvoicingResult.isValid)
-        assertThat(mustangResult.resultItems).hasSize(eInvoicingResult.resultItems.size)
-        mustangResult.resultItems.forEachIndexed { index, mustangError ->
-            val eInvoicingError = eInvoicingResult.resultItems[index]
+        assertThat(mustangResult.businessRulesValidationResult).hasSize(eInvoicingResult.businessRulesValidationResult.size)
+        mustangResult.businessRulesValidationResult.forEachIndexed { index, mustangError ->
+            val eInvoicingError = eInvoicingResult.businessRulesValidationResult[index]
 
             assertThat(mustangError.severity).isEqualTo(eInvoicingError.severity)
             // the messages differ as Mustang adds some information like the .xslt file

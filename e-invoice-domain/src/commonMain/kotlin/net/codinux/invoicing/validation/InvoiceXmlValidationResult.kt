@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class InvoiceXmlValidationResult(
     val isValid: Boolean,
-    val resultItems: List<ValidationResultItem>
+    val businessRulesValidationResult: List<ValidationResultItem>
 ) {
-    override fun toString() = "isValid? $isValid, ${resultItems.joinToString()}"
+    override fun toString() = "isValid? $isValid, ${businessRulesValidationResult.joinToString()}"
 }
