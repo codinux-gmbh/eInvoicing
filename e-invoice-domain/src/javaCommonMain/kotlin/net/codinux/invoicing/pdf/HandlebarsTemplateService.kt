@@ -2,10 +2,7 @@ package net.codinux.invoicing.pdf
 
 import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Options
-import net.codinux.invoicing.model.BigDecimal
-import net.codinux.invoicing.model.Invoice
-import net.codinux.invoicing.model.InvoiceLanguage
-import net.codinux.invoicing.model.LocalDate
+import net.codinux.invoicing.model.*
 import net.codinux.invoicing.model.codes.Currency
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 import java.text.DecimalFormat
@@ -33,13 +30,13 @@ open class HandlebarsTemplateService : TemplateService {
 
         val compiledTemplate = handlebars.compileInline(template) // TODO: cache invoice template
 
-        val templateSettings = if (settings?.logoBytes != null) settings.copy(logoUrl = createLogoDataUrl(settings))
+        val templateSettings = if (settings?.logo?.imageBytes != null) settings.copy(logo = Image.forUrl(createLogoDataUrl(settings)))
                                 else settings
         return compiledTemplate.apply(TemplateContext(invoice, templateSettings))
     }
 
     protected open fun createLogoDataUrl(settings: InvoicePdfTemplateSettings) =
-        "data:${settings.logoMimeType ?: "image/png"};base64,${Base64.getEncoder().encodeToString(settings.logoBytes)}"
+        "data:${settings.logo?.imageMimeType ?: "image/png"};base64,${Base64.getEncoder().encodeToString(settings.logo?.imageBytes)}"
 
 
     open class HelperSource(protected val language: InvoiceLanguage) {

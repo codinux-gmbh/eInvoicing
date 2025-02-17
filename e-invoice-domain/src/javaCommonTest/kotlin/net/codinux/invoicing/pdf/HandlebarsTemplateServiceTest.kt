@@ -3,6 +3,7 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import net.codinux.invoicing.model.Image
 import net.codinux.invoicing.model.InvoiceLanguage
 import net.codinux.invoicing.model.LocalDate
 import net.codinux.invoicing.model.ServiceDate
@@ -246,7 +247,7 @@ class HandlebarsTemplateServiceTest {
 
 
     private fun settingsFor(language: InvoiceLanguage = InvoiceLanguage.English, logoUrl: String? = null, logoBytes: ByteArray? = null, logoMimeType: String? = null) =
-        InvoicePdfTemplateSettings(language, logoUrl, logoBytes, logoMimeType)
+        InvoicePdfTemplateSettings(language, Image(logoUrl, logoBytes, logoMimeType))
 
     private fun assertCommonText(result: String) {
         assertThat(result).contains("""${invoice.supplier.name} | ${invoice.supplier.address} | ${invoice.supplier.postalCode} ${invoice.supplier.city}""")
