@@ -26,13 +26,14 @@ import kotlin.io.path.readBytes
 
 @Path(CurrentVersion)
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_XML)
+@Produces(MediaType.APPLICATION_JSON)
 class InvoicingResource(
     private val service: InvoicingService
 ) {
 
     @Path("create")
     @POST
+    @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Create an e-invoice XML in format determined by format parameter")
     @Tag(name = "Create")
     fun createEInvoiceXml(invoice: Invoice, @QueryParam("format") format: EInvoiceFormat): Response =
@@ -40,6 +41,7 @@ class InvoicingResource(
 
     @Path("create/xrechnung")
     @POST
+    @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Create a XRechnung XML")
     @Tag(name = "Create")
     fun createXRechnung(invoice: Invoice): Response =
@@ -47,6 +49,7 @@ class InvoicingResource(
 
     @Path("create/facturx/xml")
     @POST
+    @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML (ZUGFeRD is a synonym for Factur-X)")
     @Tag(name = "Create")
     fun createFacturXXml(invoice: Invoice): Response =
@@ -117,7 +120,6 @@ class InvoicingResource(
 
     @Path("attach")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaTypePdf)
     @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
     @Tag(name = "Create - Attach")
@@ -129,7 +131,6 @@ class InvoicingResource(
 
 //    @Path("attach/xml")
 //    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
 //    @Produces(MediaTypePdf)
 //    @Operation(summary = "Attaches the invoice data as EN 16931 XML to a PDF file, combining them to a Factur-X / ZUGFeRD hybrid PDF with XML invoice file")
 //    @Tag(name = "Create - Attach")
@@ -144,7 +145,6 @@ class InvoicingResource(
     @Path("extract")
     @POST
     @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung file")
     @Tag(name = "Extract")
     suspend fun extractInvoiceDataFromPdf(pdfBytes: ByteArray) =
@@ -153,7 +153,6 @@ class InvoicingResource(
     @Path("extract")
     @POST
     @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "extractFromXML", summary = "Extract invoice data from a Factur-X / ZUGFeRD or XRechnung XML")
     @RequestBody(
         description = "The Factur-X/ZUGFeRD or XRechnung XML",
@@ -166,7 +165,6 @@ class InvoicingResource(
     @Path("extractXml")
     @POST
     @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "extractXmlFromPdf", summary = "Extract invoice XML from a Factur-X / ZUGFeRD PDF")
     @RequestBody(
         description = "The Factur-X/ZUGFeRD or XRechnung XML",
@@ -180,7 +178,6 @@ class InvoicingResource(
     @Path("validate")
     @POST
     @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD or XRechnung XML")
     @Tag(name = "Validate")
     fun validateInvoiceXml(invoiceXml: String) =
@@ -189,7 +186,6 @@ class InvoicingResource(
     @Path("validate")
     @POST
     @Consumes(MediaTypePdf, MediaType.APPLICATION_OCTET_STREAM) // TODO: remove MediaType.APPLICATION_OCTET_STREAM after migrating all clients
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Validate a Factur-X / ZUGFeRD PDF")
     @Tag(name = "Validate")
     fun validateInvoicePdf(pdfBytes: ByteArray) =
@@ -198,8 +194,6 @@ class InvoicingResource(
 
     @Path("calculateTotalAmounts")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Calculates invoice total amounts from invoice item prices")
     @Tag(name = "Tools - Calculate")
     fun calculateTotalAmounts(
