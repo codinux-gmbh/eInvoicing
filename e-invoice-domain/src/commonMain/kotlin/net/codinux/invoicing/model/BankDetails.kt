@@ -3,7 +3,7 @@ package net.codinux.invoicing.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-class BankDetails(
+data class BankDetails(
     /**
      * In the EU / SEPA area the IBAN
      */

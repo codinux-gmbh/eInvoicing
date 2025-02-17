@@ -3,7 +3,7 @@ package net.codinux.invoicing.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ChargeOrAllowance(
+data class ChargeOrAllowance(
     /**
      * Gesamtbetrag der Gebühr oder des Nachlasses.
      * Evtl. berechnet aus [basisAmount] und [calculationPercent].

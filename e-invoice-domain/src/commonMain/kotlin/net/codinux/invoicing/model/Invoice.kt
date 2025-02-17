@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
-class Invoice(
+data class Invoice( // we can also use class instead of data class, but then we need to implement copy() and equals() ourselves in order that everything still works
     val details: InvoiceDetails,
     val supplier: Party,
     val customer: Party,
@@ -38,11 +38,6 @@ class Invoice(
 ) {
     @get:JsonIgnore // used e.g. for filename to save invoice
     val shortDescription by lazy { "${details.invoiceDate.toDotSeparatedIsoDate()} ${details.invoiceNumber} ${customer.name}" }
-
-    fun copy(details: InvoiceDetails = this.details, supplier: Party = this.supplier, customer: Party = this.customer,
-             items: List<InvoiceItem> = this.items, customerReferenceNumber: String? = this.customerReferenceNumber,
-             amountAdjustments: AmountAdjustments? = this.amountAdjustments, totals: TotalAmounts? = this.totals) =
-        Invoice(details, supplier, customer, items, customerReferenceNumber, amountAdjustments, totals)
 
     override fun toString() = "$details to $customer ${totals?.duePayableAmount?.let { " (${it.toPlainString()})" } ?: ""}"
 }

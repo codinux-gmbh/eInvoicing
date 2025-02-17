@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.codes.Currency
 
 @Serializable
-class InvoiceDetails(
+data class InvoiceDetails(
     val invoiceNumber: String,
 
     /**
@@ -34,10 +34,5 @@ class InvoiceDetails(
     val dueDate: LocalDate? = null,
     val paymentDescription: String? = null,
 ) {
-    fun copy(invoiceNumber: String = this.invoiceNumber, invoiceDate: LocalDate = this.invoiceDate,
-             currency: Currency = this.currency, serviceDate: ServiceDate? = this.serviceDate,
-             dueDate: LocalDate? = this.dueDate, paymentDescription: String? = this.paymentDescription) =
-        InvoiceDetails(invoiceNumber, invoiceDate, currency, serviceDate, dueDate, paymentDescription)
-
     override fun toString() = "$invoiceDate $invoiceNumber"
 }

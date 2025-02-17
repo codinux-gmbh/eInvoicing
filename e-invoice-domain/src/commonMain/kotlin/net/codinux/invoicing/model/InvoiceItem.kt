@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import net.codinux.invoicing.model.codes.UnitOfMeasure
 
 @Serializable
-class InvoiceItem(
+data class InvoiceItem(
     val name: String,
     val quantity: BigDecimal,
     val unit: UnitOfMeasure,

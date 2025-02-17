@@ -3,7 +3,7 @@ package net.codinux.invoicing.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AmountAdjustments(
+data class AmountAdjustments(
     /**
      * Vorauszahlungen.
      */
