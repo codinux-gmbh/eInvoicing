@@ -21,7 +21,7 @@ class HtmlResource(
     @POST
     @Consumes(MediaType.TEXT_HTML)
     @Produces(MediaTypePdf)
-    @Operation(summary = "Create a PDF from supplied HTML")
+    @Operation(summary = "Converts the provided HTML to a PDF")
     @Tag(name = "Create")
     fun createPdfFromHtml(html: String): Response {
         val pdf = service.createPdfFromHtml(html)
