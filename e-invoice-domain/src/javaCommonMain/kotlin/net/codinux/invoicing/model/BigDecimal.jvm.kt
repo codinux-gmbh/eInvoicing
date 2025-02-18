@@ -65,6 +65,8 @@ actual class BigDecimal(
 
     actual fun toDouble(): Double = value.toDouble()
 
+    fun scale(): Int = value.scale()
+
     actual fun setScale(newScale: Int) = BigDecimal(value.setScale(newScale, RoundingMode.HALF_UP))
 
     actual fun toPlainString(): String = value.toPlainString()
