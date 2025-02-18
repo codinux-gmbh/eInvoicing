@@ -84,9 +84,9 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
 
     actual fun toPlainStringWithoutTrailingZeros(): String {
         val format = NSNumberFormatter().apply {
-            this.numberStyle = NSNumberFormatterDecimal
-            this.minimumFractionDigits = 0
-            this.maximumFractionDigits = 20
+            this.numberStyle = NSNumberFormatterDecimalStyle
+            this.minimumFractionDigits = 0.toNSUInteger()
+            this.maximumFractionDigits = 20.toNSUInteger()
         }
 
         return format.stringFromNumber(this.value)!!
