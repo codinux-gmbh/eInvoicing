@@ -51,8 +51,8 @@ class InvoicingService {
     suspend fun createFacturXPdf(invoice: Invoice, settings: InvoicePdfSettings): Result<Pdf> =
         pdfCreator.createFacturXPdf(invoice, settings)
 
-    suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings): Result<Pdf> =
-        pdfCreator.createFacturXPdf(invoiceXml, settings)
+    suspend fun createFacturXPdf(invoiceXml: String, settings: InvoicePdfSettings? = null): Result<Pdf> =
+        pdfCreator.createFacturXPdf(invoiceXml, settings ?: InvoicePdfSettings())
 
 
     fun createPdfFromHtml(html: String): Result<Pdf> =

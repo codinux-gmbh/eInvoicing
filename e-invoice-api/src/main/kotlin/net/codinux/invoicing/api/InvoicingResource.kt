@@ -72,8 +72,20 @@ class InvoicingResource(
     @Produces(MediaTypePdf)
     @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
     @Tag(name = "Create")
-    suspend fun createFacturXPdfFromInvoiceXml(dto: CreatePdfFromInvoiceXmlDto): Response {
-        val pdf = service.createFacturXPdf(dto.invoiceXml, dto.settings)
+    suspend fun createFacturXPdfFromInvoiceXml(dto: CreatePdfFromInvoiceXmlDto) =
+        createFacturXPdfFromInvoiceXml(dto.invoiceXml, dto.settings)
+
+    @Path("create/pdf/fromXml")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaTypePdf)
+    @Operation(summary = "Create a Factur-X / ZUGFeRD XML, transforms it to PDF and attaches before created XML to it")
+    @Tag(name = "Create")
+    suspend fun createFacturXPdfFromInvoiceXml(
+        @RestForm("invoiceXml") @PartType(MediaType.TEXT_PLAIN) invoiceXml: String,
+        @RestForm @PartType(MediaType.APPLICATION_JSON) settings: InvoicePdfSettings? = null
+    ): Response {
+        val pdf = service.createFacturXPdf(invoiceXml, settings)
 
         return createPdfResponse(pdf)
     }

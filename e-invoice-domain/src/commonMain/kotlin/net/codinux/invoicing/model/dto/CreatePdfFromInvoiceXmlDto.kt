@@ -6,7 +6,7 @@ import net.codinux.invoicing.pdf.InvoicePdfSettings
 @Serializable
 data class CreatePdfFromInvoiceXmlDto(
     val invoiceXml: String,
-    val settings: InvoicePdfSettings = InvoicePdfSettings()
+    val settings: InvoicePdfSettings? = null
 ) {
     override fun toString() = "$settings ${invoiceXml.substring(0, 250)}"
 }
