@@ -39,7 +39,7 @@ open class HandlebarsTemplateService : TemplateService {
         "data:${settings.logo?.imageMimeType ?: "image/png"};base64,${Base64.getEncoder().encodeToString(settings.logo?.imageBytes)}"
 
 
-    open class HelperSource(protected val language: InvoiceLanguage) {
+    open class HelperSource(protected val language: InvoiceLanguage) : TemplateFormatter {
 
         protected val locale = if (language == InvoiceLanguage.German) Locale.GERMAN else Locale.ENGLISH
 
@@ -51,22 +51,22 @@ open class HandlebarsTemplateService : TemplateService {
         protected open val currencyFormat = DecimalFormat.getCurrencyInstance(locale)
 
 
-        open fun formatDate(date: LocalDate): String = dateFormat.format(date.toJvmDate())
+        override fun formatDate(date: LocalDate): String = dateFormat.format(date.toJvmDate())
 
-        open fun formatPercent(percent: BigDecimal): String = percentFormat.format(percent.toJvmBigDecimal())
+        override fun formatPercent(percent: BigDecimal): String = percentFormat.format(percent.toJvmBigDecimal())
 
-        open fun formatCurrency(amount: BigDecimal?, currency: Currency): String = amount?.let {
+        override fun formatCurrency(amount: BigDecimal?, currency: Currency): String = amount?.let {
             currencyFormat.apply { this.currency = java.util.Currency.getInstance(currency.alpha3Code) }
                 .format(amount.toJvmBigDecimal())
         } ?: ""
 
-        open fun formatUnit(unit: UnitOfMeasure): String = unit.symbol ?: unit.englishName // TODO
+        override fun formatUnit(unit: UnitOfMeasure): String = unit.symbol ?: unit.englishName // TODO
 
-        open fun formatItemPosition(itemPosition: String?, itemIndex: Int): String = itemPosition ?: (itemIndex + 1).toString()
+        override fun formatItemPosition(itemPosition: String?, itemIndex: Int): String = itemPosition ?: (itemIndex + 1).toString()
 
-        open fun i18n(english: String, german: String): String = if (language == InvoiceLanguage.German) german else english
+        override fun i18n(english: String, german: String): String = if (language == InvoiceLanguage.German) german else english
 
-        open fun i18nArgs(english: String, german: String, args: Options): String {
+        override fun i18nArgs(english: String, german: String, args: Options): String {
             val stringTemplate = i18n(english, german)
 
             return String.format(stringTemplate, *args.params.drop(1).toTypedArray())
