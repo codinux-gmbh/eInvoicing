@@ -6,7 +6,7 @@ object Config {
 
     var InvoicingApiBaseUrl = "http://0.0.0.0:8091"
 
-    var InvoicingApiRootPath = "/invoicing/v1"
+    var InvoicingApiRootPath = "/invoicing/v0"
 
     var OsInfo = "${Platform.osName} ${Platform.osVersion}${Platform.cpuArchitecture?.let { " ($it)" } ?: ""}"
 
