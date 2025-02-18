@@ -3,10 +3,7 @@ package net.codinux.invoicing.pdf
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
-import net.codinux.invoicing.model.Image
-import net.codinux.invoicing.model.InvoiceLanguage
-import net.codinux.invoicing.model.LocalDate
-import net.codinux.invoicing.model.ServiceDate
+import net.codinux.invoicing.model.*
 import net.codinux.invoicing.test.DataGenerator
 import net.codinux.invoicing.test.TestUtils
 import java.text.DecimalFormat
@@ -263,10 +260,10 @@ class HandlebarsTemplateServiceTest {
             assertThat(result).contains("<td class=\"right-aligned\">${index + 1}</td>")
             assertThat(result).contains("<td>${item.articleNumber ?: ""}</td>")
             assertThat(result).contains("<td>${item.name}</td>")
-            assertThat(result).contains("<td class=\"right-aligned\">${item.quantity.toPlainString()}</td>")
+            assertThat(result).contains("<td class=\"right-aligned\">${item.quantity.toPlainStringWithoutTrailingZeros()}</td>")
             //            assertThat(result).contains("<td>${item.unit}</td>") // TODO: assert unit
             assertThat(result).contains("<td class=\"right-aligned\">${currencyFormat.format(item.unitPrice.toJvmBigDecimal())}</td>")
-            assertThat(result).contains("<td class=\"right-aligned\">${percentFormat.format(item.vatRate.toJvmBigDecimal())}</td>")
+            assertThat(result).contains("<td class=\"right-aligned\">${percentFormat.format((item.vatRate / BigDecimal(100)).toJvmBigDecimal())}</td>")
         }
     }
 
