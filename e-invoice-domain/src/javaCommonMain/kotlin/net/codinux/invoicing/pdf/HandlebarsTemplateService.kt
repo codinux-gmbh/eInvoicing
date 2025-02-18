@@ -6,7 +6,7 @@ import net.codinux.invoicing.model.Invoice
 import net.codinux.invoicing.model.InvoiceLanguage
 import java.util.*
 
-open class HandlebarsTemplateService(creator: TemplateFormatterCreator?) : TemplateService {
+open class HandlebarsTemplateService(creator: TemplateFormatterCreator? = null) : TemplateService {
 
     protected val handlebarsByLanguage = mapOf(
         InvoiceLanguage.English to Handlebars().registerHelpers(creator?.createFormatter(InvoiceLanguage.English) ?: TemplateFormatterHelperSource(InvoiceLanguage.English)),

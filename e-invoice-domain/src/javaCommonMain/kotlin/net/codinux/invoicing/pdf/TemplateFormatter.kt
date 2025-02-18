@@ -12,6 +12,8 @@ interface TemplateFormatter {
 
     fun formatPercent(percent: BigDecimal): String
 
+    fun formatQuantity(quantity: BigDecimal): String
+
     fun formatCurrency(amount: BigDecimal?, currency: Currency): String
 
     fun formatUnit(unit: UnitOfMeasure): String
