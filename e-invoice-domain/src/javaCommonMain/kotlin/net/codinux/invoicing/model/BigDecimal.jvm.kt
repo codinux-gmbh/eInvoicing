@@ -69,6 +69,8 @@ actual class BigDecimal(
 
     actual fun toPlainString(): String = value.toPlainString()
 
+    actual fun toPlainStringWithoutTrailingZeros(): String = value.stripTrailingZeros().toPlainString()
+
     actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)
 
     fun setScale(newScale: Int, roundingMode: RoundingMode = RoundingMode.UNNECESSARY) =

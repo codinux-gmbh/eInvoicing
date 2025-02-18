@@ -82,6 +82,16 @@ actual class BigDecimal(private val value: NSDecimalNumber) : Comparable<BigDeci
 
     actual fun toPlainString(): String = value.stringValue
 
+    actual fun toPlainStringWithoutTrailingZeros(): String {
+        val format = NSNumberFormatter().apply {
+            this.numberStyle = NSNumberFormatterDecimal
+            this.minimumFractionDigits = 0
+            this.maximumFractionDigits = 20
+        }
+
+        return format.stringFromNumber(this.value)!!
+    }
+
     fun toFixed(decimalPlaces: Int): String {
         val format = NSNumberFormatter().apply {
             this.locale = NSLocale(localeIdentifier = "en_US") // otherwise e.g. on German systems ',' would be used as decimal separator

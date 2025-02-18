@@ -46,6 +46,8 @@ expect class BigDecimal(value: String) : Comparable<BigDecimal> {
 
     fun toPlainString(): String
 
+    fun toPlainStringWithoutTrailingZeros(): String
+
     override fun compareTo(other: BigDecimal): Int
 
 }

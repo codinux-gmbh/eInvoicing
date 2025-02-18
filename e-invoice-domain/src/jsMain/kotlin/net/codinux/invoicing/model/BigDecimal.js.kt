@@ -47,6 +47,8 @@ actual class BigDecimal(private val value: BigJs) : Comparable<BigDecimal> {
 
     actual fun toPlainString(): String = value.valueOf()
 
+    actual fun toPlainStringWithoutTrailingZeros(): String = value.toString()
+
     actual override fun compareTo(other: BigDecimal): Int = value.cmp(other.value)
 
 

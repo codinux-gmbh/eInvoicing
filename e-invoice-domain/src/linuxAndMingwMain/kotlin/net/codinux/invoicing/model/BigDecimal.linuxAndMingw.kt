@@ -83,6 +83,8 @@ actual class BigDecimal(private val value: Double) : Comparable<BigDecimal> {
         trimmed
     }
 
+    actual fun toPlainStringWithoutTrailingZeros(): String = toPlainString()
+
     actual override fun compareTo(other: BigDecimal): Int = value.compareTo(other.value)
 
 

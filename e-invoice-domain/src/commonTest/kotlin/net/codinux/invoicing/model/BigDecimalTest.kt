@@ -79,6 +79,20 @@ class BigDecimalTest {
         assertThat(result).isEqualTo("12345.6789")
     }
 
+    @Test
+    fun toPlainStringWithoutTrailingZeros_NoScale() {
+        val result = BigDecimal("123.0000").toPlainStringWithoutTrailingZeros()
+
+        assertThat(result).isEqualTo("123")
+    }
+
+    @Test
+    fun toPlainStringWithoutTrailingZeros_Scale2() {
+        val result = BigDecimal("123.4500").toPlainStringWithoutTrailingZeros()
+
+        assertThat(result).isEqualTo("123.45")
+    }
+
 
     @Test
     fun toInt() {
