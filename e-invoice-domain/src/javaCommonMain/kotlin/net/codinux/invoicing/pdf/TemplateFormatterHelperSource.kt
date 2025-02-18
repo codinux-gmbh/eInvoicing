@@ -25,7 +25,7 @@ open class TemplateFormatterHelperSource(protected val language: InvoiceLanguage
 
     override fun formatDate(date: LocalDate): String = dateFormat.format(date.toJvmDate())
 
-    override fun formatPercent(percent: BigDecimal): String = percentFormat.format(percent.toJvmBigDecimal() / java.math.BigDecimal(100))
+    override fun formatPercent(percent: BigDecimal): String = percentFormat.format((percent / BigDecimal(100)).toJvmBigDecimal())
 
     override fun formatQuantity(quantity: BigDecimal): String = quantity.toJvmBigDecimal().stripTrailingZeros().toPlainString()
 
