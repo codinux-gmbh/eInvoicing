@@ -39,6 +39,8 @@ dependencies {
 
     compileOnly("org.mustangproject:library:$mustangVersion") // only required for documenting REST API
 
+    implementation("com.fasterxml.woodstox:woodstox-core:7.0.0") // suddenly and only in Docker container DocumentBuilderFactoryImpl hasn't been found anymore, adding woodstox fixes this
+
     implementation("net.codinux.log:klf:$klfVersion")
     implementation("net.codinux.log:quarkus-loki-log-appender:$lokiLogAppenderVersion")
     implementation("net.codinux.log.kubernetes:codinux-kubernetes-info-retriever:$lokiLogAppenderVersion")
