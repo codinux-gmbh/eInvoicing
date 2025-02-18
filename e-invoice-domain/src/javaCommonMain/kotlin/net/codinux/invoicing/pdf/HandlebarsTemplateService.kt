@@ -11,11 +11,11 @@ import java.time.format.FormatStyle
 import java.util.Base64
 import java.util.Locale
 
-open class HandlebarsTemplateService : TemplateService {
+open class HandlebarsTemplateService(creator: TemplateFormatterCreator?) : TemplateService {
 
     protected val handlebarsByLanguage = mapOf(
-        InvoiceLanguage.English to Handlebars().registerHelpers(HelperSource(InvoiceLanguage.English)),
-        InvoiceLanguage.German to Handlebars().registerHelpers(HelperSource(InvoiceLanguage.German))
+        InvoiceLanguage.English to Handlebars().registerHelpers(creator?.createFormatter(InvoiceLanguage.English) ?: HelperSource(InvoiceLanguage.English)),
+        InvoiceLanguage.German to Handlebars().registerHelpers(creator?.createFormatter(InvoiceLanguage.German) ?: HelperSource(InvoiceLanguage.German))
     )
 
 
