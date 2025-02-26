@@ -9,6 +9,9 @@ plugins {
     id("com.android.library")
 
     kotlin("plugin.serialization")
+
+
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
 
@@ -238,6 +241,9 @@ kotlin {
 
             dependencies {
                 implementation(npm("big.js", "6.2.2"))
+
+                implementation(npm("pdf-lib", "^1.17.1"))
+                implementation(npm(project.file("../js/PdfMetadataReaderWriter/")))
             }
         }
         val jsCommonTest by creating {
@@ -314,6 +320,53 @@ afterEvaluate { // below tasks are only available after evaluation
 
     tasks.named<Test>("testReleaseUnitTest") {
         useJUnitPlatform() // use JUnit 5 in Android ReleaseUnit tests, required for @ParameterizedTests
+    }
+}
+
+
+val isBunInstalled = checkIsBunInstalled()
+
+val buildJsPdfMetadataReaderWriter = if (isBunInstalled) {
+    tasks.register<Exec>("buildJsPdfMetadataReaderWriter") {
+        group = "build"
+        description = "Builds JS PdfMetadataReaderWriter files so that they can be imported by Kotlin/JS and Kotlin/WasmJS"
+
+        val frontendDir = project.layout.projectDirectory.dir("../js/PdfMetadataReaderWriter")
+        val distDir = frontendDir.dir("dist")
+
+        inputs.dir(frontendDir)
+        outputs.dir(distDir)
+
+        workingDir = frontendDir.asFile
+        commandLine("bun", "run", "build")
+    }
+} else {
+    tasks.register<com.github.gradle.node.npm.task.NpxTask>("buildJsPdfMetadataReaderWriter") {
+        dependsOn("npmInstall")
+        group = "build"
+        description = "Builds JS PdfMetadataReaderWriter files so that they can be imported by Kotlin/JS and Kotlin/WasmJS"
+
+        command.set("npm")
+        args.addAll("run", "build")
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinPackageJsonTask>().configureEach {
+    if (name.equals("jsPackageJson", ignoreCase = true) || name.equals("wasmJsPackageJson", ignoreCase = true)) {
+        dependsOn(buildJsPdfMetadataReaderWriter)
+    }
+}
+
+fun checkIsBunInstalled(): Boolean {
+    try {
+        val exitCode = ProcessBuilder()
+            .command("bun", "-h")
+            .start()
+            .waitFor()
+
+        return exitCode == 0
+    } catch (e: Throwable) { // if bun is not installed an exception gets thrown
+        return false
     }
 }
 

@@ -1,0 +1,32 @@
+{
+  "name": "pdfmetadatareaderwriter",
+  "version": "1.0.0",
+  "description": "My TypeScript library",
+  "main": "./dist/PdfReader.js",
+  "module": "./dist/PdfReader.mjs",
+  "types": "./dist/PdfReader.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "bun run build"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/PdfReader.mjs",
+      "require": "./dist/PdfReader.js"
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tsup": "^8.3.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}
