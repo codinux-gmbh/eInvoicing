@@ -5,7 +5,7 @@ export default defineConfig({
     minify: "esbuild",
     lib: {
       entry: "dist/index.js",
-      formats: ["es", "cjs"],
+      formats: ["es"],
     },
     rollupOptions: {
       output: {

@@ -2,6 +2,7 @@
   "name": "pdfmetadatareaderwriter",
   "version": "1.0.0",
   "description": "My TypeScript library",
+  "type": "module",
   "main": "./dist/PdfReader.js",
   "module": "./dist/PdfReader.mjs",
   "types": "./dist/PdfReader.d.ts",
