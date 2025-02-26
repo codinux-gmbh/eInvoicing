@@ -1,10 +1,13 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  // entry: ["src/index.ts"],
-  entry: ["src/PdfEmbeddedFile.ts", "src/PdfReader.ts"],
+  entry: {
+    index: "src/index.ts"
+  },
+  outDir: "dist",
   format: ["esm", "cjs"],
   dts: true,
   sourcemap: true,
-  clean: true
+  clean: true,
+  minify: false, // let Vite handle minification
 });
