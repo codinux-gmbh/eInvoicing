@@ -97,6 +97,8 @@ kotlin {
 
     val kotlinxSerializationVersion: String by project
 
+    val pdf4kVersion: String by project
+
     val mustangVersion: String by project
 
     val saxonVersion: String by project
@@ -139,6 +141,8 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
             implementation("io.github.pdvrieze.xmlutil:serialization:$xmlUtilVersion")
+
+            implementation("net.codinux.pdf:pdf4k:$pdf4kVersion")
 
             implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
             implementation("net.codinux.log:klf:$klfVersion")

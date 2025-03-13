@@ -19,6 +19,9 @@ object Constants {
         FacturXFilename, ZugferdFilename, XRechnungFilename // also "ZUGFeRD-invoice.xml" is found but we make compare case insensitive anyway
     )
 
+    fun isKnownEInvoiceXmlAttachmentName(filename: String): Boolean =
+        filename.lowercase() in KnownEInvoiceXmlAttachmentNames
+
 
     fun getProfileNameForFormat(format: EInvoiceFormat) = when (format) {
         EInvoiceFormat.FacturX, EInvoiceFormat.Zugferd -> FacturXProfileName
