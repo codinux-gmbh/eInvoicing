@@ -1,11 +1,15 @@
 package net.codinux.invoicing.reader
 
 import net.codinux.invoicing.config.DI
+import net.codinux.invoicing.pdf.Pdf4kPdfAttachmentReader
+import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.web.WebClient
 
 actual open class EInvoiceReader(
-    protected open val reader: WebServiceEInvoiceReader,
-    protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader()
+    protected open val webServiceReader: WebServiceEInvoiceReader,
+    protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader(),
+    protected open val attachmentReader: PdfAttachmentReader = Pdf4kPdfAttachmentReader(),
+    protected open val localEInvoiceReader: LocalOrWebServiceEInvoiceReader = LocalOrWebServiceEInvoiceReader(webServiceReader, attachmentReader),
 ) {
 
     actual constructor() : this(DI.DefaultWebClient)
@@ -17,9 +21,9 @@ actual open class EInvoiceReader(
         xmlReader.parseInvoiceXml(xml)
 
     actual open suspend fun extractFromPdf(pdfFile: ByteArray) =
-        reader.extractFromPdf(pdfFile)
+        webServiceReader.extractFromPdf(pdfFile)
 
     actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray) =
-        reader.extractXmlFromPdf(pdfFile)
+        localEInvoiceReader.extractXmlFromPdf(pdfFile)
 
 }
