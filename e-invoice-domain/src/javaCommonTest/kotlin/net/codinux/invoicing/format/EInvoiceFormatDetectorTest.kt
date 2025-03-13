@@ -3,6 +3,7 @@ package net.codinux.invoicing.format
 import assertk.assertThat
 import assertk.assertions.*
 import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.pdf.getFileAttachments
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.test.JavaTestPlatform
 import org.junit.jupiter.params.ParameterizedTest

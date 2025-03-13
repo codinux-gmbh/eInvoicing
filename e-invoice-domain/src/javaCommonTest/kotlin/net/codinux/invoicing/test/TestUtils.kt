@@ -2,6 +2,7 @@ package net.codinux.invoicing.test
 
 import net.codinux.invoicing.pdf.PdfAttachmentReader
 import net.codinux.invoicing.pdf.ResourceUtil
+import net.codinux.invoicing.pdf.getFileAttachments
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.invoicing.testfiles.*
 import org.junit.jupiter.api.Named

@@ -5,6 +5,7 @@ import net.codinux.invoicing.model.dto.SerializableException
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResult
 import net.codinux.invoicing.pdf.PdfAttachmentExtractionResultType
 import net.codinux.invoicing.pdf.PdfAttachmentReader
+import net.codinux.invoicing.pdf.getFileAttachments
 import net.codinux.invoicing.platform.JavaPlatform
 import net.codinux.log.logger
 import java.io.File
