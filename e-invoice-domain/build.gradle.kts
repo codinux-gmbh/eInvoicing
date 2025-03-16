@@ -313,6 +313,10 @@ kotlin {
 }
 
 
+tasks.withType<Test> {
+    maxHeapSize = "2G"
+}
+
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform() // use JUnit 5, required for @ParameterizedTests
 }
