@@ -9,7 +9,7 @@ actual open class EInvoiceReader(
     protected open val webServiceReader: WebServiceEInvoiceReader,
     protected open val xmlReader: EInvoiceXmlReader = EInvoiceXmlReader(),
     protected open val attachmentReader: PdfAttachmentReader = Pdf4kPdfAttachmentReader(),
-    protected open val localEInvoiceReader: LocalOrWebServiceEInvoiceReader = LocalOrWebServiceEInvoiceReader(webServiceReader, attachmentReader),
+    protected open val localEInvoiceReader: LocalOrWebServiceEInvoiceReader = LocalOrWebServiceEInvoiceReader(xmlReader, attachmentReader, webServiceReader),
 ) {
 
     actual constructor() : this(DI.DefaultWebClient)
@@ -21,7 +21,7 @@ actual open class EInvoiceReader(
         xmlReader.parseInvoiceXml(xml)
 
     actual open suspend fun extractFromPdf(pdfFile: ByteArray) =
-        webServiceReader.extractFromPdf(pdfFile)
+        localEInvoiceReader.extractFromPdf(pdfFile)
 
     actual open suspend fun extractXmlFromPdf(pdfFile: ByteArray) =
         localEInvoiceReader.extractXmlFromPdf(pdfFile)
