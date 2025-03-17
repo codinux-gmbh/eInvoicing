@@ -63,6 +63,24 @@ class PdfBoxPdfAttachmentWriterTest {
         assertThat(result.validationErrors).isEmpty()
     }
 
+    @Test
+    fun containsAlreadyEmbeddedEInvoice_addEInvoice_PreviousEInvoiceGetsRemoved() {
+        val format = EInvoiceFormat.FacturX
+        val xmlContent = TestData.FacturXXml
+        val pdfPath = TestUtils.getTestFile("ZUGFeRD.pdf")
+        val pdfBytes = pdfPath.readBytes()
+
+        val destination = pdfPath.parent.parent.resolve("tmp").also { Files.createDirectories(it) }.resolve("AddAttachmentResult.pdf")
+        destination.deleteIfExists()
+
+
+        underTest.addFileAttachment(pdfBytes, format, xmlContent, destination.outputStream())
+
+
+        val embeddedFiles = reader.getFileAttachments(destination.inputStream())
+        assertThat(embeddedFiles.attachments).hasSize(1)
+    }
+
 
     private fun getTestFile(filename: String) = TestUtils.getInvalidInvoiceFileAsStream(filename)
 

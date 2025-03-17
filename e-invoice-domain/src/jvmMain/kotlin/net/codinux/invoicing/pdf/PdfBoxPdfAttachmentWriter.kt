@@ -1,9 +1,11 @@
 package net.codinux.invoicing.pdf
 
+import net.codinux.invoicing.config.Constants
 import net.codinux.invoicing.format.EInvoiceFormat
 import net.codinux.log.logger
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.cos.COSArray
+import org.apache.pdfbox.cos.COSDictionary
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.cos.COSObject
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -94,6 +96,7 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         }
 
         val afArray = getAssociatedFilesArray(document)
+        removeExistingEmbeddedEInvoices(afArray) // per Factur-X standard only one embedded e-invoice per PDF file is permitted
         afArray.add(fileSpecificationDictionary)
 
         return fileSpecificationDictionary
@@ -120,6 +123,21 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         }
     }
 
+    /**
+     * Per Factur-X standard only one embedded e-invoice per PDF file is permitted. So find already embedded
+     * e-invoices and remove them.
+     */
+    protected open fun removeExistingEmbeddedEInvoices(associatedFiles: COSArray) {
+        val alreadyEmbeddedEInvoices = associatedFiles.filter {
+            val fileDict = if (it.isDirect) it as? COSDictionary
+                            else (it as COSObject).`object` as COSDictionary
+            fileDict != null && (Constants.isKnownEInvoiceXmlAttachmentName(fileDict.getString(COSName.F)) ||
+                Constants.isKnownEInvoiceXmlAttachmentName(fileDict.getString(COSName.UF)))
+        }
+
+        associatedFiles.removeAll(alreadyEmbeddedEInvoices)
+    }
+
     protected open fun addInvoiceXmlToEmbeddedFilesDictionary(document: PDDocument, fileSpec: PDComplexFileSpecification) {
         val catalog = document.documentCatalog
         val names = catalog.names ?: PDDocumentNameDictionary(document.documentCatalog).apply {
@@ -132,7 +150,12 @@ open class PdfBoxPdfAttachmentWriter : PdfAttachmentWriter {
         // embeddedFiles.names returned UnmodifiableMap, therefore embeddedFiles.names?.toMutableMap() did not work
         val fileMap = mutableMapOf<String, PDComplexFileSpecification>().apply {
             embeddedFiles.names?.let {
-                it.forEach { (name, fileSpec) -> this.put(name.toString(), fileSpec) }
+                it.forEach { (name, fileSpec) ->
+                    // per Factur-X standard only one embedded e-invoice per PDF file is permitted. So filter out already embedded e-invoices
+                    if (Constants.isKnownEInvoiceXmlAttachmentName(name) == false) {
+                        this.put(name.toString(), fileSpec)
+                    }
+                }
             }
         }
 
