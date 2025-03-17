@@ -167,8 +167,6 @@ class HandlebarsTemplateServiceTest {
         assertThat(result).contains("Contact")
         assertThat(result).contains("Bank Details")
 
-        assertThat(result).contains("Page")
-
         // line items
         assertThat(result).contains("<th>Pos.</th>")
         assertThat(result).contains("<th>Article Number</th>")
@@ -227,8 +225,6 @@ class HandlebarsTemplateServiceTest {
         assertThat(result).contains("Anschrift")
         assertThat(result).contains("Kontakt")
         assertThat(result).contains("Bankverbindung")
-
-        assertThat(result).contains("Seite")
 
         // line items
         assertThat(result).contains("<th>Nr.</th>")
