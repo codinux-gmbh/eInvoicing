@@ -13,7 +13,7 @@ throughout the documentation and code.
 ### Gradle
 
 ```
-implementation("net.codinux.invoicing:e-invoice:0.8.0")
+implementation("net.codinux.invoicing:e-invoice:0.8.1")
 ```
 
 ### Android
