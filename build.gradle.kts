@@ -30,6 +30,9 @@ allprojects {
 
 
     repositories {
+        maven {
+            setUrl("https://maven.dankito.net/api/packages/codinux/maven")
+        }
         mavenCentral()
         google()
         mavenLocal()
